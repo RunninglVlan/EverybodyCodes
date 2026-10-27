@@ -19,9 +19,12 @@ var scales = input.Split(Environment.NewLine).Select(it => {
     int[] colorValues = [.. colorComponents.Select(ToValue)];
     return new Scale(id, colorValues);
 });
-int sumOfIds = scales.Where(Scale.IsGreenDominant).Sum(it => it.Id);
-Console.WriteLine(sumOfIds);
+Console.WriteLine(SumOfGreenDominantScales());
 return;
+
+int SumOfGreenDominantScales() {
+    return scales.Where(Scale.IsGreenDominant).Sum(it => it.Id);
+}
 
 int ToValue(string component) {
     char[] binary = [.. component.Select(it => char.IsUpper(it) ? '1' : '0')];
