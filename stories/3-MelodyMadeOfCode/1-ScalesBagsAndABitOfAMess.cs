@@ -27,16 +27,17 @@ int SumOfGreenDominantScales() {
 }
 
 int DarkestShinyScale() {
-    int maxShine = scales.Max(it => it.ColorValues[Scale.SHINE]);
+    int maxShine = scales.Max(it => it.Shine);
     var darkestShinyScale = scales
-            .Where(it => it.ColorValues[Scale.SHINE] == maxShine)
+            .Where(it => it.Shine == maxShine)
             .MinBy(it => it.ColorValues.SkipLast(1).Sum());
     return darkestShinyScale.Id;
 }
 
 readonly record struct Scale(int Id, int[] ColorValues) {
-    const int GREEN = 1;
-    public const int SHINE = 3;
+    const int GREEN = 1, SHINE = 3;
+
+    public int Shine => ColorValues[SHINE];
 
     public static int ToValue(string color) {
         char[] binary = [.. color.Select(it => char.IsUpper(it) ? '1' : '0')];
