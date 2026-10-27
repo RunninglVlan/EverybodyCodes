@@ -6,10 +6,10 @@ using System.Linq;
 const string inputFile = "../../Input.txt";
 string input = File.ReadAllText(inputFile);
 const string inputExample = """
-                            2456:rrrrrr ggGgGG bbbbBB
-                            7689:rrRrrr ggGggg bbbBBB
-                            3145:rrRrRr gggGgg bbbbBB
-                            6710:rrrRRr ggGGGg bbBBbB
+                            2456:rrrrrr ggGgGG bbbbBB sSsSsS
+                            7689:rrRrrr ggGggg bbbBBB ssSSss
+                            3145:rrRrRr gggGgg bbbbBB sSsSsS
+                            6710:rrrRRr ggGGGg bbBBbB ssSSss
                             """;
 // input = inputExample;
 var scales = input.Split(Environment.NewLine).Select(it => {
@@ -19,11 +19,19 @@ var scales = input.Split(Environment.NewLine).Select(it => {
     int[] colorValues = [.. colorComponents.Select(ToValue)];
     return new Scale(id, colorValues);
 });
-Console.WriteLine(SumOfGreenDominantScales());
+Console.WriteLine(DarkestShinyScale());
 return;
 
 int SumOfGreenDominantScales() {
     return scales.Where(Scale.IsGreenDominant).Sum(it => it.Id);
+}
+
+int DarkestShinyScale() {
+    int maxShininess = scales.Max(it => it.ColorValues[Scale.SHININESS]);
+    var darkestShinyScale = scales
+            .Where(it => it.ColorValues[Scale.SHININESS] == maxShininess)
+            .MinBy(it => it.ColorValues.SkipLast(1).Sum());
+    return darkestShinyScale.Id;
 }
 
 int ToValue(string component) {
@@ -33,6 +41,7 @@ int ToValue(string component) {
 
 readonly record struct Scale(int Id, int[] ColorValues) {
     const int GREEN = 1;
+    public const int SHININESS = 3;
 
     public static bool IsGreenDominant(Scale scale) {
         var dominantColor = scale.ColorValues
