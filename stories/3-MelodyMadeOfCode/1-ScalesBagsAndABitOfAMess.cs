@@ -27,9 +27,9 @@ int SumOfGreenDominantScales() {
 }
 
 int DarkestShinyScale() {
-    int maxShininess = scales.Max(it => it.ColorValues[Scale.SHININESS]);
+    int maxShine = scales.Max(it => it.ColorValues[Scale.SHINE]);
     var darkestShinyScale = scales
-            .Where(it => it.ColorValues[Scale.SHININESS] == maxShininess)
+            .Where(it => it.ColorValues[Scale.SHINE] == maxShine)
             .MinBy(it => it.ColorValues.SkipLast(1).Sum());
     return darkestShinyScale.Id;
 }
@@ -41,7 +41,7 @@ int ToValue(string component) {
 
 readonly record struct Scale(int Id, int[] ColorValues) {
     const int GREEN = 1;
-    public const int SHININESS = 3;
+    public const int SHINE = 3;
 
     public static bool IsGreenDominant(Scale scale) {
         var dominantColor = scale.ColorValues
