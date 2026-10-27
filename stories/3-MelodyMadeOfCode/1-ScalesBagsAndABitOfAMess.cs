@@ -16,7 +16,7 @@ var scales = input.Split(Environment.NewLine).Select(it => {
     string[] scaleParts = it.Split(':');
     int id = int.Parse(scaleParts.First());
     string[] colorComponents = scaleParts.Last().Split(' ');
-    int[] colorValues = [.. colorComponents.Select(ToValue)];
+    int[] colorValues = [.. colorComponents.Select(Scale.ToValue)];
     return new Scale(id, colorValues);
 });
 Console.WriteLine(DarkestShinyScale());
@@ -34,14 +34,14 @@ int DarkestShinyScale() {
     return darkestShinyScale.Id;
 }
 
-int ToValue(string component) {
-    char[] binary = [.. component.Select(it => char.IsUpper(it) ? '1' : '0')];
-    return Convert.ToInt32(new string(binary), 2);
-}
-
 readonly record struct Scale(int Id, int[] ColorValues) {
     const int GREEN = 1;
     public const int SHINE = 3;
+
+    public static int ToValue(string color) {
+        char[] binary = [.. color.Select(it => char.IsUpper(it) ? '1' : '0')];
+        return Convert.ToInt32(new string(binary), 2);
+    }
 
     public static bool IsGreenDominant(Scale scale) {
         var dominantColor = scale.ColorValues
