@@ -6,26 +6,27 @@ using System.Linq;
 const string inputFile = "Input.txt";
 string input = File.ReadAllText(inputFile);
 int[] outpostPineCones = [.. input.Split(',').Select(int.Parse)];
-Console.WriteLine(RequiredPineCones());
+Console.WriteLine(RequiredPineCones(new Formation(1)));
 return;
 
-int RequiredPineCones() {
+int RequiredPineCones(Formation formation) {
     var required = 0;
-    var squareNumber = 0;
-    int square = NextSquare();
     foreach (int pineCones in outpostPineCones) {
-        if (pineCones == square) {
+        if (pineCones == formation.Value) {
             continue;
         }
-        while (pineCones > square) {
-            square = NextSquare();
+        while (pineCones > formation.Value) {
+            formation.Next();
         }
-        required += square - pineCones;
+        required += formation.Value - pineCones;
     }
     return required;
+}
 
-    int NextSquare() {
-        squareNumber++;
-        return squareNumber * squareNumber;
-    }
+class Formation(int start) {
+    int counter = start;
+
+    public int Value => counter * counter;
+
+    public void Next() => counter++;
 }
