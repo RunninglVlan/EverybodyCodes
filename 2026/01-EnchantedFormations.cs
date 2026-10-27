@@ -25,22 +25,22 @@ int RequiredPineCones(Formation formation) {
 }
 
 abstract class Formation(int start) {
-    protected int counter = start;
+    protected int size = start;
     public abstract int Value { get; }
 
-    public void Next() => counter++;
+    public void Next() => size++;
 }
 
 class FilledSquare() : Formation(1) {
-    public override int Value => counter * counter;
+    public override int Value => size * size;
 }
 
 class SquareFrame() : Formation(3) {
     public override int Value {
         get {
-            int filled = counter * counter;
-            int emptyCounter = counter - 2;
-            int empty = emptyCounter * emptyCounter;
+            int filled = size * size;
+            int emptySize = size - 2;
+            int empty = emptySize * emptySize;
             return filled - empty;
         }
     }
