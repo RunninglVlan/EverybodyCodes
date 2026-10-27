@@ -12,20 +12,29 @@ const string inputExample = """
                             6710:rrrRRr ggGGGg bbBBbB
                             """;
 // input = inputExample;
-var sumOfIdentifiers = 0;
-foreach (string scaleData in input.Split(Environment.NewLine)) {
-    string[] scaleParts = scaleData.Split(':');
-    int identifier = int.Parse(scaleParts.First());
+var scales = input.Split(Environment.NewLine).Select(it => {
+    string[] scaleParts = it.Split(':');
+    int id = int.Parse(scaleParts.First());
     string[] colorComponents = scaleParts.Last().Split(' ');
     int[] colorValues = [.. colorComponents.Select(ToValue)];
-    if (colorValues.Select((it, i) => (value: it, i)).MaxBy(it => it.value).i == 1) {
-        sumOfIdentifiers += identifier;
-    }
-}
-Console.WriteLine(sumOfIdentifiers);
+    return new Scale(id, colorValues);
+});
+int sumOfIds = scales.Where(Scale.IsGreenDominant).Sum(it => it.Id);
+Console.WriteLine(sumOfIds);
 return;
 
 int ToValue(string component) {
     char[] binary = [.. component.Select(it => char.IsUpper(it) ? '1' : '0')];
     return Convert.ToInt32(new string(binary), 2);
+}
+
+readonly record struct Scale(int Id, int[] ColorValues) {
+    const int GREEN = 1;
+
+    public static bool IsGreenDominant(Scale scale) {
+        var dominantColor = scale.ColorValues
+                .Select((it, i) => (value: it, i))
+                .MaxBy(it => it.value);
+        return dominantColor.i == GREEN;
+    }
 }
