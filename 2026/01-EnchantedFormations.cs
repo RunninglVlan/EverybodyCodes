@@ -5,8 +5,9 @@ using System.Linq;
 // https://everybody.codes/event/2026/quests/1
 const string inputFile = "Input.txt";
 string input = File.ReadAllText(inputFile);
+// input = "3,11,12,16,24,25";
 int[] outpostPineCones = [.. input.Split(',').Select(int.Parse)];
-Console.WriteLine(RequiredPineCones(new Formation(1)));
+Console.WriteLine(RequiredPineCones(new SquareFrame()));
 return;
 
 int RequiredPineCones(Formation formation) {
@@ -23,10 +24,24 @@ int RequiredPineCones(Formation formation) {
     return required;
 }
 
-class Formation(int start) {
-    int counter = start;
-
-    public int Value => counter * counter;
+abstract class Formation(int start) {
+    protected int counter = start;
+    public abstract int Value { get; }
 
     public void Next() => counter++;
+}
+
+class FilledSquare() : Formation(1) {
+    public override int Value => counter * counter;
+}
+
+class SquareFrame() : Formation(3) {
+    public override int Value {
+        get {
+            int filled = counter * counter;
+            int emptyCounter = counter - 2;
+            int empty = emptyCounter * emptyCounter;
+            return filled - empty;
+        }
+    }
 }
