@@ -5,12 +5,7 @@ using System.Linq;
 // https://everybody.codes/story/3/quests/1
 const string inputFile = "../../Input.txt";
 string input = File.ReadAllText(inputFile);
-const string inputExample = """
-                            2456:rrrrrr ggGgGG bbbbBB sSsSsS
-                            7689:rrRrrr ggGggg bbbBBB ssSSss
-                            3145:rrRrRr gggGgg bbbbBB sSsSsS
-                            6710:rrrRRr ggGGGg bbBBbB ssSSss
-                            """;
+const string inputExample = "15437:rRrrRR gGGGGG BBBBBB sSSSSS";
 // input = inputExample;
 var scales = input.Split(Environment.NewLine).Select(it => {
     string[] scaleParts = it.Split(':');
@@ -19,7 +14,7 @@ var scales = input.Split(Environment.NewLine).Select(it => {
     int[] colorValues = [.. colorComponents.Select(Scale.ToValue)];
     return new Scale(id, colorValues);
 });
-Console.WriteLine(DarkestShinyScale());
+Console.WriteLine(LargestGroupOfSimilarScales());
 return;
 
 int SumOfGreenDominantScales() {
@@ -34,10 +29,26 @@ int DarkestShinyScale() {
     return darkestShinyScale.Id;
 }
 
+int LargestGroupOfSimilarScales() {
+    return scales
+            .Where(it => it.Matte || it.Shiny)
+            .Select(it => (scale: it, maxColor: it.ColorValues.SkipLast(1).Max()))
+            .Where(it => it.scale.ColorValues.Count(value => value == it.maxColor) == 1)
+            .Select(it => {
+                int dominantColor = it.scale.ColorValues.IndexOf(it.maxColor);
+                return (id: it.scale.Id, dominantColor, matte: it.scale.Matte);
+            })
+            .GroupBy(it => (it.dominantColor, it.matte))
+            .MaxBy(it => it.Count())!
+            .Sum(it => it.id);
+}
+
 readonly record struct Scale(int Id, int[] ColorValues) {
     const int GREEN = 1, SHINE = 3;
 
     public int Shine => ColorValues[SHINE];
+    public bool Matte => Shine <= 30;
+    public bool Shiny => Shine >= 33;
 
     public static int ToValue(string color) {
         char[] binary = [.. color.Select(it => char.IsUpper(it) ? '1' : '0')];
