@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 
+Test.From = "Part III Example 1";
+Test.Until = "Part III Example 2";
 // https://everybody.codes/story/3/quests/2
 const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
@@ -7,16 +9,22 @@ var part = 2;
 var grid = new Grid();
 Test.Run((notes, part, expected) => {
     grid.Read(notes);
-    Assert.ActualEqualsExpected(grid.CountSteps(part == 1 ? ReachVocalBone() : SurroundVocalBone()), expected);
+    int steps = grid.CountSteps(part switch {
+        1 => ReachVocalBone(),
+        2 => SurroundVocalBone(),
+        _ => SurroundVocalBones()
+    });
+    Assert.ActualEqualsExpected(steps, expected);
 });
 return;
 
 Part ReachVocalBone() => new(cell => IsEmpty(cell) || IsVocalBone(cell), IsVocalBone);
 Part SurroundVocalBone() => new(IsEmpty, grid.SurroundedVocalBone);
+Part SurroundVocalBones() => new(IsEmpty, grid.SurroundedVocalBones, 3);
 bool IsEmpty(char cell) => cell == Cells.EMPTY;
 bool IsVocalBone(char cell) => cell == Cells.VOCAL_BONE;
 
-readonly record struct Part(Predicate<char> IsValid, Predicate<char> IsEnd);
+readonly record struct Part(Predicate<char> IsValid, Predicate<char> IsEnd, int Times = 1);
 
 class Grid {
     static readonly Point[] DIRECTIONS = [Screen.UP, Screen.RIGHT, Screen.DOWN, Screen.LEFT];
@@ -45,17 +53,19 @@ class Grid {
         var steps = 0;
         while (true) {
             foreach (var direction in DIRECTIONS) {
-                var next = current + direction;
-                char nextCell = cells.GetValueOrDefault(next, Cells.EMPTY);
-                if (!part.IsValid(nextCell)) {
-                    continue;
-                }
-                cells[next] = Cells.SOUND_WAVE;
-                current = next;
-                steps++;
-                FillSurrounded(current);
-                if (part.IsEnd(nextCell)) {
-                    return steps;
+                for (var _ = 0; _ < part.Times; _++) {
+                    var next = current + direction;
+                    char nextCell = cells.GetValueOrDefault(next, Cells.EMPTY);
+                    if (!part.IsValid(nextCell)) {
+                        continue;
+                    }
+                    cells[next] = Cells.SOUND_WAVE;
+                    current = next;
+                    steps++;
+                    FillSurrounded(current);
+                    if (part.IsEnd(nextCell)) {
+                        return steps;
+                    }
                 }
             }
         }
@@ -74,6 +84,11 @@ class Grid {
     public bool SurroundedVocalBone(char _) {
         var vocalBone = cells.First(it => it.Value == Cells.VOCAL_BONE).Key;
         return Surrounded(vocalBone);
+    }
+
+    public bool SurroundedVocalBones(char _) {
+        var vocalBones = cells.Where(it => it.Value == Cells.VOCAL_BONE);
+        return vocalBones.All(it => Surrounded(it.Key));
     }
 
     bool Surrounded(Point point) {
