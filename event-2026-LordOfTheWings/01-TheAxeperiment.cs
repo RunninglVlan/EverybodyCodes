@@ -16,25 +16,10 @@ return;
 // Orders alloys from hardest to softest
 long AlloyNumber(string group) {
     var alloyPairs = group.Split(' ').Select(AlloyPair.From).ToArray();
-    HashSet<char> alloys = [];
-    foreach ((char harder, char softer) in alloyPairs) {
-        alloys.Add(harder);
-        alloys.Add(softer);
-    }
+    HashSet<char> alloys = [.. alloyPairs.SelectMany(it => it.All())];
     var number = string.Empty;
     while (alloys.Count > 0) {
-        var hardest = '\0';
-        foreach (char alloy in alloys) {
-            var harderThanCount = 0;
-            foreach ((char harder, char softer) in alloyPairs) {
-                if (alloy == softer && !number.Contains(harder)) {
-                    harderThanCount++;
-                }
-            }
-            if (harderThanCount == 0) {
-                hardest = alloy;
-            }
-        }
+        char hardest = alloys.First(alloy => !alloyPairs.Any(it => alloy == it.Softer && !number.Contains(it.Harder)));
         number += hardest;
         alloys.Remove(hardest);
     }
@@ -44,5 +29,10 @@ long AlloyNumber(string group) {
 readonly record struct AlloyPair(char Harder, char Softer) {
     public static AlloyPair From(string pair) {
         return pair.Contains('<') ? new AlloyPair(pair[2], pair[0]) : new AlloyPair(pair[0], pair[2]);
+    }
+
+    public IEnumerable<char> All() {
+        yield return Harder;
+        yield return Softer;
     }
 }
