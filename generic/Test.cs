@@ -5,19 +5,13 @@ static class Test {
     const string LOG_FILE = "../Test.Log.txt";
 
     static readonly TextReader consoleIn = Console.In;
-    public static bool StepEnabled { get; set; }
+    public static bool StepEnabled { get; set; } = true;
     public static string? From { get; set; }
     public static string? Until { get; set; }
 
     public static void Run(Action<string, int, int> action) {
         File.WriteAllText(LOG_FILE, null);
-        string cases = File.ReadAllText(CASE_FILE);
-        if (From != null) {
-            cases = cases[cases.IndexOf(From, StringComparison.Ordinal)..];
-        }
-        if (Until != null) {
-            cases = cases[..cases.IndexOf(Until, StringComparison.Ordinal)];
-        }
+        string cases = ReadCases();
         Console.SetIn(new StringReader(cases));
         var totalTime = 0L;
         while (Console.In.Peek() != -1) {
@@ -38,15 +32,35 @@ static class Test {
             Log(console: true);
         }
         Log($"All tests took {totalTime}ms", console: true);
-        return;
+    }
 
-        static string ReadUntilNewLine() {
-            List<string> lines = [];
-            for (string line; !string.IsNullOrEmpty(line = Console.ReadLine()!);) {
-                lines.Add(line);
+    static string ReadCases() {
+        string cases = File.ReadAllText(CASE_FILE);
+        string[] lines = cases.ReplaceLineEndings(Environment.NewLine).Split(Environment.NewLine);
+        if (From != null) {
+            int start = Array.IndexOf(lines, From);
+            if (start < 0) {
+                throw new InvalidOperationException($"Line '{From}' not found");
             }
-            return string.Join(Environment.NewLine, lines);
+            lines = lines[start..];
         }
+        if (Until != null) {
+            int end = Array.IndexOf(lines, Until);
+            if (end < 0) {
+                throw new InvalidOperationException($"Line '{Until}' not found");
+            }
+            lines = lines[..end];
+        }
+        cases = string.Join(Environment.NewLine, lines);
+        return cases;
+    }
+
+    static string ReadUntilNewLine() {
+        List<string> lines = [];
+        for (string line; !string.IsNullOrEmpty(line = Console.ReadLine()!);) {
+            lines.Add(line);
+        }
+        return string.Join(Environment.NewLine, lines);
     }
 
     public static void Step() {
