@@ -15,8 +15,7 @@ const string inputExample = """
 // input = inputExample;
 var grid = new Grid();
 grid.Read(input);
-int steps = grid.ReachVocalBone();
-Console.WriteLine(steps);
+Console.WriteLine(grid.CountSteps(grid.ReachedVocalBone));
 
 class Grid {
     static readonly Point[] DIRECTIONS = [Screen.UP, Screen.RIGHT, Screen.DOWN, Screen.LEFT];
@@ -38,13 +37,13 @@ class Grid {
         }
     }
 
-    public int ReachVocalBone() {
+    public int CountSteps(Predicate<Point> endPredicate) {
         var current = soundSource;
         HashSet<Point> steps = [current];
         while (true) {
             foreach (var direction in DIRECTIONS) {
                 var next = current + direction;
-                if (next == vocalBone) {
+                if (endPredicate(next)) {
                     return steps.Count;
                 }
                 if (steps.Add(next)) {
@@ -53,6 +52,8 @@ class Grid {
             }
         }
     }
+
+    public bool ReachedVocalBone(Point next) => next == vocalBone;
 }
 
 static class Cells {
