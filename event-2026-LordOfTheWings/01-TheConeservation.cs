@@ -1,8 +1,5 @@
-﻿using System;
-using System.IO;
-using System.Linq;
+﻿// https://everybody.codes/event/2026/quests/1
 
-// https://everybody.codes/event/2026/quests/1
 const string inputFile = "Input.txt";
 string input = File.ReadAllText(inputFile);
 const string inputExample = "3,11,12,16,24,25";
