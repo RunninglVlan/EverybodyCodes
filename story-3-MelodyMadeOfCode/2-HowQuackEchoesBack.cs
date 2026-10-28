@@ -1,6 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿// https://everybody.codes/story/3/quests/2
 
-// https://everybody.codes/story/3/quests/2
 const string inputFile = "../Input.txt";
 string input = File.ReadAllText(inputFile);
 const string inputExample = """
@@ -15,50 +14,63 @@ const string inputExample = """
 // input = inputExample;
 var grid = new Grid();
 grid.Read(input);
-Console.WriteLine(grid.CountSteps(grid.ReachedVocalBone));
+Console.WriteLine(grid.CountSteps(Predicates.ReachVocalBone()));
+
+readonly record struct Predicates(Predicate<char> IsValid, Predicate<char> IsEnd) {
+    public static Predicates ReachVocalBone() {
+        return new Predicates(cell => cell == Cells.EMPTY || IsVocalBone(cell), IsVocalBone);
+    }
+
+    static bool IsVocalBone(char cell) => cell == Cells.VOCAL_BONE;
+}
 
 class Grid {
     static readonly Point[] DIRECTIONS = [Screen.UP, Screen.RIGHT, Screen.DOWN, Screen.LEFT];
 
-    Point soundSource, vocalBone;
+    readonly Dictionary<Point, char> cells = [];
 
-    [SuppressMessage("ReSharper", "ConvertIfStatementToSwitchStatement")]
     public void Read(string input) {
         string[] rows = input.Split(Environment.NewLine);
         int width = rows[0].Length, height = rows.Length;
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < width; x++) {
-                if (rows[y][x] == Cells.SOUND_SOURCE) {
-                    soundSource = new Point(x, y);
-                } else if (rows[y][x] == Cells.VOCAL_BONE) {
-                    vocalBone = new Point(x, y);
+                char cell = rows[y][x];
+                if (cell is not (Cells.SOUND_SOURCE or Cells.VOCAL_BONE)) {
+                    continue;
                 }
+                cells.Add(new Point(x, y), cell);
             }
         }
     }
 
-    public int CountSteps(Predicate<Point> endPredicate) {
+    public int CountSteps(Predicates predicates) {
+        var soundSource = cells.First(it => it.Value == Cells.SOUND_SOURCE).Key;
+        cells[soundSource] = Cells.SOUND_WAVE;
         var current = soundSource;
-        HashSet<Point> steps = [current];
+        var steps = 0;
         while (true) {
             foreach (var direction in DIRECTIONS) {
                 var next = current + direction;
-                if (endPredicate(next)) {
-                    return steps.Count;
+                char nextCell = cells.GetValueOrDefault(next, Cells.EMPTY);
+                if (!predicates.IsValid(nextCell)) {
+                    continue;
                 }
-                if (steps.Add(next)) {
-                    current = next;
+                cells[next] = Cells.SOUND_WAVE;
+                current = next;
+                steps++;
+                if (predicates.IsEnd(nextCell)) {
+                    return steps;
                 }
             }
         }
     }
-
-    public bool ReachedVocalBone(Point next) => next == vocalBone;
 }
 
 static class Cells {
+    public const char EMPTY = '.';
     public const char SOUND_SOURCE = '@';
     public const char VOCAL_BONE = '#';
+    public const char SOUND_WAVE = '+';
 }
 
 readonly record struct Point(int X, int Y) {
