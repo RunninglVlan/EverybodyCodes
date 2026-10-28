@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 
-Test.StepEnabled = false;
-// Test.From = "Part II Example";
-Test.Until = "Part III Example 3";
+// Test.StepEnabled = false;
+// Test.From = "Part III";
+// Test.Until = "Part II";
 // https://everybody.codes/story/3/quests/2
 const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
@@ -44,6 +44,9 @@ class Grid {
                 }
                 cells.Add(new Point(x, y), cell);
             }
+        }
+        foreach (var bone in cells.Where(it => it.Value == Cells.VOCAL_BONE).Select(it => it.Key).ToArray()) {
+            FillSurrounded(bone);
         }
     }
 
@@ -100,11 +103,11 @@ class Grid {
         int obstacles = DIRECTIONS
                 .Select(it => cells.GetValueOrDefault(point + it, Cells.EMPTY))
                 .Count(neighbor => neighbor != Cells.EMPTY);
-        return obstacles == 4 || obstacles >= 2 && ConfirmSurrounded(point, out toFill);
+        return obstacles == 4 || ConfirmSurrounded(point, out toFill);
     }
 
     bool ConfirmSurrounded(Point point, out HashSet<Point> toFill) {
-        const int max = 10;
+        const int max = 100;
         Queue<Point> queue = new();
         var visited = toFill = [point];
         queue.Enqueue(point);
@@ -118,7 +121,7 @@ class Grid {
                 if (visited.Add(next)) {
                     queue.Enqueue(next);
                 }
-                if (visited.Count == 10) {
+                if (visited.Count == max) {
                     return false;
                 }
             }
