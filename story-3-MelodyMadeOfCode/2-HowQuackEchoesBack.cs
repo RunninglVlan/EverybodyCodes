@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics;
 
-Test.From = "Part III Example 1";
-Test.Until = "Part III Example 2";
+Test.StepEnabled = false;
+// Test.From = "Part II Example";
+Test.Until = "Part III Example 3";
 // https://everybody.codes/story/3/quests/2
 const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
@@ -57,7 +58,7 @@ class Grid {
                     var next = current + direction;
                     char nextCell = cells.GetValueOrDefault(next, Cells.EMPTY);
                     if (!part.IsValid(nextCell)) {
-                        continue;
+                        break;
                     }
                     cells[next] = Cells.SOUND_WAVE;
                     current = next;
@@ -75,26 +76,54 @@ class Grid {
         foreach (var direction in DIRECTIONS) {
             var neighbor = current + direction;
             char neighborCell = cells.GetValueOrDefault(neighbor, Cells.EMPTY);
-            if (neighborCell == Cells.EMPTY && Surrounded(neighbor)) {
-                cells.Add(neighbor, Cells.SOUND_WAVE);
+            if (neighborCell != Cells.EMPTY || !Surrounded(neighbor, out var toFill)) {
+                continue;
+            }
+            foreach (var point in toFill) {
+                cells.Add(point, Cells.SOUND_WAVE);
             }
         }
     }
 
-    public bool SurroundedVocalBone(char _) {
+    public bool SurroundedVocalBone(char cell) {
         var vocalBone = cells.First(it => it.Value == Cells.VOCAL_BONE).Key;
-        return Surrounded(vocalBone);
+        return Surrounded(vocalBone, out _);
     }
 
-    public bool SurroundedVocalBones(char _) {
+    public bool SurroundedVocalBones(char cell) {
         var vocalBones = cells.Where(it => it.Value == Cells.VOCAL_BONE);
-        return vocalBones.All(it => Surrounded(it.Key));
+        return vocalBones.All(it => Surrounded(it.Key, out _));
     }
 
-    bool Surrounded(Point point) {
-        return DIRECTIONS
+    bool Surrounded(Point point, out HashSet<Point> toFill) {
+        toFill = [point];
+        int obstacles = DIRECTIONS
                 .Select(it => cells.GetValueOrDefault(point + it, Cells.EMPTY))
-                .All(neighbor => neighbor != Cells.EMPTY);
+                .Count(neighbor => neighbor != Cells.EMPTY);
+        return obstacles == 4 || obstacles >= 2 && ConfirmSurrounded(point, out toFill);
+    }
+
+    bool ConfirmSurrounded(Point point, out HashSet<Point> toFill) {
+        const int max = 10;
+        Queue<Point> queue = new();
+        var visited = toFill = [point];
+        queue.Enqueue(point);
+        while (queue.TryDequeue(out var current)) {
+            foreach (var direction in DIRECTIONS) {
+                var next = current + direction;
+                char nextCell = cells.GetValueOrDefault(next, Cells.EMPTY);
+                if (nextCell != Cells.EMPTY) {
+                    continue;
+                }
+                if (visited.Add(next)) {
+                    queue.Enqueue(next);
+                }
+                if (visited.Count == 10) {
+                    return false;
+                }
+            }
+        }
+        return visited.Count < max;
     }
 }
 
