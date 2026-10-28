@@ -14,15 +14,15 @@ const string inputExample = """
 // input = inputExample;
 var grid = new Grid();
 grid.Read(input);
-Console.WriteLine(grid.CountSteps(Predicates.ReachVocalBone()));
+Console.WriteLine(grid.CountSteps(SurroundVocalBone()));
+return;
 
-readonly record struct Predicates(Predicate<char> IsValid, Predicate<char> IsEnd) {
-    public static Predicates ReachVocalBone() {
-        return new Predicates(cell => cell == Cells.EMPTY || IsVocalBone(cell), IsVocalBone);
-    }
+Part ReachVocalBone() => new(cell => IsEmpty(cell) || IsVocalBone(cell), IsVocalBone);
+Part SurroundVocalBone() => new(IsEmpty, grid.SurroundedVocalBone);
+bool IsEmpty(char cell) => cell == Cells.EMPTY;
+bool IsVocalBone(char cell) => cell == Cells.VOCAL_BONE;
 
-    static bool IsVocalBone(char cell) => cell == Cells.VOCAL_BONE;
-}
+readonly record struct Part(Predicate<char> IsValid, Predicate<char> IsEnd);
 
 class Grid {
     static readonly Point[] DIRECTIONS = [Screen.UP, Screen.RIGHT, Screen.DOWN, Screen.LEFT];
@@ -43,7 +43,7 @@ class Grid {
         }
     }
 
-    public int CountSteps(Predicates predicates) {
+    public int CountSteps(Part part) {
         var soundSource = cells.First(it => it.Value == Cells.SOUND_SOURCE).Key;
         cells[soundSource] = Cells.SOUND_WAVE;
         var current = soundSource;
@@ -52,17 +52,32 @@ class Grid {
             foreach (var direction in DIRECTIONS) {
                 var next = current + direction;
                 char nextCell = cells.GetValueOrDefault(next, Cells.EMPTY);
-                if (!predicates.IsValid(nextCell)) {
+                if (!part.IsValid(nextCell)) {
+                    continue;
+                }
+                if (Surrounded(next)) {
+                    cells.Add(next, Cells.SOUND_WAVE);
                     continue;
                 }
                 cells[next] = Cells.SOUND_WAVE;
                 current = next;
                 steps++;
-                if (predicates.IsEnd(nextCell)) {
+                if (part.IsEnd(nextCell)) {
                     return steps;
                 }
             }
         }
+    }
+
+    public bool SurroundedVocalBone(char _) {
+        var vocalBone = cells.First(it => it.Value == Cells.VOCAL_BONE).Key;
+        return Surrounded(vocalBone);
+    }
+
+    bool Surrounded(Point point) {
+        return DIRECTIONS
+                .Select(it => cells.GetValueOrDefault(point + it, Cells.EMPTY))
+                .All(neighbor => neighbor != Cells.EMPTY);
     }
 }
 
