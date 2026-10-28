@@ -55,16 +55,23 @@ class Grid {
                 if (!part.IsValid(nextCell)) {
                     continue;
                 }
-                if (Surrounded(next)) {
-                    cells.Add(next, Cells.SOUND_WAVE);
-                    continue;
-                }
                 cells[next] = Cells.SOUND_WAVE;
                 current = next;
                 steps++;
+                FillSurrounded(current);
                 if (part.IsEnd(nextCell)) {
                     return steps;
                 }
+            }
+        }
+    }
+
+    void FillSurrounded(Point current) {
+        foreach (var direction in DIRECTIONS) {
+            var neighbor = current + direction;
+            char neighborCell = cells.GetValueOrDefault(neighbor, Cells.EMPTY);
+            if (neighborCell == Cells.EMPTY && Surrounded(neighbor)) {
+                cells.Add(neighbor, Cells.SOUND_WAVE);
             }
         }
     }
