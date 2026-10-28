@@ -3,34 +3,40 @@
 const string inputFile = "../Input.txt";
 string input = File.ReadAllText(inputFile);
 const string inputExample = """
-                            4<3 2<5 3>1 1>2 1<5 4<1 3>2 4<2 3>5 4<5
-                            4>1 2>1 3>2 1<5 4>5 2<5 3>1 4>3 2<4 5<3
-                            5>1 5>2 4>1 2<4 3>2 3<4 1>2 3>5 1<3 4>5
+                            2<5 3>1 1>2 1<5 4<1 3>2 4<2 3>5 4<5
+                            2>1 3>2 1<5 4>5 2<5 3>1 4>3 2<4 5<3
+                            5>1 5>2 4>1 3>2 3<4 1>2 3>5 1<3 4>5
                             """;
 // input = inputExample;
 string[] alloyGroups = input.Split(Environment.NewLine);
-int checksum = alloyGroups.Select(AlloyNumber).Sum();
+long checksum = alloyGroups.Select(AlloyNumber).Sum();
 Console.WriteLine(checksum);
 return;
 
 // Orders alloys from hardest to softest
-int AlloyNumber(string group) {
-    const string alloys = "12345";
+long AlloyNumber(string group) {
+    var alloyPairs = group.Split(' ').Select(AlloyPair.From).ToArray();
+    HashSet<char> alloys = [];
+    foreach ((char harder, char softer) in alloyPairs) {
+        alloys.Add(harder);
+        alloys.Add(softer);
+    }
     var number = string.Empty;
-    var alloyPairs = group.Split(' ').Select(AlloyPair.From).ToList();
-    while (alloyPairs.Count > 0) {
-        (char? alloy, int count) softest = (null, 0);
+    while (alloys.Count > 0) {
+        var hardest = '\0';
         foreach (char alloy in alloys) {
-            int count = alloyPairs.Count(it => it.Softer == alloy);
-            if (count > softest.count) {
-                softest = (alloy, count);
+            var harderThanCount = 0;
+            foreach ((char harder, char softer) in alloyPairs) {
+                if (alloy == softer && !number.Contains(harder)) {
+                    harderThanCount++;
+                }
+            }
+            if (harderThanCount == 0) {
+                hardest = alloy;
             }
         }
-        number = softest.alloy + number;
-        if (alloyPairs.Count == 1) {
-            number = alloyPairs.First().Harder + number;
-        }
-        alloyPairs.RemoveAll(it => it.Softer == softest.alloy);
+        number += hardest;
+        alloys.Remove(hardest);
     }
     return int.Parse(number);
 }
