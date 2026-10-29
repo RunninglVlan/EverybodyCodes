@@ -10,30 +10,32 @@ var part = 1;
 Test.Run((notes, part, expected) => {
     var votes = notes.Split(Environment.NewLine)
             .Select(Vote.From)
-            .Select(it => it.ToDecimal());
+            .Select(it => it.decimalValue);
     Assert.ActualEqualsExpected(votes.Sum(), expected);
 });
 
-readonly record struct Vote(string Standard, string Value) {
+readonly struct Vote {
+    readonly string standard, value;
+    public readonly long decimalValue;
+
     public static Vote From(string vote) {
         var parts = vote.Split(' ');
         var standard = parts.First();
         return new Vote(standard.Split('-').Last(), parts.Last());
     }
 
-    public long ToDecimal() {
-        var result = 0.0;
-        var standard = Standard;
-        for (var i = 1; i <= Value.Length; i++) {
+    Vote(string standard, string value) {
+        this.standard = standard;
+        this.value = value;
+        for (var i = 1; i <= value.Length; i++) {
             if (i > standard.Length) {
-                standard += Standard;
+                standard += standard;
             }
             var standardDigit = char.GetNumericValue(standard[^i]);
-            var valueDigit = char.GetNumericValue(Value[^i]);
+            var valueDigit = char.GetNumericValue(value[^i]);
             var power = i - 1;
-            result += valueDigit * Math.Pow(standardDigit, power);
+            decimalValue += (long)(valueDigit * Math.Pow(standardDigit, power));
         }
-        return (long)result;
     }
 }
 
