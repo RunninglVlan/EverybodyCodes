@@ -11,21 +11,21 @@ static class Test {
 
     public static void Run(Action<string, int, int> action) {
         File.WriteAllText(LOG_FILE, null);
-        string cases = ReadCases();
+        var cases = ReadCases();
         Console.SetIn(new StringReader(cases));
         var totalTime = 0L;
         while (Console.In.Peek() != -1) {
             var stopwatch = Stopwatch.StartNew();
-            string name = Console.ReadLine()!;
+            var name = Console.ReadLine()!;
             Log(name, console: true, color: ConsoleColor.Cyan);
-            int part = int.Parse(Console.ReadLine()!);
-            string notes = ReadUntilNewLine();
-            int expected = int.Parse(ReadUntilNewLine());
+            var part = int.Parse(Console.ReadLine()!);
+            var notes = ReadUntilNewLine();
+            var expected = int.Parse(ReadUntilNewLine());
             try {
                 action(notes, part, expected);
             }
             finally {
-                long time = stopwatch.ElapsedMilliseconds;
+                var time = stopwatch.ElapsedMilliseconds;
                 totalTime += time;
                 Log($"Test took {time}ms", console: true);
             }
@@ -35,17 +35,17 @@ static class Test {
     }
 
     static string ReadCases() {
-        string cases = File.ReadAllText(CASE_FILE);
-        string[] lines = cases.ReplaceLineEndings(Environment.NewLine).Split(Environment.NewLine);
+        var cases = File.ReadAllText(CASE_FILE);
+        var lines = cases.ReplaceLineEndings(Environment.NewLine).Split(Environment.NewLine);
         if (From != null) {
-            int start = Array.IndexOf(lines, From);
+            var start = Array.IndexOf(lines, From);
             if (start < 0) {
                 throw new InvalidOperationException($"Line '{From}' not found");
             }
             lines = lines[start..];
         }
         if (Until != null) {
-            int end = Array.IndexOf(lines, Until);
+            var end = Array.IndexOf(lines, Until);
             if (end < 0) {
                 throw new InvalidOperationException($"Line '{Until}' not found");
             }
@@ -90,7 +90,7 @@ static class Assert {
     public static bool Throw { get; set; }
 
     public static void ActualEqualsExpected(object actual, object expected) {
-        bool equals = Equals(actual, expected);
+        var equals = Equals(actual, expected);
         Console.WriteLine(equals ? $"✅ {actual}" : $"❌ found {actual}, but expected {expected}");
         if (!equals && Throw) {
             throw new Exception();
