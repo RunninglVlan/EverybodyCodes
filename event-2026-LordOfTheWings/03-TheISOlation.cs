@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
 // Test.StepEnabled = false;
 // Test.From = "Part III";
@@ -21,13 +20,12 @@ readonly record struct Vote(string Standard, string Value) {
         return new Vote(parts.First(), parts.Last());
     }
 
-    [SuppressMessage("ReSharper", "InlineTemporaryVariable")]
     public int ToDecimal() {
         var result = 0.0;
-        for (var power = 0; power < Value.Length; power++) {
-            int last = power, secondToLast = power + 1;
-            var standardDigit = int.Parse(Standard[^secondToLast..^last]);
-            var valueDigit = int.Parse(Value[^secondToLast..^last]);
+        for (var i = 1; i <= Value.Length; i++) {
+            var standardDigit = char.GetNumericValue(Standard[^i]);
+            var valueDigit = char.GetNumericValue(Value[^i]);
+            var power = i - 1;
             result += valueDigit * Math.Pow(standardDigit, power);
         }
         return (int)result;
