@@ -1,15 +1,38 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 // Test.StepEnabled = false;
 // Test.From = "Part III";
 // Test.Until = "Part II";
 // https://everybody.codes/event/2026/quests/3
 const string noteFile = "../Notes.txt";
-string notes = File.ReadAllText(noteFile);
+var notes = File.ReadAllText(noteFile);
 var part = 1;
 Test.Run((notes, part, expected) => {
-    Assert.ActualEqualsExpected(1, expected);
+    var votes = notes.Split(Environment.NewLine)
+            .Select(Vote.From)
+            .Select(it => it.ToDecimal());
+    Assert.ActualEqualsExpected(votes.Sum(), expected);
 });
+
+readonly record struct Vote(string Standard, string Value) {
+    public static Vote From(string vote) {
+        var parts = vote.Split(' ');
+        return new Vote(parts.First(), parts.Last());
+    }
+
+    [SuppressMessage("ReSharper", "InlineTemporaryVariable")]
+    public int ToDecimal() {
+        var result = 0.0;
+        for (var power = 0; power < Value.Length; power++) {
+            int last = power, secondToLast = power + 1;
+            var standardDigit = int.Parse(Standard[^secondToLast..^last]);
+            var valueDigit = int.Parse(Value[^secondToLast..^last]);
+            result += valueDigit * Math.Pow(standardDigit, power);
+        }
+        return (int)result;
+    }
+}
 
 static class Test {
     const string CASE_FILE = "../Test.Cases.txt";
