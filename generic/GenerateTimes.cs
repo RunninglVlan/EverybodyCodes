@@ -10,7 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 const string inputPath = "../event-2026-LordOfTheWings/times.txt";
-const string outputPath = "../event-2026-LordOfTheWings/times.md";
+const string outputPath = "../event-2026-LordOfTheWings/README.md";
 
 string[] partNames = ["I", "II", "III"];
 
