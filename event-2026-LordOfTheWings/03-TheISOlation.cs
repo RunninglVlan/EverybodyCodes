@@ -17,18 +17,23 @@ Test.Run((notes, part, expected) => {
 readonly record struct Vote(string Standard, string Value) {
     public static Vote From(string vote) {
         var parts = vote.Split(' ');
-        return new Vote(parts.First(), parts.Last());
+        var standard = parts.First();
+        return new Vote(standard.Split('-').Last(), parts.Last());
     }
 
-    public int ToDecimal() {
+    public long ToDecimal() {
         var result = 0.0;
+        var standard = Standard;
         for (var i = 1; i <= Value.Length; i++) {
-            var standardDigit = char.GetNumericValue(Standard[^i]);
+            if (i > standard.Length) {
+                standard += Standard;
+            }
+            var standardDigit = char.GetNumericValue(standard[^i]);
             var valueDigit = char.GetNumericValue(Value[^i]);
             var power = i - 1;
             result += valueDigit * Math.Pow(standardDigit, power);
         }
-        return (int)result;
+        return (long)result;
     }
 }
 
@@ -41,23 +46,23 @@ static class Test {
     public static string? From { get; set; }
     public static string? Until { get; set; }
 
-    public static void Run(Action<string, int, int> action) {
+    public static void Run(Action<string, int, long> action) {
         File.WriteAllText(LOG_FILE, null);
-        string cases = ReadCases();
+        var cases = ReadCases();
         Console.SetIn(new StringReader(cases));
         var totalTime = 0L;
         while (Console.In.Peek() != -1) {
             var stopwatch = Stopwatch.StartNew();
-            string name = Console.ReadLine()!;
+            var name = Console.ReadLine()!;
             Log(name, console: true, color: ConsoleColor.Cyan);
-            int part = int.Parse(Console.ReadLine()!);
-            string notes = ReadUntilNewLine();
-            int expected = int.Parse(ReadUntilNewLine());
+            var part = int.Parse(Console.ReadLine()!);
+            var notes = ReadUntilNewLine();
+            var expected = long.Parse(ReadUntilNewLine());
             try {
                 action(notes, part, expected);
             }
             finally {
-                long time = stopwatch.ElapsedMilliseconds;
+                var time = stopwatch.ElapsedMilliseconds;
                 totalTime += time;
                 Log($"Test took {time}ms", console: true);
             }
@@ -67,17 +72,17 @@ static class Test {
     }
 
     static string ReadCases() {
-        string cases = File.ReadAllText(CASE_FILE);
-        string[] lines = cases.ReplaceLineEndings(Environment.NewLine).Split(Environment.NewLine);
+        var cases = File.ReadAllText(CASE_FILE);
+        var lines = cases.ReplaceLineEndings(Environment.NewLine).Split(Environment.NewLine);
         if (From != null) {
-            int start = Array.IndexOf(lines, From);
+            var start = Array.IndexOf(lines, From);
             if (start < 0) {
                 throw new InvalidOperationException($"Line '{From}' not found");
             }
             lines = lines[start..];
         }
         if (Until != null) {
-            int end = Array.IndexOf(lines, Until);
+            var end = Array.IndexOf(lines, Until);
             if (end < 0) {
                 throw new InvalidOperationException($"Line '{Until}' not found");
             }
@@ -122,7 +127,7 @@ static class Assert {
     public static bool Throw { get; set; }
 
     public static void ActualEqualsExpected(object actual, object expected) {
-        bool equals = Equals(actual, expected);
+        var equals = Equals(actual, expected);
         Console.WriteLine(equals ? $"✅ {actual}" : $"❌ found {actual}, but expected {expected}");
         if (!equals && Throw) {
             throw new Exception();

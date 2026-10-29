@@ -9,7 +9,7 @@ static class Test {
     public static string? From { get; set; }
     public static string? Until { get; set; }
 
-    public static void Run(Action<string, int, int> action) {
+    public static void Run(Action<string, int, long> action) {
         File.WriteAllText(LOG_FILE, null);
         var cases = ReadCases();
         Console.SetIn(new StringReader(cases));
@@ -20,7 +20,7 @@ static class Test {
             Log(name, console: true, color: ConsoleColor.Cyan);
             var part = int.Parse(Console.ReadLine()!);
             var notes = ReadUntilNewLine();
-            var expected = int.Parse(ReadUntilNewLine());
+            var expected = long.Parse(ReadUntilNewLine());
             try {
                 action(notes, part, expected);
             }
