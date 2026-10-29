@@ -10,21 +10,24 @@ var part = 1;
 Test.Run((notes, part, expected) => {
     var votes = notes.Split(Environment.NewLine)
             .Select(Vote.From)
-            .Select(it => it.decimalValue);
-    Assert.ActualEqualsExpected(votes.Sum(), expected);
+            .Where(it => it.IsValid());
+    Assert.ActualEqualsExpected(votes.Sum(it => it.decimalValue), expected);
 });
 
 readonly struct Vote {
+    readonly bool isISO2;
     readonly string standard, value;
     public readonly long decimalValue;
 
     public static Vote From(string vote) {
         var parts = vote.Split(' ');
-        var standard = parts.First();
-        return new Vote(standard.Split('-').Last(), parts.Last());
+        var standard = parts.First().Split('-');
+        var isISO2 = standard.First().Contains('2');
+        return new Vote(isISO2, standard.Last(), parts.Last());
     }
 
-    Vote(string standard, string value) {
+    Vote(bool isISO2, string standard, string value) {
+        this.isISO2 = isISO2;
         this.standard = standard;
         this.value = value;
         for (var i = 1; i <= value.Length; i++) {
@@ -36,6 +39,18 @@ readonly struct Vote {
             var power = i - 1;
             decimalValue += (long)(valueDigit * Math.Pow(standardDigit, power));
         }
+    }
+
+    public bool IsValid() {
+        if (!isISO2) {
+            return true;
+        }
+        for (var current = long.Parse(value) - 1; current >= 0; current--) {
+            if (new Vote(true, standard, current.ToString()).decimalValue == decimalValue) {
+                return false;
+            }
+        }
+        return true;
     }
 }
 
