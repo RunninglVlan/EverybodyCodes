@@ -16,10 +16,10 @@ readonly struct Vote {
         var parts = vote.Split(' ');
         var standard = parts.First().Split('-');
         var isISO2 = standard.First().Contains('2');
-        return new Vote(isISO2, standard.Last(), parts.Last());
+        return new Vote(standard.Last(), parts.Last(), isISO2);
     }
 
-    Vote(bool isISO2, string standard, string value) {
+    Vote(string standard, string value, bool isISO2 = false) {
         this.isISO2 = isISO2;
         this.standard = standard;
         this.value = value;
@@ -39,7 +39,7 @@ readonly struct Vote {
             return true;
         }
         for (var current = long.Parse(value) - 1; current >= 0; current--) {
-            if (new Vote(true, standard, current.ToString()).decimalValue == decimalValue) {
+            if (new Vote(standard, current.ToString()).decimalValue == decimalValue) {
                 return false;
             }
         }
