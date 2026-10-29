@@ -1,4 +1,6 @@
-﻿// Turns the raw results text into a Markdown table of local times.
+﻿// Generated with the help of Claude AI
+//
+// Turns the raw results text into a Markdown table of local times.
 //
 // Usage:
 //   dotnet run Report.cs  -> reads the times file and writes the table next to it (see the paths below)
@@ -6,6 +8,7 @@
 // The "Local Time" column in the raw data is cumulative within a quest, so the time
 // of each part is the difference between it and the previous part.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -70,7 +73,8 @@ table.AppendLine("| **All** |"
         + string.Concat(Enumerable.Repeat(" |", partCount))
         + $" **{Format(allQuestsTotal)}** |");
 table.AppendLine();
-table.AppendLine("🟢 fastest · 🟠 in between · 🔴 slowest (parts are compared within their quest, totals across all quests)");
+table.AppendLine(
+        "🟢 fastest · 🟠 in between · 🔴 slowest (parts are compared within their quest, totals across all quests)");
 
 if (reportedTotal is { } reported && reported != allQuestsTotal) {
     Console.Error.WriteLine(
@@ -87,7 +91,6 @@ TimeSpan LastDurationIn(string line) {
 
 static TimeSpan ParseDuration(string text) {
     int days = 0, hours = 0, minutes = 0, seconds = 0, milliseconds = 0;
-
     foreach (Match unit in Regex.Matches(text, @"(\d+)(ms|d|h|m|s)")) {
         var amount = int.Parse(unit.Groups[1].Value);
         switch (unit.Groups[2].Value) {
@@ -98,7 +101,6 @@ static TimeSpan ParseDuration(string text) {
             case "ms": milliseconds = amount; break;
         }
     }
-
     return new TimeSpan(days, hours, minutes, seconds, milliseconds);
 }
 
@@ -109,6 +111,7 @@ static string Format(TimeSpan time) =>
 // Compares a time with the other times it should be judged against (the parts of one quest,
 // or the totals of all quests).
 // 🟢 fastest, 🔴 slowest, 🟠 everything in between (no marker if there is nothing to compare with).
+[SuppressMessage("ReSharper", "ConvertIfStatementToReturnStatement")]
 static string MarkerFor(TimeSpan time, List<TimeSpan> comparedTimes) {
     if (comparedTimes.Count < 2) {
         return "";
