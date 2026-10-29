@@ -1,8 +1,7 @@
 ﻿// Turns the raw results text into a Markdown table of local times.
 //
 // Usage:
-//   dotnet run Report.cs                        -> reads raw.txt, prints the table
-//   dotnet run Report.cs -- raw.txt results.md  -> writes the table to results.md
+//   dotnet run Report.cs  -> reads the times file and writes the table next to it (see the paths below)
 //
 // The "Local Time" column in the raw data is cumulative within a quest, so the time
 // of each part is the difference between it and the previous part.
@@ -51,20 +50,27 @@ var table = new StringBuilder();
 table.AppendLine($"| Quest | {string.Join(" | ", partNames.Take(partCount))} | Total |");
 table.AppendLine($"|{string.Join("|", Enumerable.Repeat("---", partCount + 2))}|");
 
+var questTotals = quests.Values.Select(times => times[^1]).ToList();
+
 var allQuestsTotal = TimeSpan.Zero;
 foreach (var (questNumber, cumulativeTimes) in quests) {
     var partTimes = cumulativeTimes
             .Select((time, index) => index == 0 ? time : time - cumulativeTimes[index - 1])
-            .Select(Format)
-            .Concat(Enumerable.Repeat("", partCount - cumulativeTimes.Count));
+            .ToList();
+    var partCells = partTimes
+            .Select(time => $"{MarkerFor(time, partTimes)} {Format(time)}".Trim())
+            .Concat(Enumerable.Repeat("", partCount - partTimes.Count));
     var questTotal = cumulativeTimes[^1];
     allQuestsTotal += questTotal;
-    table.AppendLine($"| {questNumber} | {string.Join(" | ", partTimes)} | {Format(questTotal)} |");
+    var totalCell = $"{MarkerFor(questTotal, questTotals)} {Format(questTotal)}".Trim();
+    table.AppendLine($"| {questNumber} | {string.Join(" | ", partCells)} | {totalCell} |");
 }
 
 table.AppendLine("| **All** |"
         + string.Concat(Enumerable.Repeat(" |", partCount))
         + $" **{Format(allQuestsTotal)}** |");
+table.AppendLine();
+table.AppendLine("🟢 fastest · 🟠 in between · 🔴 slowest (parts are compared within their quest, totals across all quests)");
 
 if (reportedTotal is { } reported && reported != allQuestsTotal) {
     Console.Error.WriteLine(
@@ -96,6 +102,22 @@ static TimeSpan ParseDuration(string text) {
     return new TimeSpan(days, hours, minutes, seconds, milliseconds);
 }
 
-// hh:mm:ss.mmm, with hours kept as total hours so long times never wrap around.
+// hh:mm:ss (milliseconds are dropped), with hours kept as total hours so long times never wrap around.
 static string Format(TimeSpan time) =>
-        $"{(int)time.TotalHours:00}:{time.Minutes:00}:{time.Seconds:00}.{time.Milliseconds:000}";
+        $"{(int)time.TotalHours:00}:{time.Minutes:00}:{time.Seconds:00}";
+
+// Compares a time with the other times it should be judged against (the parts of one quest,
+// or the totals of all quests).
+// 🟢 fastest, 🔴 slowest, 🟠 everything in between (no marker if there is nothing to compare with).
+static string MarkerFor(TimeSpan time, List<TimeSpan> comparedTimes) {
+    if (comparedTimes.Count < 2) {
+        return "";
+    }
+    if (time == comparedTimes.Min()) {
+        return "🟢";
+    }
+    if (time == comparedTimes.Max()) {
+        return "🔴";
+    }
+    return "🟠";
+}
