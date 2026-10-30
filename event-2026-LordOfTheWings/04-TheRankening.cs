@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 
-// Test.From = "Part III Example 1";
-Test.Until = "Part III Example 3";
+// Test.From = "Part III Example 3";
+// Test.Until = "Part III Example 3";
 // https://everybody.codes/event/2026/quests/4
 const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
@@ -10,7 +10,16 @@ string notes = File.ReadAllText(noteFile);
     Test.Run((notes, part, expected) => {
         var results = notes.Split(Environment.NewLine).Select(Result.From).ToArray();
         var ranking = part != 3 ? TimeRanking(results) : PointRanking(results);
-        int checksum = ranking.Select((score, i) => score * (i + 1)).Sum();
+        int checksum = 0;
+        (int place, int score) last = (0, 0);
+        int place = 1;
+        foreach (int score in ranking) {
+            bool isTiedWithPrevious = score == last.score;
+            int currentPlace = isTiedWithPrevious ? last.place : place;
+            last = (currentPlace, score);
+            checksum += score * currentPlace;
+            place++;
+        }
         Assert.ActualEqualsExpected(checksum, expected);
     });
 }
@@ -32,10 +41,9 @@ IEnumerable<int> PointRanking(Result[] allResults) {
     int quests = allResults.Select(it => it.Quest).Max();
     int parts = allResults.Select(it => it.Part).Max();
     for (int quest = 1; quest <= quests; quest++) {
-        Console.WriteLine($"  quest: {quest}");
         var questResults = allResults.Where(it => it.Quest == quest).ToArray();
         for (int part = 1; part <= parts; part++) {
-            Console.WriteLine($"    part: {part}");
+            Test.Log($"Quest {quest}, Part {part}:");
             var bestResults = questResults
                     .Where(it => it.Part <= part)
                     .GroupBy(it => it.Id)
@@ -48,14 +56,22 @@ IEnumerable<int> PointRanking(Result[] allResults) {
                 var result = bestResults[i];
                 bool isTiedWithPrevious = i > 0 && result.totalTime == bestResults[i - 1].totalTime;
                 int currentPoints = isTiedWithPrevious ? lastPoints : points;
-                Console.WriteLine($"{i + 1}, id: {result.id}, time: {result.totalTime}, points: {currentPoints}");
+                if (currentPoints <= 0) {
+                    break;
+                }
+                Test.Log($"id={result.id}, time={result.totalTime}, points={currentPoints}");
                 scores[result.id - 1] += currentPoints;
                 lastPoints = currentPoints;
             }
+            Test.Log();
         }
     }
-    foreach (int score in scores.OrderByDescending(it => it)) {
-        Console.WriteLine($"score: {score}");
+    {
+        Test.Log("Final Ranking:");
+        int i = 1;
+        foreach (int score in scores.OrderByDescending(it => it)) {
+            // Test.Log($"{i++}. points={score}");
+        }
     }
     return scores.OrderByDescending(it => it);
 }
