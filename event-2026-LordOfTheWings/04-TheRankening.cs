@@ -13,8 +13,8 @@ string notes = File.ReadAllText(noteFile);
         bool isTiedWithPrevious = score == last.score;
         int currentPlace = isTiedWithPrevious ? last.place : place;
         checksum += score * currentPlace;
-        place++;
         last = (currentPlace, score);
+        place++;
     }
     Console.WriteLine(checksum);
 }
@@ -45,16 +45,17 @@ IEnumerable<int> PointRanking(Result[] allResults) {
                     .Select(results => (id: results.Key, totalTime: results.Sum(it => it.Time)))
                     .OrderBy(it => it.totalTime)
                     .ToArray();
-            int lastPoints = 0;
-            for (int i = 0, points = pointCoefficient * part; i < ranking.Length; i++, points--) {
-                var result = ranking[i];
-                bool isTiedWithPrevious = i > 0 && result.totalTime == ranking[i - 1].totalTime;
-                int currentPoints = isTiedWithPrevious ? lastPoints : points;
+            (int time, int points) last = (0, 0);
+            int points = pointCoefficient * part;
+            foreach (var result in ranking) {
+                bool isTiedWithPrevious = result.totalTime == last.time;
+                int currentPoints = isTiedWithPrevious ? last.points : points;
                 if (currentPoints <= 0) {
                     break;
                 }
                 scores[result.id - 1] += currentPoints;
-                lastPoints = currentPoints;
+                last = (result.totalTime, currentPoints);
+                points--;
             }
         }
     }
