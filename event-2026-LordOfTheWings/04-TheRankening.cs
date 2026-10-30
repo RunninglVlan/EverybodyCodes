@@ -2,7 +2,7 @@
 
 // https://everybody.codes/event/2026/quests/4
 Test.Run((notes, part, expected) => {
-    long checksum = notes.Split(Environment.NewLine)
+    var checksum = notes.Split(Environment.NewLine)
             .Select(Result.From)
             .GroupBy(result => result.Id)
             .Select(participantResult => participantResult.Sum(it => it.Time))
@@ -30,7 +30,7 @@ static class Test {
     public static string? From { get; set; }
     public static string? Until { get; set; }
 
-    public static void Run(Action<string, int, long> action) {
+    public static void Run(Action<string, int, string> action) {
         File.WriteAllText(LOG_FILE, null);
         var cases = ReadCases();
         Console.SetIn(new StringReader(cases));
@@ -41,7 +41,7 @@ static class Test {
             Log(name, console: true, color: ConsoleColor.Cyan);
             var part = int.Parse(Console.ReadLine()!);
             var notes = ReadUntilNewLine();
-            var expected = long.Parse(ReadUntilNewLine());
+            var expected = ReadUntilNewLine();
             try {
                 action(notes, part, expected);
             }
@@ -111,7 +111,7 @@ static class Assert {
     public static bool Throw { get; set; }
 
     public static void ActualEqualsExpected(object actual, object expected) {
-        var equals = Equals(actual, expected);
+        var equals = Equals(actual.ToString(), expected);
         Console.WriteLine(equals ? $"✅ {actual}" : $"❌ found {actual}, but expected {expected}");
         if (!equals && Throw) {
             throw new Exception();
