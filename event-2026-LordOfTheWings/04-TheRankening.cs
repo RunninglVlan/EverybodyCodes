@@ -5,9 +5,10 @@ Test.Run((notes, part, expected) => {
     var checksum = notes.Split(Environment.NewLine)
             .Select(Result.From)
             .GroupBy(result => result.Id)
-            .Select(participantResult => participantResult.Sum(it => it.Time))
-            .OrderBy(totalTime => totalTime)
-            .Select((participantTime, i) => participantTime * (i + 1))
+            .Select(result => (parts: result.Count(), totalTime: result.Sum(it => it.Time)))
+            .OrderByDescending(it => it.parts)
+            .ThenBy(it => it.totalTime)
+            .Select((results, i) => results.totalTime * (i + 1))
             .Sum();
     Assert.ActualEqualsExpected(checksum, expected);
 });
