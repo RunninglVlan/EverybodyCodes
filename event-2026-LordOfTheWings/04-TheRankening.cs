@@ -5,23 +5,23 @@ const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
 int part = 2;
 Test.Run((notes, part, expected) => {
-    var results = notes.Split(Environment.NewLine).Select(Result.From);
-    int checksum = part != 3 ? TimeChecksum(results) : PointChecksum(results);
+    var results = notes.Split(Environment.NewLine).Select(Result.From).ToArray();
+    var ranking = part != 3 ? TimeRanking(results) : PointRanking(results);
+    int checksum = ranking.Select((score, i) => score * (i + 1)).Sum();
     Assert.ActualEqualsExpected(checksum, expected);
 });
 return;
 
-int TimeChecksum(IEnumerable<Result> allResults) {
+IEnumerable<int> TimeRanking(Result[] allResults) {
     return allResults
             .GroupBy(result => result.Id)
             .Select(results => (parts: results.Count(), totalTime: results.Sum(it => it.Time)))
             .OrderByDescending(it => it.parts)
             .ThenBy(it => it.totalTime)
-            .Select((results, i) => results.totalTime * (i + 1))
-            .Sum();
+            .Select(it => it.totalTime);
 }
 
-int PointChecksum(IEnumerable<Result> allResults) {
+IEnumerable<int> PointRanking(Result[] allResults) {
     throw new NotImplementedException();
 }
 
