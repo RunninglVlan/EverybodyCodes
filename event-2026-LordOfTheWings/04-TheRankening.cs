@@ -11,17 +11,17 @@ Test.Run((notes, part, expected) => {
 });
 return;
 
-int TimeChecksum(IEnumerable<Result> results) {
-    return results
+int TimeChecksum(IEnumerable<Result> allResults) {
+    return allResults
             .GroupBy(result => result.Id)
-            .Select(result => (parts: result.Count(), totalTime: result.Sum(it => it.Time)))
+            .Select(results => (parts: results.Count(), totalTime: results.Sum(it => it.Time)))
             .OrderByDescending(it => it.parts)
             .ThenBy(it => it.totalTime)
-            .Select((participantResults, i) => participantResults.totalTime * (i + 1))
+            .Select((results, i) => results.totalTime * (i + 1))
             .Sum();
 }
 
-int PointChecksum(IEnumerable<Result> results) {
+int PointChecksum(IEnumerable<Result> allResults) {
     throw new NotImplementedException();
 }
 
