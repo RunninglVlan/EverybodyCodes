@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 
 // Test.From = "Part III Example 1";
-Test.Until = "Part III Example 2";
+Test.Until = "Part III Example 3";
 // https://everybody.codes/event/2026/quests/4
 const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
@@ -36,7 +36,6 @@ IEnumerable<int> PointRanking(Result[] allResults) {
         var questResults = allResults.Where(it => it.Quest == quest).ToArray();
         for (int part = 1; part <= parts; part++) {
             Console.WriteLine($"    part: {part}");
-            int points = pointCoefficient * part;
             var bestResults = questResults
                     .Where(it => it.Part <= part)
                     .GroupBy(it => it.Id)
@@ -44,10 +43,14 @@ IEnumerable<int> PointRanking(Result[] allResults) {
                     .Select(results => (id: results.Key, totalTime: results.Sum(it => it.Time)))
                     .OrderBy(it => it.totalTime)
                     .ToArray();
-            for (int i = 0; i < bestResults.Length; i++) {
+            int lastPoints = 0;
+            for (int i = 0, points = pointCoefficient * part; i < bestResults.Length; i++, points--) {
                 var result = bestResults[i];
-                Console.WriteLine($"{i + 1}, id: {result.id}, time: {result.totalTime}, points: {points}");
-                scores[result.id - 1] += points--;
+                bool isTiedWithPrevious = i > 0 && result.totalTime == bestResults[i - 1].totalTime;
+                int currentPoints = isTiedWithPrevious ? lastPoints : points;
+                Console.WriteLine($"{i + 1}, id: {result.id}, time: {result.totalTime}, points: {currentPoints}");
+                scores[result.id - 1] += currentPoints;
+                lastPoints = currentPoints;
             }
         }
     }
