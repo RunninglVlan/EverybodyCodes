@@ -1,15 +1,19 @@
 ﻿using System.Diagnostics;
 
+// Test.From = "Part III Example 1";
+Test.Until = "Part III Example 2";
 // https://everybody.codes/event/2026/quests/4
 const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
-int part = 2;
-Test.Run((notes, part, expected) => {
-    var results = notes.Split(Environment.NewLine).Select(Result.From).ToArray();
-    var ranking = part != 3 ? TimeRanking(results) : PointRanking(results);
-    int checksum = ranking.Select((score, i) => score * (i + 1)).Sum();
-    Assert.ActualEqualsExpected(checksum, expected);
-});
+{
+    int part = 3;
+    Test.Run((notes, part, expected) => {
+        var results = notes.Split(Environment.NewLine).Select(Result.From).ToArray();
+        var ranking = part != 3 ? TimeRanking(results) : PointRanking(results);
+        int checksum = ranking.Select((score, i) => score * (i + 1)).Sum();
+        Assert.ActualEqualsExpected(checksum, expected);
+    });
+}
 return;
 
 IEnumerable<int> TimeRanking(Result[] allResults) {
@@ -22,15 +26,45 @@ IEnumerable<int> TimeRanking(Result[] allResults) {
 }
 
 IEnumerable<int> PointRanking(Result[] allResults) {
-    throw new NotImplementedException();
+    const int pointCoefficient = 50;
+    int ids = allResults.Select(it => it.Id).Max();
+    int[] scores = new int[ids];
+    int quests = allResults.Select(it => it.Quest).Max();
+    int parts = allResults.Select(it => it.Part).Max();
+    for (int quest = 1; quest <= quests; quest++) {
+        Console.WriteLine($"  quest: {quest}");
+        var questResults = allResults.Where(it => it.Quest == quest).ToArray();
+        for (int part = 1; part <= parts; part++) {
+            Console.WriteLine($"    part: {part}");
+            int points = pointCoefficient * part;
+            var bestResults = questResults
+                    .Where(it => it.Part <= part)
+                    .GroupBy(it => it.Id)
+                    .Where(results => results.Any(it => it.Part == part))
+                    .Select(results => (id: results.Key, totalTime: results.Sum(it => it.Time)))
+                    .OrderBy(it => it.totalTime)
+                    .ToArray();
+            for (int i = 0; i < bestResults.Length; i++) {
+                var result = bestResults[i];
+                Console.WriteLine($"{i + 1}, id: {result.id}, time: {result.totalTime}, points: {points}");
+                scores[result.id - 1] += points--;
+            }
+        }
+    }
+    foreach (int score in scores.OrderByDescending(it => it)) {
+        Console.WriteLine($"score: {score}");
+    }
+    return scores.OrderByDescending(it => it);
 }
 
-readonly record struct Result(int Id, int Time) {
+readonly record struct Result(int Id, int Quest, int Part, int Time) {
     public static Result From(string result) {
         string[] parts = result.Split(' ');
-        string id = parts.First().Split('=').Last();
-        string time = parts.Last().Split('=').Last();
-        return new Result(int.Parse(id), int.Parse(time));
+        string id = parts[0].Split('=').Last();
+        string quest = parts[1].Split('=').Last();
+        string part = parts[2].Split('=').Last();
+        string time = parts[3].Split('=').Last();
+        return new Result(int.Parse(id), int.Parse(quest), int.Parse(part), int.Parse(time));
     }
 }
 
