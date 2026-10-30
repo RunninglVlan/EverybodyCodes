@@ -1,17 +1,29 @@
 ﻿using System.Diagnostics;
 
 // https://everybody.codes/event/2026/quests/4
+const string noteFile = "../Notes.txt";
+string notes = File.ReadAllText(noteFile);
+int part = 2;
 Test.Run((notes, part, expected) => {
-    int checksum = notes.Split(Environment.NewLine)
-            .Select(Result.From)
+    var results = notes.Split(Environment.NewLine).Select(Result.From);
+    int checksum = part != 3 ? TimeChecksum(results) : PointChecksum(results);
+    Assert.ActualEqualsExpected(checksum, expected);
+});
+return;
+
+int TimeChecksum(IEnumerable<Result> results) {
+    return results
             .GroupBy(result => result.Id)
             .Select(result => (parts: result.Count(), totalTime: result.Sum(it => it.Time)))
             .OrderByDescending(it => it.parts)
             .ThenBy(it => it.totalTime)
-            .Select((results, i) => results.totalTime * (i + 1))
+            .Select((participantResults, i) => participantResults.totalTime * (i + 1))
             .Sum();
-    Assert.ActualEqualsExpected(checksum, expected);
-});
+}
+
+int PointChecksum(IEnumerable<Result> results) {
+    throw new NotImplementedException();
+}
 
 readonly record struct Result(int Id, int Time) {
     public static Result From(string result) {
