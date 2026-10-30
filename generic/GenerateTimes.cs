@@ -26,9 +26,9 @@ var durationPattern = new Regex(@"(?:\d+d\s+)?(?:\d+h\s+)?(?:\d+m\s+)?(?:\d+s\s+
 // Cumulative local time of every part, grouped by quest number.
 var quests = new SortedDictionary<int, List<TimeSpan>>();
 TimeSpan? reportedTotal = null;
-var currentQuest = 0;
+int currentQuest = 0;
 
-foreach (var line in File.ReadLines(inputPath)) {
+foreach (string line in File.ReadLines(inputPath)) {
     if (line.TrimStart().StartsWith('-')) {
         // The summary line: its last duration is the total local time.
         reportedTotal = LastDurationIn(line);
@@ -47,16 +47,18 @@ foreach (var line in File.ReadLines(inputPath)) {
     cumulativeTimes.Add(LastDurationIn(line));
 }
 
-var partCount = quests.Values.Max(times => times.Count);
+int partCount = quests.Values.Max(times => times.Count);
 var table = new StringBuilder();
 
+table.AppendLine("### Local times");
+table.AppendLine();
 table.AppendLine($"| Quest | {string.Join(" | ", partNames.Take(partCount))} | Total |");
 table.AppendLine($"|{string.Join("|", Enumerable.Repeat("---", partCount + 2))}|");
 
 var questTotals = quests.Values.Select(times => times[^1]).ToList();
 
 var allQuestsTotal = TimeSpan.Zero;
-foreach (var (questNumber, cumulativeTimes) in quests) {
+foreach ((int questNumber, var cumulativeTimes) in quests) {
     var partTimes = cumulativeTimes
             .Select((time, index) => index == 0 ? time : time - cumulativeTimes[index - 1])
             .ToList();
@@ -65,7 +67,7 @@ foreach (var (questNumber, cumulativeTimes) in quests) {
             .Concat(Enumerable.Repeat("", partCount - partTimes.Count));
     var questTotal = cumulativeTimes[^1];
     allQuestsTotal += questTotal;
-    var totalCell = $"{MarkerFor(questTotal, questTotals)} {Format(questTotal)}".Trim();
+    string totalCell = $"{MarkerFor(questTotal, questTotals)} {Format(questTotal)}".Trim();
     table.AppendLine($"| {questNumber} | {string.Join(" | ", partCells)} | {totalCell} |");
 }
 
@@ -92,7 +94,7 @@ TimeSpan LastDurationIn(string line) {
 static TimeSpan ParseDuration(string text) {
     int days = 0, hours = 0, minutes = 0, seconds = 0, milliseconds = 0;
     foreach (Match unit in Regex.Matches(text, @"(\d+)(ms|d|h|m|s)")) {
-        var amount = int.Parse(unit.Groups[1].Value);
+        int amount = int.Parse(unit.Groups[1].Value);
         switch (unit.Groups[2].Value) {
             case "d": days = amount; break;
             case "h": hours = amount; break;
