@@ -10,18 +10,24 @@ Test.Run((notes, part, expected) => {
     map.Reconstruct();
     int cells = part switch {
         1 => map.Land,
-        _ => map.Sand
+        2 => map.Sand,
+        _ => map.Trees
     };
+    if (part == 3) {
+        map.Log();
+    }
     Assert.ActualEqualsExpected(cells, expected);
 });
 
 class Map {
     const int VALID_NEIGHBORS = 5;
+    const int TREE_RADIUS = 2;
 
     readonly Dictionary<Point, char> grid = [];
     int width, height;
-    public int Land => grid.Values.Count(it => it is Cells.LAND or Cells.SAND);
+    public int Land => grid.Values.Count(it => it is Cells.LAND or Cells.SAND or Cells.TREE);
     public int Sand => grid.Values.Count(it => it is Cells.SAND);
+    public int Trees => grid.Values.Count(it => it is Cells.TREE);
 
     public void Read(string notes) {
         string[] rows = [.. notes.Split(Environment.NewLine)];
@@ -40,7 +46,7 @@ class Map {
             grid[point] = Cells.WATER;
         }
         MarkSand();
-        Log();
+        MarkTrees();
     }
 
     void MarkLand() {
@@ -100,7 +106,41 @@ class Map {
         }
     }
 
-    void Log() {
+    void MarkTrees() {
+        for (int y = TREE_RADIUS; y < height - TREE_RADIUS; y++) {
+            for (int x = TREE_RADIUS; x < width - TREE_RADIUS; x++) {
+                var point = new Point(x, y);
+                if (IsTree(point)) {
+                    grid[point] = Cells.TREE;
+                }
+            }
+        }
+        return;
+
+        bool IsTree(Point point) {
+            var min = point - TREE_RADIUS;
+            var max = point + TREE_RADIUS;
+            for (int y = min.Y; y <= max.Y; y++) {
+                for (int x = min.X; x <= max.X; x++) {
+                    var neighbor = new Point(x, y);
+                    if (neighbor == point) {
+                        continue;
+                    }
+                    bool isCorner = neighbor.Y == min.Y && (neighbor.X == min.X || neighbor.X == max.X)
+                            || neighbor.Y == max.Y && (neighbor.X == min.X || neighbor.X == max.X);
+                    if (isCorner) {
+                        continue;
+                    }
+                    if (grid[neighbor] is not (Cells.LAND or Cells.TREE)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+    }
+
+    public void Log() {
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < width; x++) {
                 char cell = grid[new Point(x, y)];
@@ -108,6 +148,7 @@ class Map {
                     Cells.WATER => ConsoleColor.Blue,
                     Cells.LAND => ConsoleColor.Green,
                     Cells.SAND => ConsoleColor.Yellow,
+                    Cells.TREE => ConsoleColor.DarkCyan,
                     _ => Console.ForegroundColor
                 };
                 Console.Write(cell);
@@ -124,6 +165,7 @@ static class Cells {
     public const char LAND = '#';
     public const char WATER = '.';
     public const char SAND = '=';
+    public const char TREE = '@';
 }
 
 readonly record struct Point(int X, int Y) {
@@ -138,6 +180,8 @@ readonly record struct Point(int X, int Y) {
     ];
 
     public static Point operator +(Point a, Point b) => new(a.X + b.X, a.Y + b.Y);
+    public static Point operator +(Point a, int value) => new(a.X + value, a.Y + value);
+    public static Point operator -(Point a, int value) => new(a.X - value, a.Y - value);
 }
 
 static class Test {
