@@ -157,7 +157,7 @@ class Map {
         while (queue.TryDequeue(out var current)) {
             foreach (var direction in Point.Directions8) {
                 var next = current + direction;
-                if (!IsNextTree(next)) {
+                if (!IsValid(next, it => it == Cells.TREE, VALID_TREE_NEIGHBORS, it => it == Cells.SAND)) {
                     continue;
                 }
                 nextTrees.Add(next);
@@ -168,19 +168,20 @@ class Map {
         }
     }
 
-    bool IsNextTree(Point point) {
+    bool IsValid(Point point, Predicate<char> include, int minValid, Predicate<char>? exclude = null) {
         var validCellsAround = 0;
         foreach (var direction in Point.Directions8) {
             var neighbor = point + direction;
-            switch (grid[neighbor]) {
-                case Cells.TREE:
-                    validCellsAround++;
-                    break;
-                case Cells.SAND:
-                    return false;
+            if (!grid.TryGetValue(neighbor, out char cell)) {
+                continue;
+            }
+            if (include(cell)) {
+                validCellsAround++;
+            } else if (exclude != null && exclude(cell)) {
+                return false;
             }
         }
-        return validCellsAround >= VALID_TREE_NEIGHBORS;
+        return validCellsAround >= minValid;
     }
 }
 
