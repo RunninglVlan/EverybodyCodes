@@ -95,22 +95,14 @@ class Map {
     void MarkSand() {
         MarkBeaches();
         var queue = new Queue<Point>();
+        HashSet<Point> sand = [];
         foreach ((var point, char _) in grid.Where(it => it.Value == Cells.SAND)) {
             queue.Enqueue(point);
+            sand.Add(point);
         }
-        while (queue.TryDequeue(out var current)) {
-            foreach (var direction in Point.Directions8) {
-                var next = current + direction;
-                int validCellsAround = Point.Directions8
-                        .Select(it => next + it)
-                        .Count(it => grid.TryGetValue(it, out char cell) && cell == Cells.SAND);
-                bool isSand = validCellsAround >= VALID_LAND_NEIGHBORS;
-                if (!isSand || grid[next] == Cells.SAND) {
-                    continue;
-                }
-                queue.Enqueue(next);
-                grid[next] = Cells.SAND;
-            }
+        Find(queue, sand, it => it == Cells.SAND, VALID_LAND_NEIGHBORS);
+        foreach (var point in sand) {
+            grid[point] = Cells.SAND;
         }
     }
 
