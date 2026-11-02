@@ -6,27 +6,34 @@ const int part = 1;
 Test.Run((notes, part, expected) => {
     var map = new Map();
     map.Read(notes);
-    int landCells = map.FindLand();
-    Assert.ActualEqualsExpected(landCells, expected);
+    map.Reconstruct();
+    Assert.ActualEqualsExpected(map.Land, expected);
 });
 
 class Map {
     const char DARK = '1', LAND = '#';
     const int VALID_NEIGHBORS = 5;
 
-    char[][] grid = null!;
+    readonly Dictionary<Point, char> grid = [];
     int width, height;
-    readonly HashSet<Point> land = [];
+    public int Land => grid.Values.Count(it => it == LAND);
 
     public void Read(string notes) {
-        grid = [.. notes.Split(Environment.NewLine).Select(it => it.ToCharArray())];
-        width = grid[0].Length;
-        height = grid.Length;
+        string[] rows = [.. notes.Split(Environment.NewLine)];
+        width = rows[0].Length;
+        height = rows.Length;
+        for (var y = 0; y < height; y++) {
+            for (var x = 0; x < width; x++) {
+                grid[new Point(x, y)] = rows[y][x];
+            }
+        }
+        var land = new Point(width / 2, height / 2);
+        grid[land] = LAND;
     }
 
-    public int FindLand() {
+    public void Reconstruct() {
         var queue = new Queue<Point>();
-        var start = new Point(width / 2, height / 2);
+        var start = grid.First(it => it.Value == LAND).Key;
         queue.Enqueue(start);
         AddLand(start);
         // Log();
@@ -41,19 +48,20 @@ class Map {
             }
         }
         // Log();
-        return land.Count;
     }
 
     bool AddLand(Point point) {
-        grid[point.Y][point.X] = LAND;
-        return land.Add(point);
+        if (grid[point] == LAND) {
+            return false;
+        }
+        grid[point] = LAND;
+        return true;
     }
 
     bool IsLand(Point point) {
         int validCellsAround = Point.Directions8
                 .Select(it => point + it)
-                .Where(it => it.InBounds(width, height))
-                .Count(it => land.Contains(it) || grid[it.Y][it.X] == DARK);
+                .Count(it => grid.TryGetValue(it, out char cell) && cell is DARK or LAND);
         return validCellsAround >= VALID_NEIGHBORS;
     }
 
@@ -61,7 +69,7 @@ class Map {
         // return;
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < width; x++) {
-                char cell = grid[y][x];
+                char cell = grid[new Point(x, y)];
                 if (cell == LAND) {
                     Console.ForegroundColor = ConsoleColor.Red;
                 }
@@ -84,10 +92,6 @@ readonly record struct Point(int X, int Y) {
         RIGHT, LEFT, UP, DOWN,
         new(1, 1), new(-1, 1), new(1, -1), new(-1, -1)
     ];
-
-    public bool InBounds(int width, int? height = null) {
-        return X >= 0 && X < width && Y >= 0 && Y < (height ?? width);
-    }
 
     public static Point operator +(Point a, Point b) => new(a.X + b.X, a.Y + b.Y);
 }
