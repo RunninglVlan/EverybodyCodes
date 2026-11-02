@@ -64,11 +64,10 @@ class Map {
         while (queue.TryDequeue(out var current)) {
             foreach (var direction in Point.Directions8) {
                 var next = current + direction;
-                int validCellsAround = Point.Directions8
-                        .Select(it => next + it)
-                        .Count(it => found.Contains(it) || grid.TryGetValue(it, out char cell) && cell == Cells.DARK);
-                bool isLand = validCellsAround >= VALID_LAND_NEIGHBORS;
-                if (!isLand || !found.Add(next)) {
+                if (!IsValid(next, it => it == Cells.DARK, VALID_LAND_NEIGHBORS, found)) {
+                    continue;
+                }
+                if (!found.Add(next)) {
                     continue;
                 }
                 queue.Enqueue(next);
@@ -157,7 +156,7 @@ class Map {
         while (queue.TryDequeue(out var current)) {
             foreach (var direction in Point.Directions8) {
                 var next = current + direction;
-                if (!IsValid(next, it => it == Cells.TREE, VALID_TREE_NEIGHBORS, it => it == Cells.SAND)) {
+                if (!IsValid(next, it => it == Cells.TREE, VALID_TREE_NEIGHBORS, exclude: it => it == Cells.SAND)) {
                     continue;
                 }
                 nextTrees.Add(next);
@@ -168,14 +167,15 @@ class Map {
         }
     }
 
-    bool IsValid(Point point, Predicate<char> include, int minValid, Predicate<char>? exclude = null) {
+    bool IsValid(Point point, Predicate<char> include, int minValid, HashSet<Point>? found = null,
+            Predicate<char>? exclude = null) {
         var validCellsAround = 0;
         foreach (var direction in Point.Directions8) {
             var neighbor = point + direction;
             if (!grid.TryGetValue(neighbor, out char cell)) {
                 continue;
             }
-            if (include(cell)) {
+            if (found != null && found.Contains(neighbor) || include(cell)) {
                 validCellsAround++;
             } else if (exclude != null && exclude(cell)) {
                 return false;
