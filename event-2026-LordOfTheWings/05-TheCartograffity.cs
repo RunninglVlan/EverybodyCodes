@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 
+Assert.Throw = true;
 const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
 const int part = 1;
@@ -7,7 +8,11 @@ Test.Run((notes, part, expected) => {
     var map = new Map();
     map.Read(notes);
     map.Reconstruct();
-    Assert.ActualEqualsExpected(map.Land, expected);
+    int cells = part switch {
+        1 => map.Land,
+        _ => map.Sand
+    };
+    Assert.ActualEqualsExpected(cells, expected);
 });
 
 class Map {
@@ -15,7 +20,8 @@ class Map {
 
     readonly Dictionary<Point, char> grid = [];
     int width, height;
-    public int Land => grid.Values.Count(it => it == Cells.LAND);
+    public int Land => grid.Values.Count(it => it is Cells.LAND or Cells.SAND);
+    public int Sand => grid.Values.Count(it => it is Cells.SAND);
 
     public void Read(string notes) {
         string[] rows = [.. notes.Split(Environment.NewLine)];
@@ -33,6 +39,7 @@ class Map {
         foreach ((var point, char _) in grid.Where(it => it.Value != Cells.LAND)) {
             grid[point] = Cells.WATER;
         }
+        MarkSand();
         Log();
     }
 
@@ -57,6 +64,20 @@ class Map {
         }
     }
 
+    void MarkSand() {
+        foreach (var point in grid.Keys.Where(it => grid[it] is Cells.LAND)) {
+            foreach (var direction in Point.Directions8) {
+                var neighbor = point + direction;
+                bool isEdge = neighbor.X == 0 || neighbor.X == width - 1 || neighbor.Y == 0 || neighbor.Y == height - 1;
+                if (!isEdge && (!grid.TryGetValue(neighbor, out char cell) || cell is not Cells.WATER)) {
+                    continue;
+                }
+                grid[point] = Cells.SAND;
+                break;
+            }
+        }
+    }
+
     void Log() {
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < width; x++) {
@@ -64,6 +85,7 @@ class Map {
                 Console.ForegroundColor = cell switch {
                     Cells.WATER => ConsoleColor.Blue,
                     Cells.LAND => ConsoleColor.Green,
+                    Cells.SAND => ConsoleColor.Yellow,
                     _ => Console.ForegroundColor
                 };
                 Console.Write(cell);
@@ -79,6 +101,7 @@ static class Cells {
     public const char DARK = '1';
     public const char LAND = '#';
     public const char WATER = '.';
+    public const char SAND = '=';
 }
 
 readonly record struct Point(int X, int Y) {
