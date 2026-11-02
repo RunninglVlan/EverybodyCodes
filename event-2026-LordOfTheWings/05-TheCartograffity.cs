@@ -65,6 +65,28 @@ class Map {
     }
 
     void MarkSand() {
+        MarkBeaches();
+        var queue = new Queue<Point>();
+        foreach ((var point, char _) in grid.Where(it => it.Value == Cells.SAND)) {
+            queue.Enqueue(point);
+        }
+        while (queue.TryDequeue(out var current)) {
+            foreach (var direction in Point.Directions8) {
+                var next = current + direction;
+                int validCellsAround = Point.Directions8
+                        .Select(it => next + it)
+                        .Count(it => grid.TryGetValue(it, out char cell) && cell == Cells.SAND);
+                bool isSand = validCellsAround >= VALID_NEIGHBORS;
+                if (!isSand || grid[next] == Cells.SAND) {
+                    continue;
+                }
+                queue.Enqueue(next);
+                grid[next] = Cells.SAND;
+            }
+        }
+    }
+
+    void MarkBeaches() {
         foreach (var point in grid.Keys.Where(it => grid[it] is Cells.LAND)) {
             foreach (var direction in Point.Directions8) {
                 var neighbor = point + direction;
