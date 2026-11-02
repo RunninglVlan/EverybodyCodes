@@ -53,18 +53,25 @@ class Map {
         var startLand = new Point(width / 2, height / 2);
         grid[startLand] = Cells.LAND;
         queue.Enqueue(startLand);
+        HashSet<Point> found = [startLand];
+        Find(queue, found);
+        foreach (var land in found) {
+            grid[land] = Cells.LAND;
+        }
+    }
+
+    void Find(Queue<Point> queue, HashSet<Point> found) {
         while (queue.TryDequeue(out var current)) {
             foreach (var direction in Point.Directions8) {
                 var next = current + direction;
                 int validCellsAround = Point.Directions8
                         .Select(it => next + it)
-                        .Count(it => grid.TryGetValue(it, out char cell) && cell is Cells.DARK or Cells.LAND);
+                        .Count(it => found.Contains(it) || grid.TryGetValue(it, out char cell) && cell == Cells.DARK);
                 bool isLand = validCellsAround >= VALID_LAND_NEIGHBORS;
-                if (!isLand || grid[next] == Cells.LAND) {
+                if (!isLand || !found.Add(next)) {
                     continue;
                 }
                 queue.Enqueue(next);
-                grid[next] = Cells.LAND;
             }
         }
     }
