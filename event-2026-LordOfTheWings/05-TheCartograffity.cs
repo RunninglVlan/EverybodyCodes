@@ -26,8 +26,6 @@ class Map {
                 grid[new Point(x, y)] = rows[y][x];
             }
         }
-        var land = new Point(width / 2, height / 2);
-        grid[land] = Cells.LAND;
     }
 
     public void Reconstruct() {
@@ -40,9 +38,9 @@ class Map {
 
     void MarkLand() {
         var queue = new Queue<Point>();
-        var start = grid.First(it => it.Value == Cells.LAND).Key;
-        queue.Enqueue(start);
-        grid[start] = Cells.LAND;
+        var startLand = new Point(width / 2, height / 2);
+        grid[startLand] = Cells.LAND;
+        queue.Enqueue(startLand);
         while (queue.TryDequeue(out var current)) {
             foreach (var direction in Point.Directions8) {
                 var next = current + direction;
