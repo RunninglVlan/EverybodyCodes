@@ -41,31 +41,31 @@ class Map {
 
     public void Reconstruct() {
         MarkLand();
-        foreach ((var point, char _) in grid.Where(it => it.Value != Cells.LAND)) {
-            grid[point] = Cells.WATER;
-        }
+        MarkWater();
         MarkSand();
         MarkTrees();
+        return;
+
+        void MarkWater() {
+            foreach ((var point, char _) in grid.Where(it => it.Value != Cells.LAND)) {
+                grid[point] = Cells.WATER;
+            }
+        }
     }
 
     void MarkLand() {
         var queue = new Queue<Point>();
         var startLand = new Point(width / 2, height / 2);
-        grid[startLand] = Cells.LAND;
         queue.Enqueue(startLand);
-        HashSet<Point> land = [startLand];
-        Find(queue, land, it => it == Cells.DARK, VALID_LAND_NEIGHBORS);
-        foreach (var point in land) {
-            grid[point] = Cells.LAND;
-        }
+        Mark(queue, [startLand], Cells.LAND, it => it == Cells.DARK, VALID_LAND_NEIGHBORS);
     }
 
-    void Find(Queue<Point> queue, HashSet<Point> found, Predicate<char> include, int minValid, bool checkFound = true,
-            bool enqueue = true, Predicate<char>? exclude = null) {
+    void Mark(Queue<Point> queue, HashSet<Point> found, char cell, Predicate<char> include, int minValid,
+            bool checkFound = true, bool enqueue = true, Predicate<char>? exclude = null) {
         while (queue.TryDequeue(out var current)) {
             foreach (var direction in Point.Directions8) {
                 var next = current + direction;
-                if (!IsValid(next) || !found.Add(next)) {
+                if (!IsValid(next, found, include, minValid, checkFound, exclude) || !found.Add(next)) {
                     continue;
                 }
                 if (enqueue) {
@@ -73,37 +73,35 @@ class Map {
                 }
             }
         }
-        return;
-
-        bool IsValid(Point point) {
-            var validCellsAround = 0;
-            foreach (var direction in Point.Directions8) {
-                var neighbor = point + direction;
-                if (!grid.TryGetValue(neighbor, out char cell)) {
-                    continue;
-                }
-                if (checkFound && found.Contains(neighbor) || include(cell)) {
-                    validCellsAround++;
-                } else if (exclude != null && exclude(cell)) {
-                    return false;
-                }
-            }
-            return validCellsAround >= minValid;
+        foreach (var point in found) {
+            grid[point] = cell;
         }
+    }
+
+    bool IsValid(Point point, HashSet<Point> found, Predicate<char> include, int minValid, bool checkFound,
+            Predicate<char>? exclude) {
+        var validCellsAround = 0;
+        foreach (var direction in Point.Directions8) {
+            var neighbor = point + direction;
+            if (!grid.TryGetValue(neighbor, out char cell)) {
+                continue;
+            }
+            if (checkFound && found.Contains(neighbor) || include(cell)) {
+                validCellsAround++;
+            } else if (exclude != null && exclude(cell)) {
+                return false;
+            }
+        }
+        return validCellsAround >= minValid;
     }
 
     void MarkSand() {
         MarkBeaches();
         var queue = new Queue<Point>();
-        HashSet<Point> sand = [];
         foreach ((var point, char _) in grid.Where(it => it.Value == Cells.SAND)) {
             queue.Enqueue(point);
-            sand.Add(point);
         }
-        Find(queue, sand, it => it == Cells.SAND, VALID_LAND_NEIGHBORS);
-        foreach (var point in sand) {
-            grid[point] = Cells.SAND;
-        }
+        Mark(queue, [], Cells.SAND, it => it == Cells.SAND, VALID_LAND_NEIGHBORS);
     }
 
     void MarkBeaches() {
@@ -161,12 +159,8 @@ class Map {
         foreach ((var point, char _) in grid.Where(it => it.Value == Cells.TREE)) {
             queue.Enqueue(point);
         }
-        HashSet<Point> nextTrees = [];
-        Find(queue, nextTrees, it => it == Cells.TREE, VALID_TREE_NEIGHBORS,
+        Mark(queue, [], Cells.TREE, it => it == Cells.TREE, VALID_TREE_NEIGHBORS,
                 checkFound: false, enqueue: false, exclude: it => it == Cells.SAND);
-        foreach (var tree in nextTrees) {
-            grid[tree] = Cells.TREE;
-        }
     }
 }
 
