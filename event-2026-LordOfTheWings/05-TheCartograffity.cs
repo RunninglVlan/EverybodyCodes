@@ -53,25 +53,42 @@ class Map {
         var startLand = new Point(width / 2, height / 2);
         grid[startLand] = Cells.LAND;
         queue.Enqueue(startLand);
-        HashSet<Point> found = [startLand];
-        Find(queue, found);
-        foreach (var land in found) {
-            grid[land] = Cells.LAND;
+        HashSet<Point> land = [startLand];
+        Find(queue, land, it => it == Cells.DARK, VALID_LAND_NEIGHBORS);
+        foreach (var point in land) {
+            grid[point] = Cells.LAND;
         }
     }
 
-    void Find(Queue<Point> queue, HashSet<Point> found) {
+    void Find(Queue<Point> queue, HashSet<Point> found, Predicate<char> include, int minValid, bool checkFound = true,
+            bool enqueue = true, Predicate<char>? exclude = null) {
         while (queue.TryDequeue(out var current)) {
             foreach (var direction in Point.Directions8) {
                 var next = current + direction;
-                if (!IsValid(next, it => it == Cells.DARK, VALID_LAND_NEIGHBORS, found)) {
+                if (!IsValid(next) || !found.Add(next)) {
                     continue;
                 }
-                if (!found.Add(next)) {
-                    continue;
+                if (enqueue) {
+                    queue.Enqueue(next);
                 }
-                queue.Enqueue(next);
             }
+        }
+        return;
+
+        bool IsValid(Point point) {
+            var validCellsAround = 0;
+            foreach (var direction in Point.Directions8) {
+                var neighbor = point + direction;
+                if (!grid.TryGetValue(neighbor, out char cell)) {
+                    continue;
+                }
+                if (checkFound && found.Contains(neighbor) || include(cell)) {
+                    validCellsAround++;
+                } else if (exclude != null && exclude(cell)) {
+                    return false;
+                }
+            }
+            return validCellsAround >= minValid;
         }
     }
 
@@ -153,35 +170,11 @@ class Map {
             queue.Enqueue(point);
         }
         HashSet<Point> nextTrees = [];
-        while (queue.TryDequeue(out var current)) {
-            foreach (var direction in Point.Directions8) {
-                var next = current + direction;
-                if (!IsValid(next, it => it == Cells.TREE, VALID_TREE_NEIGHBORS, exclude: it => it == Cells.SAND)) {
-                    continue;
-                }
-                nextTrees.Add(next);
-            }
-        }
+        Find(queue, nextTrees, it => it == Cells.TREE, VALID_TREE_NEIGHBORS,
+                checkFound: false, enqueue: false, exclude: it => it == Cells.SAND);
         foreach (var tree in nextTrees) {
             grid[tree] = Cells.TREE;
         }
-    }
-
-    bool IsValid(Point point, Predicate<char> include, int minValid, HashSet<Point>? found = null,
-            Predicate<char>? exclude = null) {
-        var validCellsAround = 0;
-        foreach (var direction in Point.Directions8) {
-            var neighbor = point + direction;
-            if (!grid.TryGetValue(neighbor, out char cell)) {
-                continue;
-            }
-            if (found != null && found.Contains(neighbor) || include(cell)) {
-                validCellsAround++;
-            } else if (exclude != null && exclude(cell)) {
-                return false;
-            }
-        }
-        return validCellsAround >= minValid;
     }
 }
 
