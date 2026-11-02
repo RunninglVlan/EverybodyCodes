@@ -32,7 +32,10 @@ class Map {
 
     public void Reconstruct() {
         MarkLand();
-        // Log();
+        foreach ((var point, char _) in grid.Where(it => it.Value != Cells.LAND)) {
+            grid[point] = Cells.WATER;
+        }
+        Log();
     }
 
     void MarkLand() {
@@ -60,21 +63,24 @@ class Map {
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < width; x++) {
                 char cell = grid[new Point(x, y)];
-                if (cell == Cells.LAND) {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                }
+                Console.ForegroundColor = cell switch {
+                    Cells.WATER => ConsoleColor.Blue,
+                    Cells.LAND => ConsoleColor.Green,
+                    _ => Console.ForegroundColor
+                };
                 Console.Write(cell);
                 Console.ResetColor();
             }
             Console.WriteLine();
         }
-        Test.Step();
+        // Test.Step();
     }
 }
 
 static class Cells {
     public const char DARK = '1';
     public const char LAND = '#';
+    public const char WATER = '.';
 }
 
 readonly record struct Point(int X, int Y) {
