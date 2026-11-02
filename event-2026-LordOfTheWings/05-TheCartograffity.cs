@@ -11,12 +11,11 @@ Test.Run((notes, part, expected) => {
 });
 
 class Map {
-    const char DARK = '1', LAND = '#';
     const int VALID_NEIGHBORS = 5;
 
     readonly Dictionary<Point, char> grid = [];
     int width, height;
-    public int Land => grid.Values.Count(it => it == LAND);
+    public int Land => grid.Values.Count(it => it == Cells.LAND);
 
     public void Read(string notes) {
         string[] rows = [.. notes.Split(Environment.NewLine)];
@@ -28,7 +27,7 @@ class Map {
             }
         }
         var land = new Point(width / 2, height / 2);
-        grid[land] = LAND;
+        grid[land] = Cells.LAND;
     }
 
     public void Reconstruct() {
@@ -38,21 +37,21 @@ class Map {
 
     void MarkLand() {
         var queue = new Queue<Point>();
-        var start = grid.First(it => it.Value == LAND).Key;
+        var start = grid.First(it => it.Value == Cells.LAND).Key;
         queue.Enqueue(start);
-        grid[start] = LAND;
+        grid[start] = Cells.LAND;
         while (queue.TryDequeue(out var current)) {
             foreach (var direction in Point.Directions8) {
                 var next = current + direction;
                 int validCellsAround = Point.Directions8
                         .Select(it => next + it)
-                        .Count(it => grid.TryGetValue(it, out char cell) && cell is DARK or LAND);
+                        .Count(it => grid.TryGetValue(it, out char cell) && cell is Cells.DARK or Cells.LAND);
                 bool isLand = validCellsAround >= VALID_NEIGHBORS;
                 if (!isLand || grid[next] == Cells.LAND) {
                     continue;
                 }
                 queue.Enqueue(next);
-                grid[next] = LAND;
+                grid[next] = Cells.LAND;
             }
         }
     }
@@ -61,7 +60,7 @@ class Map {
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < width; x++) {
                 char cell = grid[new Point(x, y)];
-                if (cell == LAND) {
+                if (cell == Cells.LAND) {
                     Console.ForegroundColor = ConsoleColor.Red;
                 }
                 Console.Write(cell);
@@ -71,6 +70,11 @@ class Map {
         }
         Test.Step();
     }
+}
+
+static class Cells {
+    public const char DARK = '1';
+    public const char LAND = '#';
 }
 
 readonly record struct Point(int X, int Y) {
