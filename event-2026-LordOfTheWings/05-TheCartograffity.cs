@@ -3,7 +3,7 @@
 Assert.Throw = true;
 const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
-const int part = 1;
+const int part = 3;
 Test.Run((notes, part, expected) => {
     var map = new Map();
     map.Read(notes);
@@ -13,7 +13,6 @@ Test.Run((notes, part, expected) => {
         2 => map.Sand,
         _ => map.Trees
     };
-    map.Log();
     Assert.ActualEqualsExpected(cells, expected);
 });
 
@@ -175,25 +174,6 @@ class Map {
             }
         }
         return validCellsAround >= VALID_TREE_NEIGHBORS;
-    }
-
-    public void Log() {
-        for (var y = 0; y < height; y++) {
-            for (var x = 0; x < width; x++) {
-                char cell = grid[new Point(x, y)];
-                Console.ForegroundColor = cell switch {
-                    Cells.WATER => ConsoleColor.Blue,
-                    Cells.LAND => ConsoleColor.Green,
-                    Cells.SAND => ConsoleColor.Yellow,
-                    Cells.TREE => ConsoleColor.DarkCyan,
-                    _ => Console.ForegroundColor
-                };
-                Console.Write(cell);
-                Console.ResetColor();
-            }
-            Console.WriteLine();
-        }
-        // Test.Step();
     }
 }
 
