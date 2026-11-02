@@ -20,8 +20,10 @@ Test.Run((notes, part, expected) => {
 });
 
 class Map {
-    const int VALID_NEIGHBORS = 5;
+    const int VALID_LAND_NEIGHBORS = 5;
+    const int VALID_TREE_NEIGHBORS = 4;
     const int TREE_RADIUS = 2;
+    const int TREE_GROWTH_TIMES = 2;
 
     readonly Dictionary<Point, char> grid = [];
     int width, height;
@@ -60,7 +62,7 @@ class Map {
                 int validCellsAround = Point.Directions8
                         .Select(it => next + it)
                         .Count(it => grid.TryGetValue(it, out char cell) && cell is Cells.DARK or Cells.LAND);
-                bool isLand = validCellsAround >= VALID_NEIGHBORS;
+                bool isLand = validCellsAround >= VALID_LAND_NEIGHBORS;
                 if (!isLand || grid[next] == Cells.LAND) {
                     continue;
                 }
@@ -82,7 +84,7 @@ class Map {
                 int validCellsAround = Point.Directions8
                         .Select(it => next + it)
                         .Count(it => grid.TryGetValue(it, out char cell) && cell == Cells.SAND);
-                bool isSand = validCellsAround >= VALID_NEIGHBORS;
+                bool isSand = validCellsAround >= VALID_LAND_NEIGHBORS;
                 if (!isSand || grid[next] == Cells.SAND) {
                     continue;
                 }
@@ -110,34 +112,71 @@ class Map {
         for (int y = TREE_RADIUS; y < height - TREE_RADIUS; y++) {
             for (int x = TREE_RADIUS; x < width - TREE_RADIUS; x++) {
                 var point = new Point(x, y);
-                if (IsTree(point)) {
+                if (IsFirstTree(point)) {
                     grid[point] = Cells.TREE;
                 }
             }
         }
-        return;
+        for (var _ = 0; _ < TREE_GROWTH_TIMES; _++) {
+            GrowTrees();
+        }
+    }
 
-        bool IsTree(Point point) {
-            var min = point - TREE_RADIUS;
-            var max = point + TREE_RADIUS;
-            for (int y = min.Y; y <= max.Y; y++) {
-                for (int x = min.X; x <= max.X; x++) {
-                    var neighbor = new Point(x, y);
-                    if (neighbor == point) {
-                        continue;
-                    }
-                    bool isCorner = neighbor.Y == min.Y && (neighbor.X == min.X || neighbor.X == max.X)
-                            || neighbor.Y == max.Y && (neighbor.X == min.X || neighbor.X == max.X);
-                    if (isCorner) {
-                        continue;
-                    }
-                    if (grid[neighbor] is not (Cells.LAND or Cells.TREE)) {
-                        return false;
-                    }
+    bool IsFirstTree(Point point) {
+        var min = point - TREE_RADIUS;
+        var max = point + TREE_RADIUS;
+        for (int y = min.Y; y <= max.Y; y++) {
+            for (int x = min.X; x <= max.X; x++) {
+                var neighbor = new Point(x, y);
+                if (neighbor == point) {
+                    continue;
+                }
+                bool isCorner = neighbor.Y == min.Y && (neighbor.X == min.X || neighbor.X == max.X)
+                        || neighbor.Y == max.Y && (neighbor.X == min.X || neighbor.X == max.X);
+                if (isCorner) {
+                    continue;
+                }
+                if (grid[neighbor] is not (Cells.LAND or Cells.TREE)) {
+                    return false;
                 }
             }
-            return true;
         }
+        return true;
+    }
+
+    void GrowTrees() {
+        var queue = new Queue<Point>();
+        foreach ((var point, char _) in grid.Where(it => it.Value == Cells.TREE)) {
+            queue.Enqueue(point);
+        }
+        HashSet<Point> nextTrees = [];
+        while (queue.TryDequeue(out var current)) {
+            foreach (var direction in Point.Directions8) {
+                var next = current + direction;
+                if (!IsNextTree(next)) {
+                    continue;
+                }
+                nextTrees.Add(next);
+            }
+        }
+        foreach (var tree in nextTrees) {
+            grid[tree] = Cells.TREE;
+        }
+    }
+
+    bool IsNextTree(Point point) {
+        var validCellsAround = 0;
+        foreach (var direction in Point.Directions8) {
+            var neighbor = point + direction;
+            switch (grid[neighbor]) {
+                case Cells.TREE:
+                    validCellsAround++;
+                    break;
+                case Cells.SAND:
+                    return false;
+            }
+        }
+        return validCellsAround >= VALID_TREE_NEIGHBORS;
     }
 
     public void Log() {
