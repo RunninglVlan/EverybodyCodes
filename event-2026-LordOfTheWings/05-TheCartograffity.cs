@@ -32,41 +32,32 @@ class Map {
     }
 
     public void Reconstruct() {
+        MarkLand();
+        // Log();
+    }
+
+    void MarkLand() {
         var queue = new Queue<Point>();
         var start = grid.First(it => it.Value == LAND).Key;
         queue.Enqueue(start);
-        AddLand(start);
-        // Log();
+        grid[start] = LAND;
         while (queue.TryDequeue(out var current)) {
             foreach (var direction in Point.Directions8) {
                 var next = current + direction;
-                if (!IsLand(next) || !AddLand(next)) {
+                int validCellsAround = Point.Directions8
+                        .Select(it => next + it)
+                        .Count(it => grid.TryGetValue(it, out char cell) && cell is DARK or LAND);
+                bool isLand = validCellsAround >= VALID_NEIGHBORS;
+                if (!isLand || grid[next] == Cells.LAND) {
                     continue;
                 }
                 queue.Enqueue(next);
-                // Log();
+                grid[next] = LAND;
             }
         }
-        // Log();
-    }
-
-    bool AddLand(Point point) {
-        if (grid[point] == LAND) {
-            return false;
-        }
-        grid[point] = LAND;
-        return true;
-    }
-
-    bool IsLand(Point point) {
-        int validCellsAround = Point.Directions8
-                .Select(it => point + it)
-                .Count(it => grid.TryGetValue(it, out char cell) && cell is DARK or LAND);
-        return validCellsAround >= VALID_NEIGHBORS;
     }
 
     void Log() {
-        // return;
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < width; x++) {
                 char cell = grid[new Point(x, y)];
