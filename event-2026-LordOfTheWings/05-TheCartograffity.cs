@@ -11,8 +11,12 @@ Test.Run((notes, part, expected) => {
 });
 
 class Map {
+    const char DARK = '1', LAND = '#';
+    const int VALID_NEIGHBORS = 5;
+
     char[][] grid = null!;
     int width, height;
+    readonly HashSet<Point> land = [];
 
     public void Read(string notes) {
         grid = [.. notes.Split(Environment.NewLine).Select(it => it.ToCharArray())];
@@ -21,8 +25,71 @@ class Map {
     }
 
     public int FindLand() {
-        return 0;
+        var queue = new Queue<Point>();
+        var start = new Point(width / 2, height / 2);
+        queue.Enqueue(start);
+        AddLand(start);
+        // Log();
+        while (queue.TryDequeue(out var current)) {
+            foreach (var direction in Point.Directions8) {
+                var next = current + direction;
+                if (!IsLand(next) || !AddLand(next)) {
+                    continue;
+                }
+                queue.Enqueue(next);
+                // Log();
+            }
+        }
+        // Log();
+        return land.Count;
     }
+
+    bool AddLand(Point point) {
+        grid[point.Y][point.X] = LAND;
+        return land.Add(point);
+    }
+
+    bool IsLand(Point point) {
+        int validCellsAround = Point.Directions8
+                .Select(it => point + it)
+                .Where(it => it.InBounds(width, height))
+                .Count(it => land.Contains(it) || grid[it.Y][it.X] == DARK);
+        return validCellsAround >= VALID_NEIGHBORS;
+    }
+
+    void Log() {
+        // return;
+        for (var y = 0; y < height; y++) {
+            for (var x = 0; x < width; x++) {
+                char cell = grid[y][x];
+                if (cell == LAND) {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                }
+                Console.Write(cell);
+                Console.ResetColor();
+            }
+            Console.WriteLine();
+        }
+        Test.Step();
+    }
+}
+
+readonly record struct Point(int X, int Y) {
+    static readonly Point UP = new(0, 1);
+    static readonly Point DOWN = new(0, -1);
+    static readonly Point LEFT = new(-1, 0);
+    static readonly Point RIGHT = new(1, 0);
+
+    public static Point[] Directions8 { get; } = [
+        RIGHT, LEFT, UP, DOWN,
+        new(1, 1), new(-1, 1), new(1, -1), new(-1, -1)
+    ];
+
+    public bool InBounds(int width, int? height = null) {
+        return X >= 0 && X < width && Y >= 0 && Y < (height ?? width);
+    }
+
+    public static Point operator +(Point a, Point b) => new(a.X + b.X, a.Y + b.Y);
 }
 
 static class Test {
