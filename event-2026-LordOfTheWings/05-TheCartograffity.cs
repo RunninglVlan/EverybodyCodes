@@ -13,9 +13,7 @@ Test.Run((notes, part, expected) => {
         2 => map.Sand,
         _ => map.Trees
     };
-    if (part == 3) {
-        map.Log();
-    }
+    map.Log();
     Assert.ActualEqualsExpected(cells, expected);
 });
 
