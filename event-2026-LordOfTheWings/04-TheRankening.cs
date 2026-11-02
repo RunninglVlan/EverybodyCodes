@@ -6,9 +6,9 @@ string notes = File.ReadAllText(noteFile);
     const int part = 3;
     var results = notes.Split(Environment.NewLine).Select(Result.From).ToArray();
     var ranking = part != 3 ? TimeRanking(results) : PointRanking(results);
-    int checksum = 0;
+    var checksum = 0;
     (int place, int score) last = (0, 0);
-    int place = 1;
+    var place = 1;
     foreach (int score in ranking) {
         bool isTiedWithPrevious = score == last.score;
         int currentPlace = isTiedWithPrevious ? last.place : place;
@@ -32,12 +32,12 @@ IEnumerable<int> TimeRanking(Result[] allResults) {
 IEnumerable<int> PointRanking(Result[] allResults) {
     const int pointCoefficient = 50;
     int ids = allResults.Select(it => it.Id).Max();
-    int[] scores = new int[ids];
+    var scores = new int[ids];
     int quests = allResults.Select(it => it.Quest).Max();
     int parts = allResults.Select(it => it.Part).Max();
-    for (int quest = 1; quest <= quests; quest++) {
+    for (var quest = 1; quest <= quests; quest++) {
         var questResults = allResults.Where(it => it.Quest == quest).ToArray();
-        for (int part = 1; part <= parts; part++) {
+        for (var part = 1; part <= parts; part++) {
             var ranking = questResults
                     .Where(it => it.Part <= part)
                     .GroupBy(it => it.Id)
