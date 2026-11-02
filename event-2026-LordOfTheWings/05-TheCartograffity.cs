@@ -54,19 +54,14 @@ class Map {
     }
 
     void MarkLand() {
-        var queue = new Queue<Point>();
         var startLand = new Point(width / 2, height / 2);
-        queue.Enqueue(startLand);
-        Mark(queue, [startLand], Cells.LAND, it => it == Cells.DARK, VALID_LAND_NEIGHBORS);
+        grid[startLand] = Cells.LAND;
+        Mark([startLand], Cells.LAND, VALID_LAND_NEIGHBORS, validCell: Cells.DARK);
     }
 
     void MarkSand() {
         MarkBeaches();
-        var queue = new Queue<Point>();
-        foreach ((var point, char _) in grid.Where(it => it.Value == Cells.SAND)) {
-            queue.Enqueue(point);
-        }
-        Mark(queue, [], Cells.SAND, it => it == Cells.SAND, VALID_LAND_NEIGHBORS);
+        Mark([], Cells.SAND, VALID_LAND_NEIGHBORS);
     }
 
     void MarkBeaches() {
@@ -93,7 +88,7 @@ class Map {
             }
         }
         for (var _ = 0; _ < TREE_GROWTH_TIMES; _++) {
-            GrowTrees();
+            Mark([], Cells.TREE, VALID_TREE_NEIGHBORS, checkFound: false, enqueue: false, invalidCell: Cells.SAND);
         }
     }
 
@@ -119,21 +114,16 @@ class Map {
         return true;
     }
 
-    void GrowTrees() {
+    void Mark(HashSet<Point> found, char cell, int minValid, char? validCell = null,
+            bool checkFound = true, bool enqueue = true, char? invalidCell = null) {
         var queue = new Queue<Point>();
-        foreach ((var point, char _) in grid.Where(it => it.Value == Cells.TREE)) {
+        foreach ((var point, char _) in grid.Where(it => it.Value == cell)) {
             queue.Enqueue(point);
         }
-        Mark(queue, [], Cells.TREE, it => it == Cells.TREE, VALID_TREE_NEIGHBORS,
-                checkFound: false, enqueue: false, exclude: it => it == Cells.SAND);
-    }
-
-    void Mark(Queue<Point> queue, HashSet<Point> found, char cell, Predicate<char> include, int minValid,
-            bool checkFound = true, bool enqueue = true, Predicate<char>? exclude = null) {
         while (queue.TryDequeue(out var current)) {
             foreach (var direction in Point.Directions8) {
                 var next = current + direction;
-                if (!IsValid(next, found, include, minValid, checkFound, exclude) || !found.Add(next)) {
+                if (!IsValid(next, found, validCell ?? cell, minValid, checkFound, invalidCell) || !found.Add(next)) {
                     continue;
                 }
                 if (enqueue) {
@@ -146,17 +136,16 @@ class Map {
         }
     }
 
-    bool IsValid(Point point, HashSet<Point> found, Predicate<char> include, int minValid, bool checkFound,
-            Predicate<char>? exclude) {
+    bool IsValid(Point point, HashSet<Point> found, char validCell, int minValid, bool checkFound, char? invalidCell) {
         var validCellsAround = 0;
         foreach (var direction in Point.Directions8) {
             var neighbor = point + direction;
             if (!grid.TryGetValue(neighbor, out char cell)) {
                 continue;
             }
-            if (checkFound && found.Contains(neighbor) || include(cell)) {
+            if (checkFound && found.Contains(neighbor) || cell == validCell) {
                 validCellsAround++;
-            } else if (exclude != null && exclude(cell)) {
+            } else if (cell == invalidCell) {
                 return false;
             }
         }
