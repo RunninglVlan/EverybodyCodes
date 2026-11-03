@@ -3,34 +3,42 @@
 Assert.Throw = true;
 // https://everybody.codes/event/2026/quests/6
 const string noteFile = "../Notes.txt";
+const string nullIngredient = "NULL";
 string notes = File.ReadAllText(noteFile);
 var part = 1;
+Dictionary<string, string[]> ingredients = [];
 Test.Run((notes, part, expected) => {
-    const string nullIngredient = "NULL";
-    var ingredients = notes.Split(Environment.NewLine)
-            .Select(it => {
-                string[] parts = it.Split(':');
-                return (key: parts.First(), values: parts.Last().Split(','));
-            })
-            .ToDictionary(it => it.key, it => it.values);
+    ingredients.Clear();
+    foreach (string[] parts in notes.Split(Environment.NewLine).Select(it => it.Split(':'))) {
+        ingredients.Add(parts.First(), parts.Last().Split(','));
+    }
+    int count = part switch {
+        1 => NullIngredients(),
+        _ => 0
+    };
+    Assert.ActualEqualsExpected(count, expected);
+});
+return;
+
+int NullIngredients() {
     var queue = new Queue<string>();
-    var nullIngredients = new HashSet<string>();
+    var result = new HashSet<string>();
     foreach (string ingredient in ingredients[nullIngredient]) {
         queue.Enqueue(ingredient);
-        nullIngredients.Add(ingredient);
+        result.Add(ingredient);
     }
-    while (queue.TryDequeue(out string? ingredient)) {
-        if (!ingredients.TryGetValue(ingredient, out string[]? subIngredients)) {
+    while (queue.TryDequeue(out string? current)) {
+        if (!ingredients.TryGetValue(current, out string[]? madeFrom)) {
             continue;
         }
-        foreach (string subIngredient in subIngredients) {
-            if (subIngredient != nullIngredient && nullIngredients.Add(subIngredient)) {
-                queue.Enqueue(subIngredient);
+        foreach (string next in madeFrom) {
+            if (next != nullIngredient && result.Add(next)) {
+                queue.Enqueue(next);
             }
         }
     }
-    Assert.ActualEqualsExpected(nullIngredients.Count, expected);
-});
+    return result.Count;
+}
 
 static class Test {
     const string CASE_FILE = "../Test.Cases.txt";
