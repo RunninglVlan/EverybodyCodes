@@ -12,43 +12,38 @@ Test.Run((notes, part, expected) => {
     foreach (string[] parts in notes.Split(Environment.NewLine).Select(it => it.Split(':'))) {
         ingredients.Add(parts.First(), parts.Last().Split(','));
     }
-    int count = part switch {
-        1 => NullIsMadeOf(),
-        _ => NullIsUsedIn()
-    };
+    int count = FindIngredients(part switch {
+        1 => MadeFrom,
+        _ => UsedIn
+    });
     Assert.ActualEqualsExpected(count, expected);
 });
 return;
 
-int NullIsMadeOf() {
-    var queue = new Queue<string>();
-    var result = new HashSet<string>();
-    foreach (string ingredient in ingredients[nullIngredient]) {
-        queue.Enqueue(ingredient);
-        result.Add(ingredient);
+IEnumerable<string> MadeFrom(string current) {
+    if (!ingredients.TryGetValue(current, out string[]? madeFrom)) {
+        yield break;
     }
-    while (queue.TryDequeue(out string? current)) {
-        if (!ingredients.TryGetValue(current, out string[]? madeFrom)) {
-            continue;
-        }
-        foreach (string next in madeFrom) {
-            if (next != nullIngredient && result.Add(next)) {
-                queue.Enqueue(next);
-            }
-        }
+    foreach (string next in madeFrom) {
+        yield return next;
     }
-    return result.Count;
 }
 
-int NullIsUsedIn() {
+IEnumerable<string> UsedIn(string current) {
+    foreach ((string next, string[] _) in ingredients.Where(it => it.Value.Contains(current))) {
+        yield return next;
+    }
+}
+
+int FindIngredients(Func<string, IEnumerable<string>> nextIngredients) {
     var queue = new Queue<string>();
     var result = new HashSet<string>();
-    foreach ((string ingredient, string[] _) in ingredients.Where(it => it.Value.Contains(nullIngredient))) {
-        queue.Enqueue(ingredient);
-        result.Add(ingredient);
+    foreach (string next in nextIngredients(nullIngredient)) {
+        queue.Enqueue(next);
+        result.Add(next);
     }
     while (queue.TryDequeue(out string? current)) {
-        foreach ((string next, string[] _) in ingredients.Where(it => it.Value.Contains(current))) {
+        foreach (string next in nextIngredients(current)) {
             if (next != nullIngredient && result.Add(next)) {
                 queue.Enqueue(next);
             }
