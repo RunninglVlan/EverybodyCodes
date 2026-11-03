@@ -16,7 +16,6 @@ Test.Run((notes, part, expected) => {
         1 => NullIsMadeOf(),
         _ => NullIsUsedIn()
     };
-
     Assert.ActualEqualsExpected(count, expected);
 });
 return;
@@ -42,7 +41,20 @@ int NullIsMadeOf() {
 }
 
 int NullIsUsedIn() {
-    return 0;
+    var queue = new Queue<string>();
+    var result = new HashSet<string>();
+    foreach ((string ingredient, string[] _) in ingredients.Where(it => it.Value.Contains(nullIngredient))) {
+        queue.Enqueue(ingredient);
+        result.Add(ingredient);
+    }
+    while (queue.TryDequeue(out string? current)) {
+        foreach ((string next, string[] _) in ingredients.Where(it => it.Value.Contains(current))) {
+            if (next != nullIngredient && result.Add(next)) {
+                queue.Enqueue(next);
+            }
+        }
+    }
+    return result.Count;
 }
 
 static class Test {
