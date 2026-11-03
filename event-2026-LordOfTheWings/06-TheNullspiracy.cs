@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 
+Assert.Throw = true;
 // https://everybody.codes/event/2026/quests/6
 const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
@@ -14,17 +15,14 @@ Test.Run((notes, part, expected) => {
             .ToDictionary(it => it.key, it => it.values);
     var queue = new Queue<string>();
     var nullIngredients = new HashSet<string>();
-    // Console.WriteLine(string.Join(',', ingredients["NULL"]));
     foreach (string ingredient in ingredients[nullIngredient]) {
         queue.Enqueue(ingredient);
         nullIngredients.Add(ingredient);
-        // Console.WriteLine(ingredient);
     }
     while (queue.TryDequeue(out string? ingredient)) {
         if (!ingredients.TryGetValue(ingredient, out string[]? subIngredients)) {
             continue;
         }
-        // Console.WriteLine(string.Join(',', subIngredients));
         foreach (string subIngredient in subIngredients) {
             if (subIngredient != nullIngredient && nullIngredients.Add(subIngredient)) {
                 queue.Enqueue(subIngredient);
