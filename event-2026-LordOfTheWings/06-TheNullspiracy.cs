@@ -24,33 +24,15 @@ Test.Run((notes, part, expected) => {
         }
     }
     int count = NullIngredients(part switch {
-        1 => MadeFrom,
-        _ => UsedIn
+        1 => ingredientsMadeFrom,
+        _ => ingredientsUsedIn
     });
     Assert.ActualEqualsExpected(count, expected);
 });
 return;
 
-IEnumerable<string> MadeFrom(string current) {
-    if (!ingredientsMadeFrom.TryGetValue(current, out var madeFrom)) {
-        yield break;
-    }
-    foreach (string next in madeFrom) {
-        yield return next;
-    }
-}
-
-IEnumerable<string> UsedIn(string current) {
-    if (!ingredientsUsedIn.TryGetValue(current, out var usedIn)) {
-        yield break;
-    }
-    foreach (string next in usedIn) {
-        yield return next;
-    }
-}
-
-int NullIngredients(Func<string, IEnumerable<string>> nextIngredients) {
-    var nullTypes = ingredientsMadeFrom
+int NullIngredients(Dictionary<string, HashSet<string>> ingredients) {
+    var nullTypes = ingredients
             .SelectMany(it => new[] { it.Key }.Concat(it.Value))
             .Where(it => it.Contains("NULL"))
             .ToHashSet();
@@ -59,18 +41,15 @@ int NullIngredients(Func<string, IEnumerable<string>> nextIngredients) {
     Dictionary<string, int> nullIngredients = [];
     foreach (string nullType in nullTypes) {
         result.Clear();
-        foreach (string next in nextIngredients(nullType)) {
+        foreach (string next in ingredients[nullType]) {
             queue.Enqueue(next);
             result.Add(next);
         }
         while (queue.TryDequeue(out string? current)) {
-            foreach (string next in nextIngredients(current)) {
-                if (next == nullType) {
-                    continue;
-                }
-                if (!result.Add(next)) {
-                    continue;
-                }
+            if (!ingredients.TryGetValue(current, out var nextIngredients)) {
+                continue;
+            }
+            foreach (string next in nextIngredients.Where(it => it != nullType && result.Add(it))) {
                 queue.Enqueue(next);
             }
         }
