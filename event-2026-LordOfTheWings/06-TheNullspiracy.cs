@@ -6,11 +6,11 @@ Assert.Throw = true;
 const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
 var part = 1;
-Dictionary<string, string[]> ingredients = [];
+Dictionary<string, HashSet<string>> ingredients = [];
 Test.Run((notes, part, expected) => {
     ingredients.Clear();
     foreach (string[] parts in notes.Split(Environment.NewLine).Select(it => it.Split(':'))) {
-        ingredients.Add(parts.First(), parts.Last().Split(','));
+        ingredients.Add(parts.First(), [.. parts.Last().Split(',')]);
     }
     int count = NullIngredients(part switch {
         1 => MadeFrom,
@@ -21,7 +21,7 @@ Test.Run((notes, part, expected) => {
 return;
 
 IEnumerable<string> MadeFrom(string current) {
-    if (!ingredients.TryGetValue(current, out string[]? madeFrom)) {
+    if (!ingredients.TryGetValue(current, out var madeFrom)) {
         yield break;
     }
     foreach (string next in madeFrom) {
@@ -30,7 +30,7 @@ IEnumerable<string> MadeFrom(string current) {
 }
 
 IEnumerable<string> UsedIn(string current) {
-    foreach ((string next, string[] _) in ingredients.Where(it => it.Value.Contains(current))) {
+    foreach ((string next, _) in ingredients.Where(it => it.Value.Contains(current))) {
         yield return next;
     }
 }
