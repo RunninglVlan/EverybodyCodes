@@ -13,14 +13,15 @@ Test.Run((notes, part, expected) => {
         ingredients.Add(parts.First(), parts.Last().Split(','));
     }
     int count = part switch {
-        1 => NullIngredients(),
-        _ => 0
+        1 => NullIsMadeOf(),
+        _ => NullIsUsedIn()
     };
+
     Assert.ActualEqualsExpected(count, expected);
 });
 return;
 
-int NullIngredients() {
+int NullIsMadeOf() {
     var queue = new Queue<string>();
     var result = new HashSet<string>();
     foreach (string ingredient in ingredients[nullIngredient]) {
@@ -38,6 +39,10 @@ int NullIngredients() {
         }
     }
     return result.Count;
+}
+
+int NullIsUsedIn() {
+    return 0;
 }
 
 static class Test {
