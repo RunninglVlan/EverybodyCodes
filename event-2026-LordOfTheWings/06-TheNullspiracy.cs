@@ -3,7 +3,6 @@
 Assert.Throw = true;
 // https://everybody.codes/event/2026/quests/6
 const string noteFile = "../Notes.txt";
-const string nullIngredient = "NULL";
 string notes = File.ReadAllText(noteFile);
 var part = 1;
 Dictionary<string, string[]> ingredients = [];
@@ -12,7 +11,7 @@ Test.Run((notes, part, expected) => {
     foreach (string[] parts in notes.Split(Environment.NewLine).Select(it => it.Split(':'))) {
         ingredients.Add(parts.First(), parts.Last().Split(','));
     }
-    int count = FindIngredients(part switch {
+    int count = NullIngredients(part switch {
         1 => MadeFrom,
         _ => UsedIn
     });
@@ -35,7 +34,8 @@ IEnumerable<string> UsedIn(string current) {
     }
 }
 
-int FindIngredients(Func<string, IEnumerable<string>> nextIngredients) {
+int NullIngredients(Func<string, IEnumerable<string>> nextIngredients) {
+    const string nullIngredient = "NULL";
     var queue = new Queue<string>();
     var result = new HashSet<string>();
     foreach (string next in nextIngredients(nullIngredient)) {
