@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 
+// Test.From = "Part III Example";
 Assert.Throw = true;
 // https://everybody.codes/event/2026/quests/6
 const string noteFile = "../Notes.txt";
@@ -35,21 +36,32 @@ IEnumerable<string> UsedIn(string current) {
 }
 
 int NullIngredients(Func<string, IEnumerable<string>> nextIngredients) {
-    const string nullIngredient = "NULL";
+    var nullTypes = ingredients
+            .SelectMany(it => new[] { it.Key }.Concat(it.Value))
+            .Where(it => it.Contains("NULL"))
+            .ToHashSet();
     var queue = new Queue<string>();
     var result = new HashSet<string>();
-    foreach (string next in nextIngredients(nullIngredient)) {
-        queue.Enqueue(next);
-        result.Add(next);
-    }
-    while (queue.TryDequeue(out string? current)) {
-        foreach (string next in nextIngredients(current)) {
-            if (next != nullIngredient && result.Add(next)) {
-                queue.Enqueue(next);
+    Dictionary<string, int> nullIngredients = [];
+    foreach (string nullType in nullTypes) {
+        result.Clear();
+        foreach (string next in nextIngredients(nullType)) {
+            queue.Enqueue(next);
+            result.Add(next);
+        }
+        while (queue.TryDequeue(out string? current)) {
+            foreach (string next in nextIngredients(current)) {
+                if (next != nullType && result.Add(next)) {
+                    queue.Enqueue(next);
+                }
             }
         }
+        foreach (string ingredient in result) {
+            nullIngredients[ingredient] = nullIngredients.GetValueOrDefault(ingredient) + 1;
+        }
     }
-    return result.Count;
+    int min = nullTypes.Count == 1 ? 1 : 2;
+    return nullIngredients.Count(it => it.Value >= min);
 }
 
 static class Test {
