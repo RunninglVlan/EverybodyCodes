@@ -5,7 +5,33 @@ const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
 var part = 1;
 Test.Run((notes, part, expected) => {
-    Assert.ActualEqualsExpected(1, expected);
+    const string nullIngredient = "NULL";
+    var ingredients = notes.Split(Environment.NewLine)
+            .Select(it => {
+                string[] parts = it.Split(':');
+                return (key: parts.First(), values: parts.Last().Split(','));
+            })
+            .ToDictionary(it => it.key, it => it.values);
+    var queue = new Queue<string>();
+    var nullIngredients = new HashSet<string>();
+    // Console.WriteLine(string.Join(',', ingredients["NULL"]));
+    foreach (string ingredient in ingredients[nullIngredient]) {
+        queue.Enqueue(ingredient);
+        nullIngredients.Add(ingredient);
+        // Console.WriteLine(ingredient);
+    }
+    while (queue.TryDequeue(out string? ingredient)) {
+        if (!ingredients.TryGetValue(ingredient, out string[]? subIngredients)) {
+            continue;
+        }
+        // Console.WriteLine(string.Join(',', subIngredients));
+        foreach (string subIngredient in subIngredients) {
+            if (subIngredient != nullIngredient && nullIngredients.Add(subIngredient)) {
+                queue.Enqueue(subIngredient);
+            }
+        }
+    }
+    Assert.ActualEqualsExpected(nullIngredients.Count, expected);
 });
 
 static class Test {
