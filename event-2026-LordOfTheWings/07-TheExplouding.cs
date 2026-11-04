@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 
 Test.From = "Part III Example";
-Test.Until = "Test";
 Assert.Throw = true;
 // https://everybody.codes/event/2026/quests/7
 const string noteFile = "../Notes.txt";
@@ -9,61 +8,53 @@ string notes = File.ReadAllText(noteFile);
 const int part = 1;
 Test.Run((notes, part, expected) => {
     var clouds = notes.Split(Environment.NewLine).Select(Cloud.From).ToDictionary(it => it.Id, it => it);
-    int forceStart = part switch {
+    int startForce = part switch {
         1 => 5,
         _ => 10
     };
-    int totalEnergy = TotalEnergy(clouds, forceStart);
+    int totalEnergy = TotalEnergy(clouds, startForce);
     Assert.ActualEqualsExpected(totalEnergy, expected);
 });
 return;
 
-int TotalEnergy(Dictionary<int, Cloud> cloudsOriginal, int forceStart) {
+int TotalEnergy(Dictionary<int, Cloud> cloudsOriginal, int startForce) {
     var maxEnergy = 0;
     Parallel.ForEach(cloudsOriginal.Keys, startId => {
         var clouds = cloudsOriginal.ToDictionary(it => it.Key, it => it.Value with { });
-        Dictionary<(int id, int force), int> impulses = new() { { (startId, forceStart), 1 } };
+        Dictionary<(int id, int force), int> impulses = new() { { (startId, startForce), 1 } };
         Dictionary<(int id, int force), int> nextImpulses = [];
-        while (true) {
+        while (impulses.Count > 0) {
             nextImpulses.Clear();
-            foreach (((int id, int force), int count) in impulses.OrderBy(it => it.Key.id)) {
+            foreach (((int id, int force), int count) in impulses) {
                 if (!clouds.TryGetValue(id, out var cloud)) {
                     continue;
                 }
-                int addEnergy = force * count;
-                cloud.Energy += addEnergy;
-                int forceNext = force - 1;
-                if (forceNext == 0) {
-                    continue;
-                }
-                foreach (int next in cloud.Connections) {
-                    var key = (next, forceNext);
-                    int nextCount = nextImpulses.GetValueOrDefault(key, 0);
-                    nextImpulses[key] = nextCount + count;
-                }
+                cloud.Energy += force * count;
+                PropagateImpulse(cloud, force - 1, nextImpulses, count);
             }
-            var explosions = clouds.Values.Where(it => it.Energy > 1_000_000).ToArray();
-            if (explosions.Length > 0) {
-                foreach (var cloud in explosions) {
-                    clouds.Remove(cloud.Id);
-                    foreach (int next in cloud.Connections) {
-                        var key = (next, 10);
-                        int nextCount = nextImpulses.GetValueOrDefault(key, 0);
-                        nextImpulses[key] = nextCount + 1;
-                    }
-                }
-            }
-            if (nextImpulses.Count == 0) {
-                break;
+            foreach (var cloud in clouds.Values.Where(it => it.Energy > 1_000_000)) {
+                clouds.Remove(cloud.Id);
+                PropagateImpulse(cloud, 10, nextImpulses, 1);
             }
             (impulses, nextImpulses) = (nextImpulses, impulses);
         }
-        int energy = clouds.Values.Select(it => it.Energy).Sum();
+        int energy = clouds.Values.Sum(it => it.Energy);
         if (energy > maxEnergy) {
             maxEnergy = energy;
         }
     });
     return maxEnergy;
+}
+
+void PropagateImpulse(Cloud cloud, int force, Dictionary<(int, int), int> impulses, int count) {
+    if (force == 0) {
+        return;
+    }
+    foreach (int next in cloud.Connections) {
+        var key = (next, force);
+        int nextCount = impulses.GetValueOrDefault(key, 0);
+        impulses[key] = nextCount + count;
+    }
 }
 
 record Cloud(int Id, int[] Connections) {
