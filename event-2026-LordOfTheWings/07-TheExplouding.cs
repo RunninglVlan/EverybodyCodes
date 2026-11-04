@@ -16,10 +16,6 @@ Test.Run((notes, part, expected) => {
     });
     while (queue.TryDequeue(out var currentItem)) {
         (var current, int impulse) = currentItem;
-        impulse--;
-        if (impulse == 0) {
-            continue;
-        }
         foreach (var next in current.Connections.Select(id => clouds[id])) {
             Propagate(next, impulse);
         }
@@ -30,8 +26,8 @@ Test.Run((notes, part, expected) => {
 return;
 
 void Propagate(Cloud cloud, int impulse) {
-    cloud.Energy += impulse;
-    if (reached.Add(cloud)) {
+    cloud.Energy += impulse--;
+    if (reached.Add(cloud) && impulse > 0) {
         queue.Enqueue((cloud, impulse));
     }
 }
