@@ -1,36 +1,44 @@
 ﻿using System.Diagnostics;
 
+// Test.From = "Part I Example";
+// Test.Until = "Part I";
 Assert.Throw = true;
 // https://everybody.codes/event/2026/quests/7
 const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
 const int part = 1;
-var queue = new Queue<(Cloud, int)>();
-var reached = new HashSet<Cloud>();
 Test.Run((notes, part, expected) => {
     var clouds = notes.Split(Environment.NewLine).Select(Cloud.From).ToDictionary(it => it.Id, it => it);
     var start = clouds.Values.MaxBy(it => it.Connections.Length)!;
-    Propagate(start, part switch {
+    int impulseStart = part switch {
         1 => 5,
         _ => 10
-    });
-    while (queue.TryDequeue(out var currentItem)) {
-        (var current, int impulse) = currentItem;
-        foreach (var next in current.Connections.Select(id => clouds[id])) {
-            Propagate(next, impulse);
+    };
+    Dictionary<int, List<int>> impulseClouds = new() { { impulseStart, [start.Id] } };
+    for (int impulse = impulseStart; impulse > 0; impulse--) {
+        Test.Log($"Strength {impulse}:");
+        foreach (var group in impulseClouds[impulse].OrderBy(it => it).GroupBy(it => it)) {
+            int count = group.Count();
+            Test.Log($"cloud {group.Key} received {count} impulse{(count > 1 ? "s" : "")}: +{impulse * count}");
+            var current = clouds[group.Key];
+            current.Energy += impulse * count;
+            int impulseNext = impulse - 1;
+            if (!impulseClouds.TryGetValue(impulseNext, out var nextList)) {
+                nextList = [];
+            }
+            foreach (int next in current.Connections) {
+                // todo
+                for (var i = 0; i < count; i++) {
+                    nextList.Add(next);
+                }
+            }
+            impulseClouds[impulseNext] = nextList;
         }
+        Test.Log();
     }
     int totalEnergy = clouds.Values.Select(it => it.Energy).Sum();
     Assert.ActualEqualsExpected(totalEnergy, expected);
 });
-return;
-
-void Propagate(Cloud cloud, int impulse) {
-    cloud.Energy += impulse--;
-    if (reached.Add(cloud) && impulse > 0) {
-        queue.Enqueue((cloud, impulse));
-    }
-}
 
 record Cloud(int Id, int[] Connections) {
     public int Energy { get; set; }
