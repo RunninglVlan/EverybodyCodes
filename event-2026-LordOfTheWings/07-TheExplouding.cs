@@ -13,6 +13,8 @@ Console.WriteLine(TotalEnergy());
 return;
 
 int TotalEnergy() {
+    const int explosionEnergy = 1_000_000;
+    const int explosionForce = 10;
     var maxEnergy = 0;
     Parallel.ForEach(cloudsOriginal.Keys, startId => {
         var clouds = cloudsOriginal.ToDictionary(it => it.Key, it => it.Value with { });
@@ -27,9 +29,9 @@ int TotalEnergy() {
                 cloud.Energy += force * count;
                 PropagateImpulse(cloud, force - 1, nextImpulses, count);
             }
-            foreach (var cloud in clouds.Values.Where(it => explode && it.Energy > 1_000_000)) {
+            foreach (var cloud in clouds.Values.Where(it => explode && it.Energy > explosionEnergy)) {
                 clouds.Remove(cloud.Id);
-                PropagateImpulse(cloud, 10, nextImpulses, 1);
+                PropagateImpulse(cloud, explosionForce, nextImpulses, 1);
             }
             (impulses, nextImpulses) = (nextImpulses, impulses);
         }
