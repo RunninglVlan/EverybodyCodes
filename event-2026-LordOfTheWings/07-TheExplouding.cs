@@ -1,13 +1,50 @@
 ﻿using System.Diagnostics;
 
-Test.From = "Part III";
 // https://everybody.codes/event/2026/quests/7
 const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
 const int part = 1;
 Test.Run((notes, part, expected) => {
-    Assert.ActualEqualsExpected(1, expected);
+    var clouds = notes.Split(Environment.NewLine).Select(Cloud.From).ToDictionary(it => it.Id, it => it);
+    var start = clouds.Values.MaxBy(it => it.Connections.Length)!;
+    var queue = new Queue<(Cloud, int)>();
+    queue.Enqueue((start, 5));
+    var reached = new HashSet<Cloud> { start };
+    Console.WriteLine("Strength 5:");
+    start.AddImpulse(5);
+    Console.WriteLine();
+    while (queue.TryDequeue(out var currentItem)) {
+        (var current, int impulse) = currentItem;
+        impulse--;
+        Console.WriteLine($"Strength {impulse}:");
+        foreach (var next in current.Connections.Select(id => clouds[id])) {
+            next.AddImpulse(impulse);
+            if (reached.Add(next)) {
+                queue.Enqueue((next, impulse));
+            }
+        }
+        Console.WriteLine();
+    }
+    int totalEnergy = clouds.Values.Select(it => it.Energy).Sum();
+    Assert.ActualEqualsExpected(totalEnergy, expected);
 });
+
+record Cloud(int Id, int[] Connections) {
+    public int Energy { get; set; }
+
+    public static Cloud From(string cloud) {
+        string[] data = cloud.Split(", ");
+        string id = data[0].Split('=').Last();
+        string energy = data[1].Split('=').Last();
+        int[] connections = [.. data[2].Split('=').Last().Split(',').Select(int.Parse)];
+        return new Cloud(int.Parse(id), connections) { Energy = int.Parse(energy) };
+    }
+
+    public void AddImpulse(int impulse) {
+        Energy += impulse;
+        Console.WriteLine($"cloud {Id} received impulse: +{impulse}");
+    }
+}
 
 static class Test {
     const string CASE_FILE = "../Test.Cases.txt";
