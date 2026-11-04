@@ -4,16 +4,15 @@ const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
 const int part = 3;
 var cloudsOriginal = notes.Split(Environment.NewLine).Select(Cloud.From).ToDictionary(it => it.Id, it => it);
-(int startForce, bool explode) = part switch {
-    1 => (5, false),
-    2 => (10, false),
-    _ => (10, true)
+(int startForce, int explosionEnergy) = part switch {
+    1 => (5, int.MaxValue),
+    2 => (10, int.MaxValue),
+    _ => (10, 1_000_000)
 };
 Console.WriteLine(TotalEnergy());
 return;
 
 int TotalEnergy() {
-    const int explosionEnergy = 1_000_000;
     const int explosionForce = 10;
     var maxEnergy = 0;
     Parallel.ForEach(cloudsOriginal.Keys, startId => {
@@ -29,7 +28,7 @@ int TotalEnergy() {
                 cloud.Energy += force * count;
                 PropagateImpulse(cloud, force - 1, nextImpulses, count);
             }
-            foreach (var cloud in clouds.Values.Where(it => explode && it.Energy > explosionEnergy)) {
+            foreach (var cloud in clouds.Values.Where(it => it.Energy > explosionEnergy)) {
                 clouds.Remove(cloud.Id);
                 PropagateImpulse(cloud, explosionForce, nextImpulses, 1);
             }
