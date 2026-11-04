@@ -14,14 +14,13 @@ Test.Run((notes, part, expected) => {
         1 => 5,
         _ => 10
     };
-    Dictionary<int, List<int>> impulses = new() { { forceStart, [start.Id] } };
+    Dictionary<int, Dictionary<int, int>> impulses = new() { { forceStart, new() { { start.Id, 1 } } } };
     for (int force = forceStart; force > 0; force--) {
         Test.Log($"Strength {force}:");
-        foreach (var group in impulses[force].OrderBy(it => it).GroupBy(it => it)) {
-            int count = group.Count();
+        foreach ((int id, int count) in impulses[force].OrderBy(it => it.Key)) {
             int addEnergy = force * count;
-            Test.Log($"cloud {group.Key} received {count} impulse{(count > 1 ? "s" : "")}: +{addEnergy}");
-            var current = clouds[group.Key];
+            Test.Log($"cloud {id} received {count} impulse{(count > 1 ? "s" : "")}: +{addEnergy}");
+            var current = clouds[id];
             current.Energy += addEnergy;
             int forceNext = force - 1;
             if (forceNext == 0) {
@@ -31,10 +30,8 @@ Test.Run((notes, part, expected) => {
                 impulses[forceNext] = nextImpulses = [];
             }
             foreach (int next in current.Connections) {
-                // todo
-                for (var i = 0; i < count; i++) {
-                    nextImpulses.Add(next);
-                }
+                int nextCount = nextImpulses.GetValueOrDefault(next, 0);
+                nextImpulses[next] = nextCount + count;
             }
         }
         Test.Log();
