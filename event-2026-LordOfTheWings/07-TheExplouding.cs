@@ -8,59 +8,71 @@ string notes = File.ReadAllText(noteFile);
 const int part = 1;
 Test.Run((notes, part, expected) => {
     var clouds = notes.Split(Environment.NewLine).Select(Cloud.From).ToDictionary(it => it.Id, it => it);
-    var start = clouds.Values.MaxBy(it => it.Connections.Length)!;
-    start = clouds[74];
     int forceStart = part switch {
         1 => 5,
         _ => 10
     };
-    Dictionary<(int id, int force), int> impulses = new() { { (start.Id, forceStart), 1 } };
-    Dictionary<(int id, int force), int> nextImpulses = [];
-    var stage = 1;
-    while (true) {
-        Test.Log($"Stage {stage++}:");
-        nextImpulses.Clear();
-        foreach (((int id, int force), int count) in impulses.OrderBy(it => it.Key.id)) {
-            if (!clouds.TryGetValue(id, out var cloud)) {
-                continue;
-            }
-            int addEnergy = force * count;
-            Test.Log($"cloud {cloud.Id} received {count} impulse{(count > 1 ? "s" : "")}"
-                    + $" with strength {force}: +{addEnergy} (energy {cloud.Energy} -> {cloud.Energy + addEnergy})");
-            cloud.Energy += addEnergy;
-            int forceNext = force - 1;
-            if (forceNext == 0) {
-                continue;
-            }
-            foreach (int next in cloud.Connections) {
-                var key = (next, forceNext);
-                int nextCount = nextImpulses.GetValueOrDefault(key, 0);
-                nextImpulses[key] = nextCount + count;
-            }
-        }
-        var explosions = clouds.Values.Where(it => it.Energy > 1_000_000).ToArray();
-        if (explosions.Length > 0) {
-            foreach (var cloud in explosions) {
-                clouds.Remove(cloud.Id);
-                Test.Log("Explosions after this stage:");
-                Test.Log($"cloud {cloud.Id} exploded at energy {cloud.Energy}");
-                foreach (int next in cloud.Connections) {
-                    var key = (next, 10);
-                    int nextCount = nextImpulses.GetValueOrDefault(key, 0);
-                    nextImpulses[key] = nextCount + 1;
-                    Test.Log($"  new impulse with strength 10: cloud {cloud.Id} -> cloud {next}");
-                }
-            }
-        }
-        if (nextImpulses.Count == 0) {
-            break;
-        }
-        (impulses, nextImpulses) = (nextImpulses, impulses);
-        Test.Log();
-    }
-    int totalEnergy = clouds.Values.Select(it => it.Energy).Sum();
+    int totalEnergy = TotalEnergy(clouds, forceStart);
     Assert.ActualEqualsExpected(totalEnergy, expected);
 });
+return;
+
+int TotalEnergy(Dictionary<int, Cloud> cloudsOriginal, int forceStart) {
+    var maxEnergy = 0;
+    foreach (int startId in cloudsOriginal.Keys.ToArray()) {
+        var clouds = cloudsOriginal.ToDictionary(it => it.Key, it => it.Value with { });
+        Dictionary<(int id, int force), int> impulses = new() { { (startId, forceStart), 1 } };
+        Dictionary<(int id, int force), int> nextImpulses = [];
+        var stage = 1;
+        while (true) {
+            Test.Log($"Stage {stage++}:");
+            nextImpulses.Clear();
+            foreach (((int id, int force), int count) in impulses.OrderBy(it => it.Key.id)) {
+                if (!clouds.TryGetValue(id, out var cloud)) {
+                    continue;
+                }
+                int addEnergy = force * count;
+                Test.Log($"cloud {cloud.Id} received {count} impulse{(count > 1 ? "s" : "")}"
+                        + $" with strength {force}: +{addEnergy} (energy {cloud.Energy} -> {cloud.Energy + addEnergy})");
+                cloud.Energy += addEnergy;
+                int forceNext = force - 1;
+                if (forceNext == 0) {
+                    continue;
+                }
+                foreach (int next in cloud.Connections) {
+                    var key = (next, forceNext);
+                    int nextCount = nextImpulses.GetValueOrDefault(key, 0);
+                    nextImpulses[key] = nextCount + count;
+                }
+            }
+            var explosions = clouds.Values.Where(it => it.Energy > 1_000_000).ToArray();
+            if (explosions.Length > 0) {
+                foreach (var cloud in explosions) {
+                    clouds.Remove(cloud.Id);
+                    Test.Log("Explosions after this stage:");
+                    Test.Log($"cloud {cloud.Id} exploded at energy {cloud.Energy}");
+                    foreach (int next in cloud.Connections) {
+                        var key = (next, 10);
+                        int nextCount = nextImpulses.GetValueOrDefault(key, 0);
+                        nextImpulses[key] = nextCount + 1;
+                        Test.Log($"  new impulse with strength 10: cloud {cloud.Id} -> cloud {next}");
+                    }
+                }
+            }
+            if (nextImpulses.Count == 0) {
+                break;
+            }
+            (impulses, nextImpulses) = (nextImpulses, impulses);
+            Test.Log();
+        }
+        int energy = clouds.Values.Select(it => it.Energy).Sum();
+        Test.Log($"{startId}: {energy}", true);
+        if (energy > maxEnergy) {
+            maxEnergy = energy;
+        }
+    }
+    return maxEnergy;
+}
 
 record Cloud(int Id, int[] Connections) {
     public int Energy { get; set; }
