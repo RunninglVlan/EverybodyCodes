@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-Test.From = "Part III Example";
+Test.From = "Part III Example 2";
 Assert.Throw = true;
 // https://everybody.codes/event/2026/quests/7
 const string noteFile = "../Notes.txt";
@@ -9,7 +9,7 @@ const int part = 1;
 Test.Run((notes, part, expected) => {
     var clouds = notes.Split(Environment.NewLine).Select(Cloud.From).ToDictionary(it => it.Id, it => it);
     var start = clouds.Values.MaxBy(it => it.Connections.Length)!;
-    start = clouds[2];
+    start = clouds[74];
     int forceStart = part switch {
         1 => 5,
         _ => 10
@@ -38,7 +38,7 @@ Test.Run((notes, part, expected) => {
                 nextImpulses[key] = nextCount + count;
             }
         }
-        var explosions = clouds.Values.Where(it => it.Energy > 100).ToArray();
+        var explosions = clouds.Values.Where(it => it.Energy > 1_000_000).ToArray();
         if (explosions.Length > 0) {
             foreach (var cloud in explosions) {
                 clouds.Remove(cloud.Id);
