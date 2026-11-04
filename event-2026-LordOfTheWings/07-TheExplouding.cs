@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 
-Test.From = "Part III Example";
 Assert.Throw = true;
 // https://everybody.codes/event/2026/quests/7
 const string noteFile = "../Notes.txt";
@@ -8,16 +7,17 @@ string notes = File.ReadAllText(noteFile);
 const int part = 1;
 Test.Run((notes, part, expected) => {
     var clouds = notes.Split(Environment.NewLine).Select(Cloud.From).ToDictionary(it => it.Id, it => it);
-    int startForce = part switch {
-        1 => 5,
-        _ => 10
+    (int startForce, bool explode) = part switch {
+        1 => (5, false),
+        2 => (10, false),
+        _ => (10, true)
     };
-    int totalEnergy = TotalEnergy(clouds, startForce);
+    int totalEnergy = TotalEnergy(clouds, startForce, explode);
     Assert.ActualEqualsExpected(totalEnergy, expected);
 });
 return;
 
-int TotalEnergy(Dictionary<int, Cloud> cloudsOriginal, int startForce) {
+int TotalEnergy(Dictionary<int, Cloud> cloudsOriginal, int startForce, bool explode) {
     var maxEnergy = 0;
     Parallel.ForEach(cloudsOriginal.Keys, startId => {
         var clouds = cloudsOriginal.ToDictionary(it => it.Key, it => it.Value with { });
@@ -32,7 +32,7 @@ int TotalEnergy(Dictionary<int, Cloud> cloudsOriginal, int startForce) {
                 cloud.Energy += force * count;
                 PropagateImpulse(cloud, force - 1, nextImpulses, count);
             }
-            foreach (var cloud in clouds.Values.Where(it => it.Energy > 1_000_000)) {
+            foreach (var cloud in clouds.Values.Where(it => explode && it.Energy > 1_000_000)) {
                 clouds.Remove(cloud.Id);
                 PropagateImpulse(cloud, 10, nextImpulses, 1);
             }
