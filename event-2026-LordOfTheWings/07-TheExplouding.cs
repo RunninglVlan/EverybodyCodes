@@ -24,6 +24,9 @@ Test.Run((notes, part, expected) => {
             var current = clouds[group.Key];
             current.Energy += addEnergy;
             int forceNext = force - 1;
+            if (forceNext == 0) {
+                continue;
+            }
             if (!impulses.TryGetValue(forceNext, out var nextImpulses)) {
                 impulses[forceNext] = nextImpulses = [];
             }
