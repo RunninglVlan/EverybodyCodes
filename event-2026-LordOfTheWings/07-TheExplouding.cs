@@ -10,7 +10,10 @@ var reached = new HashSet<Cloud>();
 Test.Run((notes, part, expected) => {
     var clouds = notes.Split(Environment.NewLine).Select(Cloud.From).ToDictionary(it => it.Id, it => it);
     var start = clouds.Values.MaxBy(it => it.Connections.Length)!;
-    Propagate(start, 5);
+    Propagate(start, part switch {
+        1 => 5,
+        _ => 10
+    });
     while (queue.TryDequeue(out var currentItem)) {
         (var current, int impulse) = currentItem;
         impulse--;
