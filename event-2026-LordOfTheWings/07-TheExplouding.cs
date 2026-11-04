@@ -10,29 +10,29 @@ const int part = 1;
 Test.Run((notes, part, expected) => {
     var clouds = notes.Split(Environment.NewLine).Select(Cloud.From).ToDictionary(it => it.Id, it => it);
     var start = clouds.Values.MaxBy(it => it.Connections.Length)!;
-    int impulseStart = part switch {
+    int forceStart = part switch {
         1 => 5,
         _ => 10
     };
-    Dictionary<int, List<int>> impulseClouds = new() { { impulseStart, [start.Id] } };
-    for (int impulse = impulseStart; impulse > 0; impulse--) {
-        Test.Log($"Strength {impulse}:");
-        foreach (var group in impulseClouds[impulse].OrderBy(it => it).GroupBy(it => it)) {
+    Dictionary<int, List<int>> impulses = new() { { forceStart, [start.Id] } };
+    for (int force = forceStart; force > 0; force--) {
+        Test.Log($"Strength {force}:");
+        foreach (var group in impulses[force].OrderBy(it => it).GroupBy(it => it)) {
             int count = group.Count();
-            Test.Log($"cloud {group.Key} received {count} impulse{(count > 1 ? "s" : "")}: +{impulse * count}");
+            int addEnergy = force * count;
+            Test.Log($"cloud {group.Key} received {count} impulse{(count > 1 ? "s" : "")}: +{addEnergy}");
             var current = clouds[group.Key];
-            current.Energy += impulse * count;
-            int impulseNext = impulse - 1;
-            if (!impulseClouds.TryGetValue(impulseNext, out var nextList)) {
-                nextList = [];
+            current.Energy += addEnergy;
+            int forceNext = force - 1;
+            if (!impulses.TryGetValue(forceNext, out var nextImpulses)) {
+                impulses[forceNext] = nextImpulses = [];
             }
             foreach (int next in current.Connections) {
                 // todo
                 for (var i = 0; i < count; i++) {
-                    nextList.Add(next);
+                    nextImpulses.Add(next);
                 }
             }
-            impulseClouds[impulseNext] = nextList;
         }
         Test.Log();
     }
