@@ -17,6 +17,9 @@ Test.Run((notes, part, expected) => {
     while (queue.TryDequeue(out var currentItem)) {
         (var current, int impulse) = currentItem;
         impulse--;
+        if (impulse == 0) {
+            continue;
+        }
         foreach (var next in current.Connections.Select(id => clouds[id])) {
             Propagate(next, impulse);
         }
