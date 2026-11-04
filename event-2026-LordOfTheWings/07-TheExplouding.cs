@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-Test.From = "Part III Example";
+Test.From = "Part III";
 Assert.Throw = true;
 // https://everybody.codes/event/2026/quests/7
 const string noteFile = "../Notes.txt";
