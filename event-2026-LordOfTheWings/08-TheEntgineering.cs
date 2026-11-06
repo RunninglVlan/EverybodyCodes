@@ -21,7 +21,7 @@ class HexGrid {
     readonly Dictionary<Point, Ent> ents = [];
     readonly Point[] starts = new Point[6];
     readonly Point[] sourceDirections = new Point[6];
-    readonly Point[][] nextDirections = new Point[6][];
+    readonly Point[][] startDirections = new Point[6][];
     int energy;
     int warriors;
 
@@ -48,32 +48,32 @@ class HexGrid {
             case 0:
                 starts[round] = new Point(0, height / 2);
                 sourceDirections[round] = Screen.BOTTOM_RIGHT;
-                nextDirections[round] = [Screen.TOP_RIGHT, Screen.HEX_RIGHT];
+                startDirections[round] = [Screen.TOP_RIGHT, Screen.HEX_RIGHT];
                 break;
             case 1:
                 starts[round] = new Point(width / 4, 0);
                 sourceDirections[round] = Screen.BOTTOM_LEFT;
-                nextDirections[round] = [Screen.HEX_RIGHT, Screen.BOTTOM_RIGHT];
+                startDirections[round] = [Screen.HEX_RIGHT, Screen.BOTTOM_RIGHT];
                 break;
             case 2:
                 starts[round] = new Point(width * 3 / 4, 0);
                 sourceDirections[round] = Screen.HEX_LEFT;
-                nextDirections[round] = [Screen.BOTTOM_RIGHT, Screen.BOTTOM_LEFT];
+                startDirections[round] = [Screen.BOTTOM_RIGHT, Screen.BOTTOM_LEFT];
                 break;
             case 3:
                 starts[round] = new Point(width - 1, height / 2);
                 sourceDirections[round] = Screen.TOP_LEFT;
-                nextDirections[round] = [Screen.BOTTOM_LEFT, Screen.HEX_LEFT];
+                startDirections[round] = [Screen.BOTTOM_LEFT, Screen.HEX_LEFT];
                 break;
             case 4:
                 starts[round] = new Point(width * 3 / 4, height - 1);
                 sourceDirections[round] = Screen.TOP_RIGHT;
-                nextDirections[round] = [Screen.HEX_LEFT, Screen.TOP_LEFT];
+                startDirections[round] = [Screen.HEX_LEFT, Screen.TOP_LEFT];
                 break;
             default:
                 starts[round] = new Point(width / 4, height - 1);
                 sourceDirections[round] = Screen.HEX_RIGHT;
-                nextDirections[round] = [Screen.TOP_LEFT, Screen.TOP_RIGHT];
+                startDirections[round] = [Screen.TOP_LEFT, Screen.TOP_RIGHT];
                 break;
         }
     }
@@ -91,7 +91,7 @@ class HexGrid {
                     ent.GotEnergy = true;
                     CastShadow(ent.Height, current, sourceDirection);
                 }
-            } while (TryNextStart(ref start, nextDirections[i]));
+            } while (TryNextStart(ref start, startDirections[i]));
             EndRound(grow);
             if (warriors >= ARMY_WARRIORS) {
                 break;
