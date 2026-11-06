@@ -19,9 +19,9 @@ class HexGrid {
 
     int width, height;
     readonly Dictionary<Point, Ent> ents = [];
-    Point start;
-    Point sourceDirection;
-    Point[] nextDirections = null!;
+    readonly Point[] starts = new Point[6];
+    readonly Point[] sourceDirections = new Point[6];
+    readonly Point[][] nextDirections = new Point[6][];
     int energy;
     int warriors;
 
@@ -38,20 +38,60 @@ class HexGrid {
                 ents[new Point(x, y)] = new Ent((int)char.GetNumericValue(plot));
             }
         }
+        for (var i = 0; i < 6; i++) {
+            InitRoundValues(i);
+        }
+    }
+
+    void InitRoundValues(int round) {
+        switch (round) {
+            case 0:
+                starts[round] = new Point(0, height / 2);
+                sourceDirections[round] = Screen.BOTTOM_RIGHT;
+                nextDirections[round] = [Screen.TOP_RIGHT, Screen.HEX_RIGHT];
+                break;
+            case 1:
+                starts[round] = new Point(width / 4, 0);
+                sourceDirections[round] = Screen.BOTTOM_LEFT;
+                nextDirections[round] = [Screen.HEX_RIGHT, Screen.BOTTOM_RIGHT];
+                break;
+            case 2:
+                starts[round] = new Point(width * 3 / 4, 0);
+                sourceDirections[round] = Screen.HEX_LEFT;
+                nextDirections[round] = [Screen.BOTTOM_RIGHT, Screen.BOTTOM_LEFT];
+                break;
+            case 3:
+                starts[round] = new Point(width - 1, height / 2);
+                sourceDirections[round] = Screen.TOP_LEFT;
+                nextDirections[round] = [Screen.BOTTOM_LEFT, Screen.HEX_LEFT];
+                break;
+            case 4:
+                starts[round] = new Point(width * 3 / 4, height - 1);
+                sourceDirections[round] = Screen.TOP_RIGHT;
+                nextDirections[round] = [Screen.HEX_LEFT, Screen.TOP_LEFT];
+                break;
+            default:
+                starts[round] = new Point(width / 4, height - 1);
+                sourceDirections[round] = Screen.HEX_RIGHT;
+                nextDirections[round] = [Screen.TOP_LEFT, Screen.TOP_RIGHT];
+                break;
+        }
     }
 
     public int CalculateEnergy(int rounds, bool grow) {
-        for (var i = 0; i < rounds; i++) {
-            StartRound(i % 6);
+        for (var round = 0; round < rounds; round++) {
+            int i = round % 6;
+            var start = starts[i];
+            var sourceDirection = sourceDirections[i];
             do {
                 for (var current = start; ents.TryGetValue(current, out var ent); current += sourceDirection) {
                     if (ent.IsSeed || ent.Height <= ent.Shadow) {
                         continue;
                     }
                     ent.GotEnergy = true;
-                    CastShadow(ent.Height, current);
+                    CastShadow(ent.Height, current, sourceDirection);
                 }
-            } while (TryNextStart());
+            } while (TryNextStart(ref start, nextDirections[i]));
             EndRound(grow);
             if (warriors >= ARMY_WARRIORS) {
                 break;
@@ -60,44 +100,9 @@ class HexGrid {
         return energy;
     }
 
-    void StartRound(int i) {
-        switch (i) {
-            case 0:
-                start = new Point(0, height / 2);
-                sourceDirection = Screen.BOTTOM_RIGHT;
-                nextDirections = [Screen.TOP_RIGHT, Screen.HEX_RIGHT];
-                break;
-            case 1:
-                start = new Point(width / 4, 0);
-                sourceDirection = Screen.BOTTOM_LEFT;
-                nextDirections = [Screen.HEX_RIGHT, Screen.BOTTOM_RIGHT];
-                break;
-            case 2:
-                start = new Point(width * 3 / 4, 0);
-                sourceDirection = Screen.HEX_LEFT;
-                nextDirections = [Screen.BOTTOM_RIGHT, Screen.BOTTOM_LEFT];
-                break;
-            case 3:
-                start = new Point(width - 1, height / 2);
-                sourceDirection = Screen.TOP_LEFT;
-                nextDirections = [Screen.BOTTOM_LEFT, Screen.HEX_LEFT];
-                break;
-            case 4:
-                start = new Point(width * 3 / 4, height - 1);
-                sourceDirection = Screen.TOP_RIGHT;
-                nextDirections = [Screen.HEX_LEFT, Screen.TOP_LEFT];
-                break;
-            default:
-                start = new Point(width / 4, height - 1);
-                sourceDirection = Screen.HEX_RIGHT;
-                nextDirections = [Screen.TOP_LEFT, Screen.TOP_RIGHT];
-                break;
-        }
-    }
-
-    void CastShadow(int entHeight, Point current) {
+    void CastShadow(int entHeight, Point current, Point direction) {
         for (int shadow = entHeight - 1; shadow > 0; shadow--) {
-            current += sourceDirection;
+            current += direction;
             if (!ents.TryGetValue(current, out var ent)) {
                 break;
             }
@@ -106,8 +111,8 @@ class HexGrid {
     }
 
     [SuppressMessage("ReSharper", "InvertIf")]
-    bool TryNextStart() {
-        foreach (var direction in nextDirections) {
+    bool TryNextStart(ref Point start, Point[] directions) {
+        foreach (var direction in directions) {
             var startNext = start + direction;
             if (ents.ContainsKey(startNext)) {
                 start = startNext;
