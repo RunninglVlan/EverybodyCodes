@@ -20,6 +20,7 @@ record Plant(int Growth, int Limit) {
 
     public int Grow() {
         List<int> branches = [0];
+        var branchingPoints = 0;
         var seconds = 0;
         while (Elements() < Limit) {
             int count = branches.Count;
@@ -32,6 +33,7 @@ record Plant(int Growth, int Limit) {
                 branches[i] = splitSize;
                 branches.Add(splitSize);
                 branches.Add(1);
+                branchingPoints++;
             }
             seconds++;
             Console.WriteLine($"seconds: {seconds}, branches: {branches.Count}, elements: {Elements()}");
@@ -41,7 +43,6 @@ record Plant(int Growth, int Limit) {
 
         int Elements() {
             int branchElements = branches.Sum();
-            int branchingPoints = branches.Count / Growth;
             return branchElements + branchingPoints;
         }
     }
@@ -134,7 +135,7 @@ static class Test {
 }
 
 static class Assert {
-    public static bool Throw { get; set; }
+    public static bool Throw { get; set; } = true;
 
     public static void ActualEqualsExpected(object actual, object expected) {
         bool equals = Equals(actual.ToString(), expected);

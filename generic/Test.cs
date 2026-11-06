@@ -87,7 +87,7 @@ static class Test {
 }
 
 static class Assert {
-    public static bool Throw { get; set; }
+    public static bool Throw { get; set; } = true;
 
     public static void ActualEqualsExpected(object actual, object expected) {
         bool equals = Equals(actual.ToString(), expected);
