@@ -5,10 +5,47 @@ const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
 const int part = 1;
 Test.Run((notes, part, expected) => {
-    var result = 0;
-    Assert.ActualEqualsExpected(result, expected);
-    // Console.WriteLine(result);
+    int totalTime = notes.Split(Environment.NewLine).Select(Plant.From).Sum(it => it.Grow());
+    Assert.ActualEqualsExpected(totalTime, expected);
+    // Console.WriteLine(totalTime);
 });
+
+record Plant(int Growth, int Limit) {
+    public static Plant From(string properties) {
+        string[] data = properties.Split(", ");
+        string growth = data[1].Split('=').Last();
+        string limit = data[2].Split('=').Last();
+        return new Plant(int.Parse(growth), int.Parse(limit));
+    }
+
+    public int Grow() {
+        List<int> branches = [0];
+        var seconds = 0;
+        while (Elements() < Limit) {
+            int count = branches.Count;
+            for (var i = 0; i < count; i++) {
+                branches[i]++;
+                if (branches[i] < Growth) {
+                    continue;
+                }
+                int splitSize = (branches[i] - 1) / 2;
+                branches[i] = splitSize;
+                branches.Add(splitSize);
+                branches.Add(1);
+            }
+            seconds++;
+            Console.WriteLine($"seconds: {seconds}, branches: {branches.Count}, elements: {Elements()}");
+        }
+        Console.WriteLine();
+        return seconds;
+
+        int Elements() {
+            int branchElements = branches.Sum();
+            int branchingPoints = branches.Count / Growth;
+            return branchElements + branchingPoints;
+        }
+    }
+}
 
 static class Test {
     const string CASE_FILE = "../Test.Cases.txt";
