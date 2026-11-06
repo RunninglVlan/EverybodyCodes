@@ -1,10 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 
-Test.StepEnabled = false;
-// Test.From = "Part III Example";
-// Test.Until = "Part III";
 // https://everybody.codes/event/2026/quests/8
 Test.Run((notes, part, expected) => {
     var grid = new HexGrid();
@@ -52,14 +48,11 @@ class HexGrid {
                     if (ent.IsSeed || ent.Height <= ent.Shadow) {
                         continue;
                     }
-                    // Test.Log($"ent {ent.Height} with shadow {ent.Shadow} got energy");
                     ent.GotEnergy = true;
                     CastShadow(ent.Height, current);
                 }
             } while (TryNextStart());
-            // Print();
             EndRound(grow);
-            Test.Step();
             if (warriors >= ARMY_WARRIORS) {
                 break;
             }
@@ -109,7 +102,6 @@ class HexGrid {
                 break;
             }
             ent.Shadow = Math.Max(shadow, ent.Shadow);
-            // Test.Log($"  ent {ent.Height} got shadow {shadow}, new shadow: {ent.Shadow}");
         }
     }
 
@@ -126,11 +118,9 @@ class HexGrid {
     }
 
     void EndRound(bool grow) {
-        int roundEnergy = 0, roundWarriors = 0;
         foreach (var ent in ents.Values) {
             if (ent.GotEnergy) {
                 energy++;
-                roundEnergy++;
             }
             if (grow) {
                 TryGrow(ent);
@@ -138,7 +128,6 @@ class HexGrid {
             ent.Shadow = 0;
             ent.GotEnergy = false;
         }
-        // Test.Log($"energy: {roundEnergy}->{energy}, warriors: {roundWarriors}->{warriors}", console: true);
         return;
 
         void TryGrow(Ent ent) {
@@ -150,31 +139,8 @@ class HexGrid {
                 return;
             }
             warriors++;
-            roundWarriors++;
             ent.Height = -Ent.SEED_ROUNDS + 1;
         }
-    }
-
-    void Print() {
-        var rows = new StringBuilder();
-        for (var y = 0; y < height; y++) {
-            for (var x = 0; x < width; x++) {
-                string cell = !ents.TryGetValue(new Point(x, y), out var ent)
-                        ? "."
-                        : ent.GotEnergy
-                                ? ent.Height.ToString()
-                                : ent.IsSeed ? "X" : ".";
-                if (cell == "X") {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                }
-                rows.Append(cell);
-                Console.Write(cell);
-                Console.ResetColor();
-            }
-            Console.WriteLine();
-            rows.AppendLine();
-        }
-        Test.Log(rows);
     }
 }
 
