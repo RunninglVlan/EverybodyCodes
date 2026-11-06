@@ -6,25 +6,25 @@ const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
 const int part = 1;
 Test.Run((notes, part, expected) => {
-    Func<List<int>, int, int> count = part switch {
+    Func<List<long>, int, long> count = part switch {
         1 => (branches, branchingPoints) => branches.Sum() + branchingPoints,
         _ => (branches, branchingPoints) => branches.Count - branchingPoints
     };
-    int totalTime = notes.Split(Environment.NewLine).Select(Plant.From).Sum(it => it.Grow(count));
+    long totalTime = notes.Split(Environment.NewLine).Select(Plant.From).Sum(it => it.Grow(count));
     Assert.ActualEqualsExpected(totalTime, expected);
     // Console.WriteLine(totalTime);
 });
 
-record Plant(int Growth, int Limit) {
+record Plant(long Growth, long Limit) {
     public static Plant From(string properties) {
         string[] data = properties.Split(", ");
         string growth = data[1].Split('=').Last();
         string limit = data[2].Split('=').Last();
-        return new Plant(int.Parse(growth), int.Parse(limit));
+        return new Plant(long.Parse(growth), long.Parse(limit));
     }
 
-    public int Grow(Func<List<int>, int, int> countElements) {
-        List<int> branches = [0];
+    public long Grow(Func<List<long>, int, long> countElements) {
+        List<long> branches = [0];
         var branchingPoints = 0;
         var seconds = 0;
         while (Elements() < Limit) {
@@ -34,7 +34,7 @@ record Plant(int Growth, int Limit) {
                 if (branches[i] < Growth) {
                     continue;
                 }
-                int splitSize = (branches[i] - 1) / 2;
+                long splitSize = (branches[i] - 1) / 2;
                 branches[i] = splitSize;
                 branches.Add(splitSize);
                 branches.Add(1);
@@ -46,7 +46,7 @@ record Plant(int Growth, int Limit) {
         Test.Log();
         return seconds;
 
-        int Elements() => countElements(branches, branchingPoints);
+        long Elements() => countElements(branches, branchingPoints);
     }
 }
 
