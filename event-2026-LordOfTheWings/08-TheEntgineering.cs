@@ -2,27 +2,33 @@
 
 // https://everybody.codes/event/2026/quests/8
 Test.Run((notes, part, expected) => {
-    (var grid, int height) = HexGrid(notes);
-    var start = new Point(0, height / 2);
-    var energy = 0;
-    Assert.ActualEqualsExpected(energy, expected);
+    var grid = new HexGrid();
+    grid.Init(notes);
+    Assert.ActualEqualsExpected(grid.CalculateEnergy(), expected);
 });
-return;
 
-(Dictionary<Point, Ent>, int height) HexGrid(string notes) {
-    string[] rows = notes.Split(Environment.NewLine);
-    int width = rows.First().Length, height = rows.Length;
-    var result = new Dictionary<Point, Ent>();
-    for (var y = 0; y < height; y++) {
-        for (var x = 0; x < width; x++) {
-            char plot = rows[y][x];
-            if (plot == '.') {
-                continue;
+class HexGrid {
+    int height;
+    readonly Dictionary<Point, Ent> ents = [];
+
+    public void Init(string notes) {
+        string[] rows = notes.Split(Environment.NewLine);
+        int width = rows.First().Length;
+        height = rows.Length;
+        for (var y = 0; y < height; y++) {
+            for (var x = 0; x < width; x++) {
+                char plot = rows[y][x];
+                if (plot == '.') {
+                    continue;
+                }
+                ents[new Point(x, y)] = new Ent((int)char.GetNumericValue(plot));
             }
-            result[new Point(x, y)] = new Ent((int)char.GetNumericValue(plot));
         }
     }
-    return (result, height);
+
+    public int CalculateEnergy() {
+        return 0;
+    }
 }
 
 record Ent(int Height) {
