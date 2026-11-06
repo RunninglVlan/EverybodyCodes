@@ -5,7 +5,11 @@ const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
 const int part = 1;
 Test.Run((notes, part, expected) => {
-    int totalTime = notes.Split(Environment.NewLine).Select(Plant.From).Sum(it => it.Grow());
+    Func<List<int>, int, int> count = part switch {
+        1 => (branches, branchingPoints) => branches.Sum() + branchingPoints,
+        _ => (branches, branchingPoints) => branches.Count - branchingPoints
+    };
+    int totalTime = notes.Split(Environment.NewLine).Select(Plant.From).Sum(it => it.Grow(count));
     Assert.ActualEqualsExpected(totalTime, expected);
     // Console.WriteLine(totalTime);
 });
@@ -18,7 +22,7 @@ record Plant(int Growth, int Limit) {
         return new Plant(int.Parse(growth), int.Parse(limit));
     }
 
-    public int Grow() {
+    public int Grow(Func<List<int>, int, int> countElements) {
         List<int> branches = [0];
         var branchingPoints = 0;
         var seconds = 0;
@@ -41,10 +45,7 @@ record Plant(int Growth, int Limit) {
         Test.Log();
         return seconds;
 
-        int Elements() {
-            int branchElements = branches.Sum();
-            return branchElements + branchingPoints;
-        }
+        int Elements() => countElements(branches, branchingPoints);
     }
 }
 
