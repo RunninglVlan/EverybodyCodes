@@ -69,12 +69,12 @@ class HexGrid {
                 nextDirections = [Screen.TOP_RIGHT, Screen.HEX_RIGHT];
                 break;
             case 1:
-                start = new Point(width / 3 - 1, 0);
+                start = new Point(width / 4, 0);
                 sourceDirection = Screen.BOTTOM_LEFT;
                 nextDirections = [Screen.HEX_RIGHT, Screen.BOTTOM_RIGHT];
                 break;
             case 2:
-                start = new Point(width * 2 / 3 + 1, 0);
+                start = new Point(width * 3 / 4, 0);
                 sourceDirection = Screen.HEX_LEFT;
                 nextDirections = [Screen.BOTTOM_RIGHT, Screen.BOTTOM_LEFT];
                 break;
@@ -84,12 +84,12 @@ class HexGrid {
                 nextDirections = [Screen.BOTTOM_LEFT, Screen.HEX_LEFT];
                 break;
             case 4:
-                start = new Point(width * 2 / 3 + 1, height - 1);
+                start = new Point(width * 3 / 4, height - 1);
                 sourceDirection = Screen.TOP_RIGHT;
                 nextDirections = [Screen.HEX_LEFT, Screen.TOP_LEFT];
                 break;
             default:
-                start = new Point(width / 3, height);
+                start = new Point(width / 4, height - 1);
                 sourceDirection = Screen.HEX_RIGHT;
                 nextDirections = [Screen.TOP_LEFT, Screen.TOP_RIGHT];
                 break;
