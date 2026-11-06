@@ -21,4 +21,10 @@ static class Screen {
     public static readonly Point DOWN = new(0, 1);
     public static readonly Point LEFT = new(-1, 0);
     public static readonly Point RIGHT = new(1, 0);
+    public static readonly Point TOP_LEFT = new(-1, -1);
+    public static readonly Point TOP_RIGHT = new(1, -1);
+    public static readonly Point HEX_LEFT = new(-2, 0);
+    public static readonly Point HEX_RIGHT = new(2, 0);
+    public static readonly Point BOTTOM_LEFT = new(-1, 1);
+    public static readonly Point BOTTOM_RIGHT = new(1, 1);
 }
