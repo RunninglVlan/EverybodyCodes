@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 
+Test.Until = "Part III";
 Test.LogEnabled = false;
 // https://everybody.codes/event/2026/quests/9
 const string noteFile = "../Notes.txt";
@@ -27,7 +28,7 @@ record Plant(long Growth, long Limit) {
         List<long> branches = [0];
         var branchingPoints = 0;
         var seconds = 0;
-        while (Elements() < Limit) {
+        for (; Elements() < Limit; seconds++) {
             int count = branches.Count;
             for (var i = 0; i < count; i++) {
                 branches[i]++;
@@ -40,7 +41,6 @@ record Plant(long Growth, long Limit) {
                 branches.Add(1);
                 branchingPoints++;
             }
-            seconds++;
             Test.Log($"seconds: {seconds}, branches: {branches.Count}, elements: {Elements()}");
         }
         Test.Log();
