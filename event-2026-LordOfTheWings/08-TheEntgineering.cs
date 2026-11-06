@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 Test.StepEnabled = false;
 // https://everybody.codes/event/2026/quests/8
@@ -14,7 +15,7 @@ Test.Run((notes, part, expected) => {
 });
 
 class HexGrid {
-    int height;
+    int width, height;
     readonly Dictionary<Point, Ent> ents = [];
     Point start;
     Point sourceDirection;
@@ -22,7 +23,7 @@ class HexGrid {
 
     public void Init(string notes) {
         string[] rows = notes.Split(Environment.NewLine);
-        int width = rows.First().Length;
+        width = rows.First().Length;
         height = rows.Length;
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < width; x++) {
@@ -39,19 +40,23 @@ class HexGrid {
         var energy = 0;
         for (var i = 0; i < rounds; i++) {
             InitRound(i);
+            foreach (var ent in ents.Values) {
+                ent.Shadow = 0;
+                ent.GotEnergy = false;
+            }
             do {
                 for (var current = start; ents.TryGetValue(current, out var ent); current += sourceDirection) {
                     if (ent.Height <= ent.Shadow) {
                         continue;
                     }
-                    Test.Log($"ent {ent.Height} with shadow {ent.Shadow} got energy");
+                    // Test.Log($"ent {ent.Height} with shadow {ent.Shadow} got energy");
                     energy++;
                     ent.GotEnergy = true;
                     CastShadow(ent.Height, current);
-                    Print();
-                    Test.Step();
                 }
             } while (TryNextStart());
+            Print();
+            Test.Step();
         }
         return energy;
     }
@@ -60,8 +65,33 @@ class HexGrid {
         switch (i) {
             case 0:
                 start = new Point(0, height / 2);
-                sourceDirection = new Point(1, 1);
-                nextDirections = [new Point(1, -1), new Point(2, 0)];
+                sourceDirection = Screen.BOTTOM_RIGHT;
+                nextDirections = [Screen.TOP_RIGHT, Screen.HEX_RIGHT];
+                break;
+            case 1:
+                start = new Point(width / 3 - 1, 0);
+                sourceDirection = Screen.BOTTOM_LEFT;
+                nextDirections = [Screen.HEX_RIGHT, Screen.BOTTOM_RIGHT];
+                break;
+            case 2:
+                start = new Point(width * 2 / 3 + 1, 0);
+                sourceDirection = Screen.HEX_LEFT;
+                nextDirections = [Screen.BOTTOM_RIGHT, Screen.BOTTOM_LEFT];
+                break;
+            case 3:
+                start = new Point(width - 1, height / 2);
+                sourceDirection = Screen.TOP_LEFT;
+                nextDirections = [Screen.BOTTOM_LEFT, Screen.HEX_LEFT];
+                break;
+            case 4:
+                start = new Point(width * 2 / 3 + 1, height - 1);
+                sourceDirection = Screen.TOP_RIGHT;
+                nextDirections = [Screen.HEX_LEFT, Screen.TOP_LEFT];
+                break;
+            default:
+                start = new Point(width / 3, height);
+                sourceDirection = Screen.HEX_RIGHT;
+                nextDirections = [Screen.TOP_LEFT, Screen.TOP_RIGHT];
                 break;
         }
     }
@@ -73,7 +103,7 @@ class HexGrid {
                 break;
             }
             ent.Shadow = Math.Max(shadow, ent.Shadow);
-            Test.Log($"  ent {ent.Height} got shadow {shadow}, new shadow: {ent.Shadow}");
+            // Test.Log($"  ent {ent.Height} got shadow {shadow}, new shadow: {ent.Shadow}");
         }
     }
 
@@ -90,17 +120,18 @@ class HexGrid {
     }
 
     void Print() {
-        return;
+        var rows = new StringBuilder();
         for (var y = 0; y < height; y++) {
-            for (var x = 0; x < 17; x++) {
+            for (var x = 0; x < width; x++) {
                 if (!ents.TryGetValue(new Point(x, y), out var ent)) {
-                    Console.Write('.');
+                    rows.Append('.');
                     continue;
                 }
-                Console.Write(ent.GotEnergy ? ent.Height : ".");
+                rows.Append(ent.GotEnergy ? ent.Height : ".");
             }
-            Console.WriteLine();
+            rows.AppendLine();
         }
+        Test.Log(rows);
     }
 }
 
@@ -111,6 +142,15 @@ record Ent(int Height) {
 
 readonly record struct Point(int X, int Y) {
     public static Point operator +(Point a, Point b) => new(a.X + b.X, a.Y + b.Y);
+}
+
+static class Screen {
+    public static readonly Point TOP_LEFT = new(-1, -1);
+    public static readonly Point TOP_RIGHT = new(1, -1);
+    public static readonly Point HEX_LEFT = new(-2, 0);
+    public static readonly Point HEX_RIGHT = new(2, 0);
+    public static readonly Point BOTTOM_LEFT = new(-1, 1);
+    public static readonly Point BOTTOM_RIGHT = new(1, 1);
 }
 
 static class Test {
