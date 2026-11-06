@@ -36,9 +36,9 @@ record Plant(int Growth, int Limit) {
                 branchingPoints++;
             }
             seconds++;
-            Console.WriteLine($"seconds: {seconds}, branches: {branches.Count}, elements: {Elements()}");
+            Test.Log($"seconds: {seconds}, branches: {branches.Count}, elements: {Elements()}");
         }
-        Console.WriteLine();
+        Test.Log();
         return seconds;
 
         int Elements() {
