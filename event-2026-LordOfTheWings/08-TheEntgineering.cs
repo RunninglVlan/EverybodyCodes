@@ -6,15 +6,19 @@ Test.StepEnabled = false;
 Test.Run((notes, part, expected) => {
     var grid = new HexGrid();
     grid.Init(notes);
-    Assert.ActualEqualsExpected(grid.CalculateEnergy(), expected);
+    int rounds = part switch {
+        1 => 1,
+        _ => 6
+    };
+    Assert.ActualEqualsExpected(grid.CalculateEnergy(rounds), expected);
 });
 
 class HexGrid {
-    static readonly Point SOURCE_DIRECTION = new(1, 1);
-    static readonly Point[] NEXT_DIRECTIONS = [new(1, -1), new(2, 0)];
-
     int height;
     readonly Dictionary<Point, Ent> ents = [];
+    Point start;
+    Point sourceDirection;
+    Point[] nextDirections = null!;
 
     public void Init(string notes) {
         string[] rows = notes.Split(Environment.NewLine);
@@ -31,28 +35,40 @@ class HexGrid {
         }
     }
 
-    public int CalculateEnergy() {
-        var start = new Point(0, height / 2);
+    public int CalculateEnergy(int rounds) {
         var energy = 0;
-        do {
-            for (var current = start; ents.TryGetValue(current, out var ent); current += SOURCE_DIRECTION) {
-                if (ent.Height <= ent.Shadow) {
-                    continue;
+        for (var i = 0; i < rounds; i++) {
+            InitRound(i);
+            do {
+                for (var current = start; ents.TryGetValue(current, out var ent); current += sourceDirection) {
+                    if (ent.Height <= ent.Shadow) {
+                        continue;
+                    }
+                    Test.Log($"ent {ent.Height} with shadow {ent.Shadow} got energy");
+                    energy++;
+                    ent.GotEnergy = true;
+                    CastShadow(ent.Height, current);
+                    Print();
+                    Test.Step();
                 }
-                Test.Log($"ent {ent.Height} with shadow {ent.Shadow} got energy");
-                energy++;
-                ent.GotEnergy = true;
-                CastShadow(ent.Height, current);
-                Print();
-                Test.Step();
-            }
-        } while (TryNextStart(ref start));
+            } while (TryNextStart());
+        }
         return energy;
+    }
+
+    void InitRound(int i) {
+        switch (i) {
+            case 0:
+                start = new Point(0, height / 2);
+                sourceDirection = new Point(1, 1);
+                nextDirections = [new Point(1, -1), new Point(2, 0)];
+                break;
+        }
     }
 
     void CastShadow(int entHeight, Point current) {
         for (int shadow = entHeight - 1; shadow > 0; shadow--) {
-            current += SOURCE_DIRECTION;
+            current += sourceDirection;
             if (!ents.TryGetValue(current, out var ent)) {
                 break;
             }
@@ -62,8 +78,8 @@ class HexGrid {
     }
 
     [SuppressMessage("ReSharper", "InvertIf")]
-    bool TryNextStart(ref Point start) {
-        foreach (var direction in NEXT_DIRECTIONS) {
+    bool TryNextStart() {
+        foreach (var direction in nextDirections) {
             var startNext = start + direction;
             if (ents.ContainsKey(startNext)) {
                 start = startNext;
