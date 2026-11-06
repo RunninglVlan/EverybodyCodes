@@ -3,23 +3,31 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 Test.StepEnabled = false;
+// Test.From = "Part III Example";
+// Test.Until = "Part III";
 // https://everybody.codes/event/2026/quests/8
 Test.Run((notes, part, expected) => {
     var grid = new HexGrid();
     grid.Init(notes);
-    int rounds = part switch {
-        1 => 1,
-        _ => 6
+    (int rounds, bool grow) = part switch {
+        1 => (1, false),
+        2 => (6, false),
+        _ => (int.MaxValue, true)
     };
-    Assert.ActualEqualsExpected(grid.CalculateEnergy(rounds), expected);
+    int energy = grid.CalculateEnergy(rounds, grow);
+    Assert.ActualEqualsExpected(energy, expected);
 });
 
 class HexGrid {
+    const int ARMY_WARRIORS = 100_000;
+
     int width, height;
     readonly Dictionary<Point, Ent> ents = [];
     Point start;
     Point sourceDirection;
     Point[] nextDirections = null!;
+    int energy;
+    int warriors;
 
     public void Init(string notes) {
         string[] rows = notes.Split(Environment.NewLine);
@@ -36,32 +44,30 @@ class HexGrid {
         }
     }
 
-    public int CalculateEnergy(int rounds) {
-        var energy = 0;
+    public int CalculateEnergy(int rounds, bool grow) {
         for (var i = 0; i < rounds; i++) {
-            InitRound(i);
-            foreach (var ent in ents.Values) {
-                ent.Shadow = 0;
-                ent.GotEnergy = false;
-            }
+            StartRound(i % 6);
             do {
                 for (var current = start; ents.TryGetValue(current, out var ent); current += sourceDirection) {
-                    if (ent.Height <= ent.Shadow) {
+                    if (ent.IsSeed || ent.Height <= ent.Shadow) {
                         continue;
                     }
                     // Test.Log($"ent {ent.Height} with shadow {ent.Shadow} got energy");
-                    energy++;
                     ent.GotEnergy = true;
                     CastShadow(ent.Height, current);
                 }
             } while (TryNextStart());
-            Print();
+            // Print();
+            EndRound(grow);
             Test.Step();
+            if (warriors >= ARMY_WARRIORS) {
+                break;
+            }
         }
         return energy;
     }
 
-    void InitRound(int i) {
+    void StartRound(int i) {
         switch (i) {
             case 0:
                 start = new Point(0, height / 2);
@@ -119,25 +125,67 @@ class HexGrid {
         return false;
     }
 
+    void EndRound(bool grow) {
+        int roundEnergy = 0, roundWarriors = 0;
+        foreach (var ent in ents.Values) {
+            if (ent.GotEnergy) {
+                energy++;
+                roundEnergy++;
+            }
+            if (grow) {
+                TryGrow(ent);
+            }
+            ent.Shadow = 0;
+            ent.GotEnergy = false;
+        }
+        // Test.Log($"energy: {roundEnergy}->{energy}, warriors: {roundWarriors}->{warriors}", console: true);
+        return;
+
+        void TryGrow(Ent ent) {
+            if (ent is { GotEnergy: false, IsSeed: false }) {
+                return;
+            }
+            ent.Height++;
+            if (ent.Height < Ent.WARRIOR_HEIGHT) {
+                return;
+            }
+            warriors++;
+            roundWarriors++;
+            ent.Height = -Ent.SEED_ROUNDS + 1;
+        }
+    }
+
     void Print() {
         var rows = new StringBuilder();
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < width; x++) {
-                if (!ents.TryGetValue(new Point(x, y), out var ent)) {
-                    rows.Append('.');
-                    continue;
+                string cell = !ents.TryGetValue(new Point(x, y), out var ent)
+                        ? "."
+                        : ent.GotEnergy
+                                ? ent.Height.ToString()
+                                : ent.IsSeed ? "X" : ".";
+                if (cell == "X") {
+                    Console.ForegroundColor = ConsoleColor.Red;
                 }
-                rows.Append(ent.GotEnergy ? ent.Height : ".");
+                rows.Append(cell);
+                Console.Write(cell);
+                Console.ResetColor();
             }
+            Console.WriteLine();
             rows.AppendLine();
         }
         Test.Log(rows);
     }
 }
 
-record Ent(int Height) {
+class Ent(int height) {
+    public const int WARRIOR_HEIGHT = 10;
+    public const int SEED_ROUNDS = 3;
+
+    public int Height { get; set; } = height;
     public int Shadow { get; set; }
     public bool GotEnergy { get; set; }
+    public bool IsSeed => Height <= 0;
 }
 
 readonly record struct Point(int X, int Y) {
