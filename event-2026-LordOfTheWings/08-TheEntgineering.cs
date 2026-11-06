@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 Test.StepEnabled = false;
 // https://everybody.codes/event/2026/quests/8
@@ -33,31 +34,20 @@ class HexGrid {
     public int CalculateEnergy() {
         var start = new Point(0, height / 2);
         var energy = 0;
-        while (true) {
-            var current = start;
-            while (true) {
-                if (!ents.TryGetValue(current, out var ent)) {
-                    break;
+        do {
+            for (var current = start; ents.TryGetValue(current, out var ent); current += SOURCE_DIRECTION) {
+                if (ent.Height <= ent.Shadow) {
+                    continue;
                 }
-                if (ent.Height > ent.Shadow) {
-                    Test.Log($"ent {ent.Height} with shadow {ent.Shadow} got energy");
-                    energy++;
-                    ent.GotEnergy = true;
-                    CastShadow(ent.Height, current);
-                    Print();
-                    Test.Step();
-                }
-                current += SOURCE_DIRECTION;
+                Test.Log($"ent {ent.Height} with shadow {ent.Shadow} got energy");
+                energy++;
+                ent.GotEnergy = true;
+                CastShadow(ent.Height, current);
+                Print();
+                Test.Step();
             }
-            var startNext = start + NEXT_DIRECTIONS.First();
-            if (!ents.ContainsKey(startNext)) {
-                startNext = start + NEXT_DIRECTIONS.Last();
-                if (!ents.ContainsKey(startNext)) {
-                    return energy;
-                }
-            }
-            start = startNext;
-        }
+        } while (TryNextStart(ref start));
+        return energy;
     }
 
     void CastShadow(int entHeight, Point current) {
@@ -69,6 +59,18 @@ class HexGrid {
             ent.Shadow = Math.Max(shadow, ent.Shadow);
             Test.Log($"  ent {ent.Height} got shadow {shadow}, new shadow: {ent.Shadow}");
         }
+    }
+
+    [SuppressMessage("ReSharper", "InvertIf")]
+    bool TryNextStart(ref Point start) {
+        foreach (var direction in NEXT_DIRECTIONS) {
+            var startNext = start + direction;
+            if (ents.ContainsKey(startNext)) {
+                start = startNext;
+                return true;
+            }
+        }
+        return false;
     }
 
     void Print() {
@@ -108,7 +110,7 @@ static class Test {
         File.WriteAllText(LOG_FILE, null);
         string cases = ReadCases();
         Console.SetIn(new StringReader(cases));
-        long totalTime = 0L;
+        var totalTime = 0L;
         while (Console.In.Peek() != -1) {
             var stopwatch = Stopwatch.StartNew();
             string name = Console.ReadLine()!;

@@ -13,7 +13,7 @@ static class Test {
         File.WriteAllText(LOG_FILE, null);
         string cases = ReadCases();
         Console.SetIn(new StringReader(cases));
-        long totalTime = 0L;
+        var totalTime = 0L;
         while (Console.In.Peek() != -1) {
             var stopwatch = Stopwatch.StartNew();
             string name = Console.ReadLine()!;
