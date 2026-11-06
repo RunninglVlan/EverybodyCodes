@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 
+Test.StepEnabled = false;
 // https://everybody.codes/event/2026/quests/8
 Test.Run((notes, part, expected) => {
     var grid = new HexGrid();
@@ -8,6 +9,9 @@ Test.Run((notes, part, expected) => {
 });
 
 class HexGrid {
+    static readonly Point SOURCE_DIRECTION = new(1, 1);
+    static readonly Point[] NEXT_DIRECTIONS = [new(1, -1), new(2, 0)];
+
     int height;
     readonly Dictionary<Point, Ent> ents = [];
 
@@ -27,15 +31,69 @@ class HexGrid {
     }
 
     public int CalculateEnergy() {
-        return 0;
+        var start = new Point(0, height / 2);
+        var energy = 0;
+        while (true) {
+            var current = start;
+            while (true) {
+                if (!ents.TryGetValue(current, out var ent)) {
+                    break;
+                }
+                if (ent.Height > ent.Shadow) {
+                    Test.Log($"ent {ent.Height} with shadow {ent.Shadow} got energy");
+                    energy++;
+                    ent.GotEnergy = true;
+                    CastShadow(ent.Height, current);
+                    Print();
+                    Test.Step();
+                }
+                current += SOURCE_DIRECTION;
+            }
+            var startNext = start + NEXT_DIRECTIONS.First();
+            if (!ents.ContainsKey(startNext)) {
+                startNext = start + NEXT_DIRECTIONS.Last();
+                if (!ents.ContainsKey(startNext)) {
+                    return energy;
+                }
+            }
+            start = startNext;
+        }
+    }
+
+    void CastShadow(int entHeight, Point current) {
+        for (int shadow = entHeight - 1; shadow > 0; shadow--) {
+            current += SOURCE_DIRECTION;
+            if (!ents.TryGetValue(current, out var ent)) {
+                break;
+            }
+            ent.Shadow = Math.Max(shadow, ent.Shadow);
+            Test.Log($"  ent {ent.Height} got shadow {shadow}, new shadow: {ent.Shadow}");
+        }
+    }
+
+    void Print() {
+        return;
+        for (var y = 0; y < height; y++) {
+            for (var x = 0; x < 17; x++) {
+                if (!ents.TryGetValue(new Point(x, y), out var ent)) {
+                    Console.Write('.');
+                    continue;
+                }
+                Console.Write(ent.GotEnergy ? ent.Height : ".");
+            }
+            Console.WriteLine();
+        }
     }
 }
 
 record Ent(int Height) {
     public int Shadow { get; set; }
+    public bool GotEnergy { get; set; }
 }
 
-readonly record struct Point(int X, int Y);
+readonly record struct Point(int X, int Y) {
+    public static Point operator +(Point a, Point b) => new(a.X + b.X, a.Y + b.Y);
+}
 
 static class Test {
     const string CASE_FILE = "../Test.Cases.txt";
