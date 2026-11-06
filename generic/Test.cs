@@ -8,6 +8,7 @@ static class Test {
     public static bool StepEnabled { get; set; } = true;
     public static string? From { get; set; }
     public static string? Until { get; set; }
+    public static bool LogEnabled { get; set; } = true;
 
     public static void Run(Action<string, int, string> action) {
         File.WriteAllText(LOG_FILE, null);
@@ -17,7 +18,7 @@ static class Test {
         while (Console.In.Peek() != -1) {
             var stopwatch = Stopwatch.StartNew();
             string name = Console.ReadLine()!;
-            Log(name, console: true, color: ConsoleColor.Cyan);
+            LogInternal(name, console: true, color: ConsoleColor.Cyan);
             int part = int.Parse(Console.ReadLine()!);
             string notes = ReadUntilNewLine();
             string expected = ReadUntilNewLine();
@@ -27,11 +28,11 @@ static class Test {
             finally {
                 long time = stopwatch.ElapsedMilliseconds;
                 totalTime += time;
-                Log($"Test took {time}ms", console: true);
+                LogInternal($"Test took {time}ms", console: true);
             }
-            Log(console: true);
+            LogInternal(console: true);
         }
-        Log($"All tests took {totalTime}ms", console: true);
+        LogInternal($"All tests took {totalTime}ms", console: true);
     }
 
     static string ReadCases() {
@@ -74,6 +75,13 @@ static class Test {
     }
 
     public static void Log(object? line = null, bool console = false, ConsoleColor? color = null) {
+        if (!LogEnabled) {
+            return;
+        }
+        LogInternal(line, console, color);
+    }
+
+    static void LogInternal(object? line = null, bool console = false, ConsoleColor? color = null) {
         File.AppendAllText(LOG_FILE, $"{line}{Environment.NewLine}");
         if (!console) {
             return;
