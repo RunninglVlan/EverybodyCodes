@@ -25,21 +25,20 @@ abstract class CountSize {
     protected abstract long Value { get; }
 
     public long Grow(Plant plant) {
-        branchesBySize = new Dictionary<long, long> { { 0, 0 } };
+        branchesBySize = new Dictionary<long, long> { { 1, 1 } };
         nextBranchesBySize = [];
         branchingPoints = 0;
-        long seconds = 0;
+        long seconds = 1;
         for (long delta = 1; Value < plant.Limit; delta = NextDelta(plant.Growth)) {
             foreach ((long size, long count) in branchesBySize) {
-                long branchSize = size;
-                branchSize += delta;
+                long branchSize = size + delta;
                 if (branchSize < plant.Growth) {
-                    GrowBranch(branchSize, count == 0 ? 1 : count);
+                    AddBranches(branchSize, count);
                     continue;
                 }
                 long splitSize = (plant.Growth - 1) / 2;
-                GrowBranch(splitSize, count * 2);
-                GrowBranch(1, count);
+                AddBranches(splitSize, count * 2);
+                AddBranches(1, count);
                 branchingPoints += count;
             }
             (branchesBySize, nextBranchesBySize) = (nextBranchesBySize, branchesBySize);
@@ -58,7 +57,7 @@ abstract class CountSize {
         return seconds;
     }
 
-    void GrowBranch(long size, long countDelta) {
+    void AddBranches(long size, long countDelta) {
         long countExisting = nextBranchesBySize.GetValueOrDefault(size);
         nextBranchesBySize[size] = countExisting + countDelta;
     }
