@@ -9,27 +9,27 @@ const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
 const int part = 1;
 Test.Run((notes, part, expected) => {
-    CountSize count = part switch {
+    GrowthCounter counter = part switch {
         1 => new CountElements(),
         _ => new CountLeaves()
     };
-    long totalTime = notes.Split(Environment.NewLine).Select(Plant.From).Sum(count.Grow);
+    long totalTime = notes.Split(Environment.NewLine).Select(Plant.From).Sum(counter.Grow);
     Assert.ActualEqualsExpected(totalTime, expected);
     // Console.WriteLine(totalTime);
 });
 
-abstract class CountSize {
+abstract class GrowthCounter {
     protected Dictionary<long, long> branchesBySize = null!;
     Dictionary<long, long> nextBranchesBySize = null!;
     protected long branchingPoints;
-    protected abstract long Value { get; }
+    protected abstract long Size { get; }
 
     public long Grow(Plant plant) {
         branchesBySize = new Dictionary<long, long> { { 1, 1 } };
         nextBranchesBySize = [];
         branchingPoints = 0;
         long seconds = 1;
-        for (long delta = 1; Value < plant.Limit; delta = NextDelta(plant.Growth)) {
+        for (long delta = 1; Size < plant.Limit; delta = NextDelta(plant.Growth)) {
             foreach ((long size, long count) in branchesBySize) {
                 long branchSize = size + delta;
                 if (branchSize < plant.Growth) {
@@ -44,7 +44,7 @@ abstract class CountSize {
             (branchesBySize, nextBranchesBySize) = (nextBranchesBySize, branchesBySize);
             nextBranchesBySize.Clear();
             Test.Log(
-                    $"seconds: {seconds}, branches: {branchesBySize.Values.Sum()}, branchingPoints: {branchingPoints}, size: {Value}",
+                    $"seconds: {seconds}, branches: {branchesBySize.Values.Sum()}, branchingPoints: {branchingPoints}, size: {Size}",
                     console: true);
             foreach ((long size, long count) in branchesBySize.OrderBy(it => it.Key)) {
                 Test.Log($"  {count} branches of size: {size}", console: true);
@@ -65,8 +65,8 @@ abstract class CountSize {
     protected virtual long NextDelta(long maxSize) => 1;
 }
 
-class CountElements : CountSize {
-    protected override long Value {
+class CountElements : GrowthCounter {
+    protected override long Size {
         get {
             long branchElements = branchesBySize.Sum(it => it.Key * it.Value);
             return branchElements + branchingPoints;
@@ -74,8 +74,8 @@ class CountElements : CountSize {
     }
 }
 
-class CountLeaves : CountSize {
-    protected override long Value => branchesBySize.Values.Sum() - branchingPoints;
+class CountLeaves : GrowthCounter {
+    protected override long Size => branchesBySize.Values.Sum() - branchingPoints;
 
     protected override long NextDelta(long maxSize) => maxSize - branchesBySize.Keys.Max();
 }
