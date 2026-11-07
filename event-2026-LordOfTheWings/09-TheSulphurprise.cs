@@ -27,12 +27,11 @@ abstract class CountSize {
     protected long secondsDelta;
     protected long growth;
 
-    public void Init(long growthValue, out long seconds) {
+    public void Init(long growthValue) {
         growth = growthValue;
         branchSizeCount = [];
         branchSizeCountNext = new Dictionary<long, long> { { 1, 1 } };
         branchingPoints = 0;
-        seconds = 1;
         AfterGrowth();
     }
 
@@ -103,7 +102,8 @@ record Plant(long Growth, long Limit) {
     }
 
     public long Grow(CountSize countSize) {
-        countSize.Init(Growth, out long seconds);
+        long seconds = 1;
+        countSize.Init(Growth);
         while (countSize.Value < Limit) {
             seconds += countSize.Grow();
             Test.Log($"seconds: {seconds}, {countSize}", console: true);
