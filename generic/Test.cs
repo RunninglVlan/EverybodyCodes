@@ -4,7 +4,6 @@ static class Test {
     const string CASE_FILE = "../Test.Cases.txt";
     const string LOG_FILE = "../Test.Log.txt";
 
-    static readonly TextReader consoleIn = Console.In;
     public static bool StepEnabled { get; set; } = true;
     public static string? From { get; set; }
     public static string? Until { get; set; }
@@ -68,10 +67,7 @@ static class Test {
         if (!StepEnabled) {
             return;
         }
-        var current = Console.In;
-        Console.SetIn(consoleIn);
-        Console.ReadLine();
-        Console.SetIn(current);
+        Console.ReadKey();
     }
 
     public static void Log(object? line = null, bool console = false, ConsoleColor? color = null) {
