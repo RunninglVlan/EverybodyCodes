@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Text;
 
 Test.StepEnabled = false;
 // Test.From = "Part III";
@@ -14,7 +13,7 @@ Test.Run((notes, part, expected) => {
         1 => new CountElements(),
         _ => new CountLeaves()
     };
-    long totalTime = notes.Split(Environment.NewLine).Select(Plant.From).Sum(it => it.Grow(count));
+    long totalTime = notes.Split(Environment.NewLine).Select(Plant.From).Sum(count.Grow);
     Assert.ActualEqualsExpected(totalTime, expected);
     // Console.WriteLine(totalTime);
 });
@@ -23,60 +22,58 @@ abstract class CountSize {
     protected Dictionary<long, long> branchSizeCount = null!;
     Dictionary<long, long> branchSizeCountNext = null!;
     protected long branchingPoints;
-    public abstract long Value { get; }
+    protected abstract long Value { get; }
     protected long secondsDelta;
-    protected long growth;
 
-    public void Init(long growthValue) {
-        growth = growthValue;
+    public long Grow(Plant plant) {
         branchSizeCount = [];
         branchSizeCountNext = new Dictionary<long, long> { { 1, 1 } };
         branchingPoints = 0;
-        AfterGrowth();
-    }
-
-    public long Grow() {
-        long delta = secondsDelta;
-        foreach ((long size, long count) in branchSizeCount) {
-            long branchSize = size;
-            branchSize += delta;
-            if (branchSize < growth) {
-                Increase(branchSize, count);
-                continue;
+        AfterGrowth(plant.Growth);
+        long seconds = 1;
+        while (Value < plant.Limit) {
+            long delta = secondsDelta;
+            foreach ((long size, long count) in branchSizeCount) {
+                long branchSize = size;
+                branchSize += delta;
+                if (branchSize < plant.Growth) {
+                    Increase(branchSize, count);
+                    continue;
+                }
+                long splitSize = (plant.Growth - 1) / 2;
+                Increase(splitSize, count * 2);
+                Increase(1, count);
+                branchingPoints += count;
             }
-            long splitSize = (growth - 1) / 2;
-            Increase(splitSize, count * 2);
-            Increase(1, count);
-            branchingPoints += count;
+            AfterGrowth(plant.Growth);
+            seconds += delta;
+            Test.Log(
+                    $"seconds: {seconds}, branches: {branchSizeCount.Values.Sum()}, branchingPoints: {branchingPoints}, size: {Value}",
+                    console: true);
+            foreach ((long size, long count) in branchSizeCount.OrderBy(it => it.Key)) {
+                Test.Log($"  {count} branches of size: {size}", console: true);
+            }
+            Test.Step();
         }
-        AfterGrowth();
-        return delta;
-
-        void Increase(long size, long countDelta) {
-            long countExisting = branchSizeCountNext.GetValueOrDefault(size);
-            branchSizeCountNext[size] = countExisting + countDelta;
-        }
+        Test.Log($"{this}, seconds: {seconds}", console: true);
+        Test.Log(console: true);
+        return seconds;
     }
 
-    protected virtual void AfterGrowth() {
+    void Increase(long size, long countDelta) {
+        long countExisting = branchSizeCountNext.GetValueOrDefault(size);
+        branchSizeCountNext[size] = countExisting + countDelta;
+    }
+
+    protected virtual void AfterGrowth(long maxSize) {
         (branchSizeCount, branchSizeCountNext) = (branchSizeCountNext, branchSizeCount);
         branchSizeCountNext.Clear();
         secondsDelta = 1;
     }
-
-    public override string ToString() {
-        var result = new StringBuilder();
-        result.AppendLine(
-                $"branches: {branchSizeCount.Values.Sum()}, branchingPoints: {branchingPoints}, size: {Value}");
-        foreach ((long size, long count) in branchSizeCount.OrderBy(it => it.Key)) {
-            result.AppendLine($"  {count} branches of size: {size}");
-        }
-        return result.ToString();
-    }
 }
 
 class CountElements : CountSize {
-    public override long Value {
+    protected override long Value {
         get {
             long branchElements = branchSizeCount.Sum(it => it.Key * it.Value);
             return branchElements + branchingPoints;
@@ -85,11 +82,11 @@ class CountElements : CountSize {
 }
 
 class CountLeaves : CountSize {
-    public override long Value => branchSizeCount.Values.Sum() - branchingPoints;
+    protected override long Value => branchSizeCount.Values.Sum() - branchingPoints;
 
-    protected override void AfterGrowth() {
-        base.AfterGrowth();
-        secondsDelta = growth - branchSizeCount.Keys.Max();
+    protected override void AfterGrowth(long maxSize) {
+        base.AfterGrowth(maxSize);
+        secondsDelta = maxSize - branchSizeCount.Keys.Max();
     }
 }
 
@@ -99,19 +96,6 @@ record Plant(long Growth, long Limit) {
         string growth = data[1].Split('=').Last();
         string limit = data[2].Split('=').Last();
         return new Plant(long.Parse(growth), long.Parse(limit));
-    }
-
-    public long Grow(CountSize countSize) {
-        long seconds = 1;
-        countSize.Init(Growth);
-        while (countSize.Value < Limit) {
-            seconds += countSize.Grow();
-            Test.Log($"seconds: {seconds}, {countSize}", console: true);
-            Test.Step();
-        }
-        Test.Log($"{this}, seconds: {seconds}", console: true);
-        Test.Log(console: true);
-        return seconds;
     }
 }
 
