@@ -94,13 +94,12 @@ class CountLeaves : CountSize {
     }
 }
 
-record Plant(int Id, long Growth, long Limit) {
+record Plant(long Growth, long Limit) {
     public static Plant From(string properties) {
         string[] data = properties.Split(", ");
-        string id = data[0].Split('=').Last();
         string growth = data[1].Split('=').Last();
         string limit = data[2].Split('=').Last();
-        return new Plant(int.Parse(id), long.Parse(growth), long.Parse(limit));
+        return new Plant(long.Parse(growth), long.Parse(limit));
     }
 
     public long Grow(CountSize countSize) {
