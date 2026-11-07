@@ -9,14 +9,53 @@ const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
 const int part = 1;
 Test.Run((notes, part, expected) => {
-    Func<List<long>, int, long> count = part switch {
-        1 => (branches, branchingPoints) => branches.Sum() + branchingPoints,
-        _ => (branches, branchingPoints) => branches.Count - branchingPoints
+    CountSize count = part switch {
+        1 => new CountElements(),
+        _ => new CountLeaves()
     };
     long totalTime = notes.Split(Environment.NewLine).Select(Plant.From).Sum(it => it.Grow(count));
     Assert.ActualEqualsExpected(totalTime, expected);
     // Console.WriteLine(totalTime);
 });
+
+abstract class CountSize {
+    protected long growth;
+    public List<long> Branches { get; } = [];
+    public int BranchingPoints { get; set; }
+    public abstract long Value { get; }
+
+    public void Init(long growthValue) {
+        growth = growthValue;
+        Branches.Clear();
+        Branches.Add(0);
+        BranchingPoints = 0;
+    }
+
+    public virtual void BeforeGrowth() { }
+    public virtual void OnElementChange(long value) { }
+    public virtual void AfterGrowth(out long secondsDelta) => secondsDelta = 1;
+}
+
+class CountElements : CountSize {
+    public override long Value => Branches.Sum() + BranchingPoints;
+}
+
+class CountLeaves : CountSize {
+    public override long Value => Branches.Count - BranchingPoints;
+    long timeTilGrowth;
+
+    public override void BeforeGrowth() {
+        timeTilGrowth = int.MaxValue;
+    }
+
+    public override void OnElementChange(long value) {
+        timeTilGrowth = Math.Min(growth - value, timeTilGrowth);
+    }
+
+    public override void AfterGrowth(out long secondsDelta) {
+        secondsDelta = timeTilGrowth;
+    }
+}
 
 record Plant(long Growth, long Limit) {
     public static Plant From(string properties) {
@@ -26,33 +65,35 @@ record Plant(long Growth, long Limit) {
         return new Plant(long.Parse(growth), long.Parse(limit));
     }
 
-    public long Grow(Func<List<long>, int, long> countElements) {
-        List<long> branches = [0];
-        var branchingPoints = 0;
-        var seconds = 1;
+    public long Grow(CountSize countSize) {
+        countSize.Init(Growth);
+        long seconds = 1, secondsDelta = 1;
         while (true) {
-            int count = branches.Count;
+            countSize.BeforeGrowth();
+            int count = countSize.Branches.Count;
             for (var i = 0; i < count; i++) {
-                branches[i]++;
-                if (branches[i] < Growth) {
+                countSize.Branches[i] += secondsDelta;
+                if (countSize.Branches[i] < Growth) {
+                    countSize.OnElementChange(countSize.Branches[i]);
                     continue;
                 }
-                long splitSize = (branches[i] - 1) / 2;
-                branches[i] = splitSize;
-                branches.Add(splitSize);
-                branches.Add(1);
-                branchingPoints++;
+                long splitSize = (countSize.Branches[i] - 1) / 2;
+                countSize.Branches[i] = splitSize;
+                countSize.OnElementChange(splitSize);
+                countSize.Branches.Add(splitSize);
+                countSize.Branches.Add(1);
+                countSize.BranchingPoints++;
             }
-            Test.Log($"seconds: {seconds}, branches: {branches.Count}, branchingPoints: {branchingPoints}, size: {Elements()}");
-            if (Elements() >= Limit) {
+            Test.Log(
+                    $"seconds: {seconds}, branches: {countSize.Branches.Count}, branchingPoints: {countSize.BranchingPoints}, size: {countSize.Value}");
+            if (countSize.Value >= Limit) {
                 break;
             }
-            seconds++;
+            countSize.AfterGrowth(out secondsDelta);
+            seconds += secondsDelta;
         }
         Test.Log();
         return seconds;
-
-        long Elements() => countElements(branches, branchingPoints);
     }
 }
 
