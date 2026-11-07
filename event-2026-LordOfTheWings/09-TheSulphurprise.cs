@@ -43,7 +43,7 @@ record Plant(long Growth, long Limit) {
                 branches.Add(1);
                 branchingPoints++;
             }
-            Test.Log($"seconds: {seconds}, branches: {branches.Count}, elements: {Elements()}");
+            Test.Log($"seconds: {seconds}, branches: {branches.Count}, branchingPoints: {branchingPoints}, size: {Elements()}");
             if (Elements() >= Limit) {
                 break;
             }
