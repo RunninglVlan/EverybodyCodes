@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 
 Test.StepEnabled = false;
-// Test.From = "Part III";
-// Test.Until = "Part III";
-Test.LogEnabled = false;
+// Test.From = "Part II Example";
+Test.Until = "Part II";
+// Test.LogEnabled = false;
 // https://everybody.codes/event/2026/quests/9
 const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
