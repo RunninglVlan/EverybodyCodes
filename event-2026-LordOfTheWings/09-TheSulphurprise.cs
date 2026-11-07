@@ -19,21 +19,21 @@ Test.Run((notes, part, expected) => {
 });
 
 abstract class CountSize {
-    protected Dictionary<long, long> branchSizeCount = null!;
-    Dictionary<long, long> branchSizeCountNext = null!;
+    protected Dictionary<long, long> branchesBySize = null!;
+    Dictionary<long, long> nextBranchesBySize = null!;
     protected long branchingPoints;
     protected abstract long Value { get; }
     protected long secondsDelta;
 
     public long Grow(Plant plant) {
-        branchSizeCount = [];
-        branchSizeCountNext = new Dictionary<long, long> { { 1, 1 } };
+        branchesBySize = new Dictionary<long, long> { { 0, 1 } };
+        nextBranchesBySize = [];
         branchingPoints = 0;
-        AfterGrowth(plant.Growth);
-        long seconds = 1;
-        while (Value < plant.Limit) {
+        long seconds = 0;
+        secondsDelta = 1;
+        while (true) {
             long delta = secondsDelta;
-            foreach ((long size, long count) in branchSizeCount) {
+            foreach ((long size, long count) in branchesBySize) {
                 long branchSize = size;
                 branchSize += delta;
                 if (branchSize < plant.Growth) {
@@ -47,10 +47,13 @@ abstract class CountSize {
             }
             AfterGrowth(plant.Growth);
             seconds += delta;
+            if (Value >= plant.Limit) {
+                break;
+            }
             Test.Log(
-                    $"seconds: {seconds}, branches: {branchSizeCount.Values.Sum()}, branchingPoints: {branchingPoints}, size: {Value}",
+                    $"seconds: {seconds}, branches: {branchesBySize.Values.Sum()}, branchingPoints: {branchingPoints}, size: {Value}",
                     console: true);
-            foreach ((long size, long count) in branchSizeCount.OrderBy(it => it.Key)) {
+            foreach ((long size, long count) in branchesBySize.OrderBy(it => it.Key)) {
                 Test.Log($"  {count} branches of size: {size}", console: true);
             }
             Test.Step();
@@ -61,13 +64,13 @@ abstract class CountSize {
     }
 
     void Increase(long size, long countDelta) {
-        long countExisting = branchSizeCountNext.GetValueOrDefault(size);
-        branchSizeCountNext[size] = countExisting + countDelta;
+        long countExisting = nextBranchesBySize.GetValueOrDefault(size);
+        nextBranchesBySize[size] = countExisting + countDelta;
     }
 
     protected virtual void AfterGrowth(long maxSize) {
-        (branchSizeCount, branchSizeCountNext) = (branchSizeCountNext, branchSizeCount);
-        branchSizeCountNext.Clear();
+        (branchesBySize, nextBranchesBySize) = (nextBranchesBySize, branchesBySize);
+        nextBranchesBySize.Clear();
         secondsDelta = 1;
     }
 }
@@ -75,18 +78,18 @@ abstract class CountSize {
 class CountElements : CountSize {
     protected override long Value {
         get {
-            long branchElements = branchSizeCount.Sum(it => it.Key * it.Value);
+            long branchElements = branchesBySize.Sum(it => it.Key * it.Value);
             return branchElements + branchingPoints;
         }
     }
 }
 
 class CountLeaves : CountSize {
-    protected override long Value => branchSizeCount.Values.Sum() - branchingPoints;
+    protected override long Value => branchesBySize.Values.Sum() - branchingPoints;
 
     protected override void AfterGrowth(long maxSize) {
         base.AfterGrowth(maxSize);
-        secondsDelta = maxSize - branchSizeCount.Keys.Max();
+        secondsDelta = maxSize - branchesBySize.Keys.Max();
     }
 }
 
