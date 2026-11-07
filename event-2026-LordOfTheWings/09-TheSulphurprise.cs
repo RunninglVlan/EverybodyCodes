@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 
 Test.StepEnabled = false;
-Test.From = "Part III";
-// Test.Until = "Part III";
+// Test.From = "Part III";
+Test.Until = "Part II";
 // Test.LogEnabled = false;
 // https://everybody.codes/event/2026/quests/9
 const string noteFile = "../Notes.txt";
@@ -66,6 +66,7 @@ record Plant(long Growth, long Limit) {
     }
 
     public long Grow(CountSize countSize) {
+        Test.Log($"Growth: {Growth}, Limit: {Limit}", console: true);
         countSize.Init(Growth);
         long seconds = 1, secondsDelta = 1;
         while (true) {
@@ -84,15 +85,19 @@ record Plant(long Growth, long Limit) {
                 countSize.Branches.Add(1);
                 countSize.BranchingPoints++;
             }
-            Test.Log(
-                    $"seconds: {seconds}, branches: {countSize.Branches.Count}, branchingPoints: {countSize.BranchingPoints}, size: {countSize.Value}");
+            Test.Log($"seconds: {seconds}, branches: {countSize.Branches.Count}, branchingPoints: {countSize.BranchingPoints}, size: {countSize.Value}", console: true);
+            foreach (var group in countSize.Branches.GroupBy(it => it).OrderBy(it => it.Key)) {
+                Test.Log($"  {group.Count()} branches of size: {group.Key}", console: true);
+            }
+            Test.Step();
             if (countSize.Value >= Limit) {
                 break;
             }
             countSize.AfterGrowth(out secondsDelta);
             seconds += secondsDelta;
         }
-        Test.Log();
+        Test.Log($"seconds: {seconds}", console: true);
+        Test.Log(console: true);
         return seconds;
     }
 }
