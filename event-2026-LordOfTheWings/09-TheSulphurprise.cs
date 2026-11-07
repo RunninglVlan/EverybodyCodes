@@ -2,8 +2,8 @@
 
 Test.StepEnabled = false;
 // Test.From = "Part II Example";
-Test.Until = "Part II";
-// Test.LogEnabled = false;
+// Test.Until = "Part II";
+Test.LogEnabled = false;
 // https://everybody.codes/event/2026/quests/9
 const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
@@ -23,33 +23,27 @@ abstract class CountSize {
     Dictionary<long, long> nextBranchesBySize = null!;
     protected long branchingPoints;
     protected abstract long Value { get; }
-    protected long secondsDelta;
 
     public long Grow(Plant plant) {
-        branchesBySize = new Dictionary<long, long> { { 0, 1 } };
+        branchesBySize = new Dictionary<long, long> { { 0, 0 } };
         nextBranchesBySize = [];
         branchingPoints = 0;
         long seconds = 0;
-        secondsDelta = 1;
-        while (true) {
-            long delta = secondsDelta;
+        for (long delta = 1; Value < plant.Limit; delta = NextDelta(plant.Growth)) {
             foreach ((long size, long count) in branchesBySize) {
                 long branchSize = size;
                 branchSize += delta;
                 if (branchSize < plant.Growth) {
-                    Increase(branchSize, count);
+                    GrowBranch(branchSize, count == 0 ? 1 : count);
                     continue;
                 }
                 long splitSize = (plant.Growth - 1) / 2;
-                Increase(splitSize, count * 2);
-                Increase(1, count);
+                GrowBranch(splitSize, count * 2);
+                GrowBranch(1, count);
                 branchingPoints += count;
             }
-            AfterGrowth(plant.Growth);
-            seconds += delta;
-            if (Value >= plant.Limit) {
-                break;
-            }
+            (branchesBySize, nextBranchesBySize) = (nextBranchesBySize, branchesBySize);
+            nextBranchesBySize.Clear();
             Test.Log(
                     $"seconds: {seconds}, branches: {branchesBySize.Values.Sum()}, branchingPoints: {branchingPoints}, size: {Value}",
                     console: true);
@@ -57,22 +51,19 @@ abstract class CountSize {
                 Test.Log($"  {count} branches of size: {size}", console: true);
             }
             Test.Step();
+            seconds += delta;
         }
         Test.Log($"{this}, seconds: {seconds}", console: true);
         Test.Log(console: true);
         return seconds;
     }
 
-    void Increase(long size, long countDelta) {
+    void GrowBranch(long size, long countDelta) {
         long countExisting = nextBranchesBySize.GetValueOrDefault(size);
         nextBranchesBySize[size] = countExisting + countDelta;
     }
 
-    protected virtual void AfterGrowth(long maxSize) {
-        (branchesBySize, nextBranchesBySize) = (nextBranchesBySize, branchesBySize);
-        nextBranchesBySize.Clear();
-        secondsDelta = 1;
-    }
+    protected virtual long NextDelta(long maxSize) => 1;
 }
 
 class CountElements : CountSize {
@@ -87,10 +78,7 @@ class CountElements : CountSize {
 class CountLeaves : CountSize {
     protected override long Value => branchesBySize.Values.Sum() - branchingPoints;
 
-    protected override void AfterGrowth(long maxSize) {
-        base.AfterGrowth(maxSize);
-        secondsDelta = maxSize - branchesBySize.Keys.Max();
-    }
+    protected override long NextDelta(long maxSize) => maxSize - branchesBySize.Keys.Max();
 }
 
 record Plant(long Growth, long Limit) {
