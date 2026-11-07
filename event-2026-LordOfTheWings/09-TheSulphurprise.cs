@@ -27,8 +27,8 @@ record Plant(long Growth, long Limit) {
     public long Grow(Func<List<long>, int, long> countElements) {
         List<long> branches = [0];
         var branchingPoints = 0;
-        var seconds = 0;
-        for (; Elements() < Limit; seconds++) {
+        var seconds = 1;
+        while (true) {
             int count = branches.Count;
             for (var i = 0; i < count; i++) {
                 branches[i]++;
@@ -42,6 +42,10 @@ record Plant(long Growth, long Limit) {
                 branchingPoints++;
             }
             Test.Log($"seconds: {seconds}, branches: {branches.Count}, elements: {Elements()}");
+            if (Elements() >= Limit) {
+                break;
+            }
+            seconds++;
         }
         Test.Log();
         return seconds;
