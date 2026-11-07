@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 
 Test.StepEnabled = false;
-// Test.From = "Part III";
-Test.Until = "Part II";
+Test.From = "Part III";
+// Test.Until = "Part III";
 // Test.LogEnabled = false;
 // https://everybody.codes/event/2026/quests/9
 const string noteFile = "../Notes.txt";
@@ -19,84 +19,109 @@ Test.Run((notes, part, expected) => {
 });
 
 abstract class CountSize {
-    protected long growth;
-    public List<long> Branches { get; } = [];
-    public int BranchingPoints { get; set; }
+    public long[] BranchSizeCount { get; private set; } = null!;
+    public long[] BranchSizeCountNext { get; private set; } = null!;
+    public long BranchingPoints { get; set; }
     public abstract long Value { get; }
+    public long BranchCount => BranchSizeCount.Sum();
 
-    public void Init(long growthValue) {
-        growth = growthValue;
-        Branches.Clear();
-        Branches.Add(0);
+    public void Init(long growth) {
+        BranchSizeCount = new long[growth];
+        BranchSizeCountNext = new long[growth];
+        BranchSizeCount[1] = 1;
         BranchingPoints = 0;
     }
 
-    public virtual void BeforeGrowth() { }
-    public virtual void OnElementChange(long value) { }
-    public virtual void AfterGrowth(out long secondsDelta) => secondsDelta = 1;
+    public virtual void AfterGrowth(out long secondsDelta) {
+        (BranchSizeCount, BranchSizeCountNext) = (BranchSizeCountNext, BranchSizeCount);
+        for (var size = 1; size < BranchSizeCountNext.Length; size++) {
+            BranchSizeCountNext[size] = 0;
+        }
+        secondsDelta = 1;
+    }
 }
 
 class CountElements : CountSize {
-    public override long Value => Branches.Sum() + BranchingPoints;
+    public override long Value {
+        get {
+            long branchElements = 0;
+            for (var size = 1; size < BranchSizeCount.Length; size++) {
+                branchElements += size * BranchSizeCount[size];
+            }
+            return branchElements + BranchingPoints;
+        }
+    }
 }
 
 class CountLeaves : CountSize {
-    public override long Value => Branches.Count - BranchingPoints;
-    long timeTilGrowth;
-
-    public override void BeforeGrowth() {
-        timeTilGrowth = int.MaxValue;
-    }
-
-    public override void OnElementChange(long value) {
-        timeTilGrowth = Math.Min(growth - value, timeTilGrowth);
-    }
+    public override long Value => BranchSizeCount.Sum() - BranchingPoints;
 
     public override void AfterGrowth(out long secondsDelta) {
-        secondsDelta = timeTilGrowth;
+        base.AfterGrowth(out secondsDelta);
+        for (int size = BranchSizeCount.Length - 1; size >= 1; size--) {
+            if (BranchSizeCount[size] == 0) {
+                continue;
+            }
+            secondsDelta = BranchSizeCount.Length - size;
+            break;
+        }
     }
 }
 
-record Plant(long Growth, long Limit) {
+record Plant(int Id, long Growth, long Limit) {
     public static Plant From(string properties) {
         string[] data = properties.Split(", ");
+        string id = data[0].Split('=').Last();
         string growth = data[1].Split('=').Last();
         string limit = data[2].Split('=').Last();
-        return new Plant(long.Parse(growth), long.Parse(limit));
+        return new Plant(int.Parse(id), long.Parse(growth), long.Parse(limit));
     }
 
     public long Grow(CountSize countSize) {
-        Test.Log($"Growth: {Growth}, Limit: {Limit}", console: true);
+        // Test.Log($"Growth: {Growth}, Limit: {Limit}", console: true);
         countSize.Init(Growth);
-        long seconds = 1, secondsDelta = 1;
+        long seconds = 2, secondsDelta = 1;
+        // Test.Log(
+        //         $"seconds: {seconds - 1}, branches: {countSize.BranchCount}, branchingPoints: {countSize.BranchingPoints}, size: {countSize.Value}",
+        //         console: true);
+        // Test.Log("  1 branches of size: 1", console: true);
         while (true) {
-            countSize.BeforeGrowth();
-            int count = countSize.Branches.Count;
-            for (var i = 0; i < count; i++) {
-                countSize.Branches[i] += secondsDelta;
-                if (countSize.Branches[i] < Growth) {
-                    countSize.OnElementChange(countSize.Branches[i]);
+            // this will probably become ~countSize.Grow()
+            for (var size = 1; size < countSize.BranchSizeCount.Length; size++) {
+                long count = countSize.BranchSizeCount[size];
+                if (count == 0) {
                     continue;
                 }
-                long splitSize = (countSize.Branches[i] - 1) / 2;
-                countSize.Branches[i] = splitSize;
-                countSize.OnElementChange(splitSize);
-                countSize.Branches.Add(splitSize);
-                countSize.Branches.Add(1);
-                countSize.BranchingPoints++;
+                long branchSize = size;
+                branchSize += secondsDelta;
+                if (branchSize < Growth) {
+                    countSize.BranchSizeCountNext[branchSize] += count;
+                    continue;
+                }
+                long splitSize = (Growth - 1) / 2;
+                countSize.BranchSizeCountNext[splitSize] += count * 2;
+                countSize.BranchSizeCountNext[1] += count;
+                countSize.BranchingPoints += count;
             }
-            Test.Log($"seconds: {seconds}, branches: {countSize.Branches.Count}, branchingPoints: {countSize.BranchingPoints}, size: {countSize.Value}", console: true);
-            foreach (var group in countSize.Branches.GroupBy(it => it).OrderBy(it => it.Key)) {
-                Test.Log($"  {group.Count()} branches of size: {group.Key}", console: true);
-            }
+            countSize.AfterGrowth(out secondsDelta);
+            // Test.Log(
+            //         $"seconds: {seconds}, branches: {countSize.BranchCount}, branchingPoints: {countSize.BranchingPoints}, size: {countSize.Value}",
+            //         console: true);
+            // for (var size = 1; size < countSize.BranchSizeCount.Length; size++) {
+            //     long count = countSize.BranchSizeCount[size];
+            //     if (count == 0) {
+            //         continue;
+            //     }
+            //     Test.Log($"  {count} branches of size: {size}", console: true);
+            // }
             Test.Step();
             if (countSize.Value >= Limit) {
                 break;
             }
-            countSize.AfterGrowth(out secondsDelta);
             seconds += secondsDelta;
         }
-        Test.Log($"seconds: {seconds}", console: true);
+        // Test.Log($"seconds: {seconds}", console: true);
+        Test.Log($"{this}, seconds: {seconds}", console: true);
         Test.Log(console: true);
         return seconds;
     }
