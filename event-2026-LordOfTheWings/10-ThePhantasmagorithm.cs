@@ -23,6 +23,7 @@ class Grid {
     int width, height;
     readonly Dictionary<Point, bool> walkableCells = [];
     readonly List<NullGhost> ghosts = [];
+    readonly List<GhostState[]> roundGhosts = [];
     public long Collisions { get; private set; }
     public long Rounds { get; private set; }
     readonly Dictionary<Point, int> roundCollisions = [];
@@ -45,6 +46,7 @@ class Grid {
 
     public void SimulateRounds(long maxRounds, long maxGhostCollisions) {
         const bool console = true;
+        roundGhosts.Add([.. ghosts.Select(it => it.State())]);
         Collisions = 0;
         Rounds = 0;
         for (; Rounds < maxRounds && ghosts.Count > 0; Rounds++) {
@@ -70,6 +72,38 @@ class Grid {
             // Test.Log(this, console);
             ghosts.RemoveAll(it => it.Collisions >= maxGhostCollisions);
             Progress();
+            var currentGhosts = ghosts.Select(it => it.State()).ToArray();
+            for (var i = 0; i < roundGhosts.Count; i++) {
+                var pastGhosts = roundGhosts[i];
+                if (!currentGhosts.SequenceEqual(pastGhosts)) {
+                    continue;
+                }
+                long skipRounds = Rounds - i;
+                Test.Log($"same ghosts at {i}", console);
+                Test.Step();
+                var collisionDiffs = new int[currentGhosts.Length];
+                for (var j = 0; j < currentGhosts.Length; j++) {
+                    var ghost = currentGhosts[j];
+                    collisionDiffs[j] = ghost.Collisions - pastGhosts[j].Collisions;
+                }
+                while (true) {
+                    Rounds += skipRounds;
+                    var safe = true;
+                    for (var i1 = 0; i1 < ghosts.Count; i1++) {
+                        ghosts[i1].Collisions += collisionDiffs[i1];
+                        if (maxGhostCollisions - ghosts[i1].Collisions < collisionDiffs[i1]) {
+                            safe = false;
+                        }
+                    }
+                    Progress();
+                    if (!safe) {
+                        break;
+                    }
+                }
+                roundGhosts.Clear();
+                break;
+            }
+            roundGhosts.Add(currentGhosts);
         }
     }
 
@@ -127,6 +161,13 @@ class NullGhost(Point point, Point direction) {
     public Point Point { get; set; } = point;
     public Point Direction { get; set; } = direction;
     public int Collisions { get; set; }
+
+    public GhostState State() => new(Point, Direction, Collisions);
+}
+
+readonly record struct GhostState(Point Point, Point Direction, int Collisions) {
+    public bool Equals(GhostState other) => Point == other.Point && Direction == other.Direction;
+    public override int GetHashCode() => HashCode.Combine(Point, Direction);
 }
 
 readonly record struct Point(int X, int Y) {
