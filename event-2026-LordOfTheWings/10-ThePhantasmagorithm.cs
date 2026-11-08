@@ -33,7 +33,7 @@ class Grid {
             for (var x = 0; x < width; x++) {
                 char cell = rows[y][x];
                 var point = new Point(x, y);
-                walkableCells[point] = cell != '#';
+                walkableCells[point] = cell != Cells.WALL;
                 if (Screen.TryParseDirection(cell, out var ghostDirection)) {
                     ghosts.Add(new NullGhost(point, ghostDirection));
                 }
@@ -76,7 +76,7 @@ class Grid {
                 }
                 Test.Log($"Round: {Rounds + 1}, same ghosts at {i}", console);
                 Test.Step();
-                SkipRounds(maxGhostCollisions, roundGhosts.Count - 1 - i, pastGhosts, currentGhosts);
+                SkipRounds(maxGhostCollisions, roundGhosts.Count - 1 - i, pastGhosts);
                 roundGhosts.Clear();
                 break;
             }
@@ -90,15 +90,15 @@ class Grid {
         ghost.Collisions++;
     }
 
-    void SkipRounds(long maxGhostCollisions, long skipRounds, GhostState[] past, GhostState[] current) {
-        var collisionDiffs = new long[current.Length];
+    void SkipRounds(long maxGhostCollisions, long skipRounds, GhostState[] past) {
+        var collisionDiffs = new long[ghosts.Count];
         var skipTimes = long.MaxValue;
-        for (var i = 0; i < current.Length; i++) {
-            long diff = current[i].Collisions - past[i].Collisions;
+        for (var i = 0; i < ghosts.Count; i++) {
+            long diff = ghosts[i].Collisions - past[i].Collisions;
             collisionDiffs[i] = diff;
-            long times = (maxGhostCollisions - current[i].Collisions) / diff;
+            long times = (maxGhostCollisions - ghosts[i].Collisions) / diff;
             skipTimes = Math.Min(times, skipTimes);
-            if (maxGhostCollisions - current[i].Collisions <= diff * times) {
+            if (maxGhostCollisions - ghosts[i].Collisions <= diff * times) {
                 return;
             }
         }
