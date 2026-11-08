@@ -46,7 +46,6 @@ class Grid {
 
     public void SimulateRounds(long maxRounds, long maxGhostCollisions) {
         const bool console = true;
-        roundGhosts.Add([.. ghosts.Select(it => it.State())]);
         Collisions = 0;
         Rounds = 0;
         for (; Rounds < maxRounds && ghosts.Count > 0; Rounds++) {
@@ -81,7 +80,7 @@ class Grid {
                 }
                 Test.Log($"same ghosts at {i}", console);
                 Test.Step();
-                SkipRounds(maxGhostCollisions, Rounds - i, pastGhosts, currentGhosts);
+                SkipRounds(maxGhostCollisions, roundGhosts.Count - 1 - i, pastGhosts, currentGhosts);
                 roundGhosts.Clear();
                 break;
             }
@@ -99,6 +98,9 @@ class Grid {
         var collisionDiffs = new int[current.Length];
         for (var i = 0; i < current.Length; i++) {
             collisionDiffs[i] = current[i].Collisions - past[i].Collisions;
+            if (maxGhostCollisions - ghosts[i].Collisions < collisionDiffs[i]) {
+                return;
+            }
         }
         // need to get rid of this loop too
         while (true) {
@@ -112,23 +114,28 @@ class Grid {
             }
             Progress();
             if (!safe) {
+                Test.Log("  skipped", console: true);
                 break;
             }
         }
     }
 
     int interval = 10;
+    int ghostsBefore;
 
     void Progress() {
         if (ghosts.Count <= 0) {
             return;
         }
-        int maxCollisions = ghosts.Max(it => it.Collisions);
-        if (maxCollisions % interval != 0) {
+        long maxCollisions = ghosts.Max(it => it.Collisions);
+        if (maxCollisions % interval != 0 && ghosts.Count == ghostsBefore) {
             return;
         }
         Test.Log($"Round: {Rounds + 1}, ghosts: {ghosts.Count}, maxCollisions: {maxCollisions}", console: true);
-        interval *= 10;
+        if (maxCollisions % interval == 0) {
+            interval *= 10;
+        }
+        ghostsBefore = ghosts.Count;
     }
 
     public override string ToString() {
