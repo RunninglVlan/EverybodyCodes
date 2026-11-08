@@ -47,7 +47,7 @@ class Grid {
             }
             foreach (var collision in ghosts.GroupBy(it => it.Point).Where(it => it.Count() > 1)) {
                 foreach (var ghost in collision) {
-                    ghost.Direction = Screen.TurnAround(ghost.Direction);
+                    ghost.Direction = -ghost.Direction;
                     AddCollision(ghost.Point);
                 }
             }
@@ -100,6 +100,7 @@ class NullGhost(Point point, Point direction) {
 
 readonly record struct Point(int X, int Y) {
     public static Point operator +(Point a, Point b) => new(a.X + b.X, a.Y + b.Y);
+    public static Point operator -(Point value) => new(-value.X, -value.Y);
 }
 
 static class Screen {
@@ -128,7 +129,6 @@ static class Screen {
     };
 
     public static Point TurnRight(Point direction) => new(-direction.Y, direction.X);
-    public static Point TurnAround(Point direction) => new(-direction.X, -direction.Y);
 }
 
 static class Test {
