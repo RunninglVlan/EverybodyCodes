@@ -154,6 +154,9 @@ static class Test {
             string expected = ReadUntilNewLine();
             try {
                 action(notes, part, expected);
+            } catch (Exception e) {
+                Console.WriteLine(e);
+                break;
             }
             finally {
                 long time = stopwatch.ElapsedMilliseconds;
