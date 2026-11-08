@@ -54,7 +54,7 @@ class Grid {
             foreach (var ghost in ghosts) {
                 var next = ghost.Point + ghost.Direction;
                 if (walkableCells[next]) {
-                    ghost.Point += ghost.Direction;
+                    ghost.Point = next;
                 } else {
                     ghost.Direction = Screen.TurnRight(ghost.Direction);
                     AddCollision(next, ghost);
