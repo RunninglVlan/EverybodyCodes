@@ -47,13 +47,13 @@ class Grid {
             }
             foreach (var collision in ghosts.GroupBy(it => it.Point).Where(it => it.Count() > 1)) {
                 foreach (var ghost in collision) {
+                    ghost.Direction = Screen.TurnAround(ghost.Direction);
                     AddCollision(ghost.Point);
                 }
             }
             Test.Log($"Collisions: {roundCollisions.Values.Sum()}");
             Test.Log();
             Test.Log(this);
-            break;
         }
         return collisions;
 
@@ -80,7 +80,9 @@ class Grid {
                     result.Append(cell);
                 }
             }
-            result.AppendLine();
+            if (y != height - 1) {
+                result.AppendLine();
+            }
         }
         return result.ToString();
     }
@@ -126,6 +128,7 @@ static class Screen {
     };
 
     public static Point TurnRight(Point direction) => new(-direction.Y, direction.X);
+    public static Point TurnAround(Point direction) => new(-direction.X, -direction.Y);
 }
 
 static class Test {
