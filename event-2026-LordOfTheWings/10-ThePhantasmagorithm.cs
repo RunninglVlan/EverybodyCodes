@@ -1,14 +1,18 @@
 ﻿using System.Diagnostics;
 using System.Text;
 
-Test.LogEnabled = false;
+// Test.LogEnabled = false;
 // https://everybody.codes/event/2026/quests/10
 Test.Run((notes, part, expected) => {
     var grid = new Grid();
     grid.Init(notes);
-    int rounds = part == 1 ? 10 : int.MaxValue;
-    grid.SimulateRounds(rounds);
-    int count = part == 1 ? grid.Collisions : grid.Rounds;
+    (long rounds, long maxGhostCollisions) = part switch {
+        1 => (10, 10_000),
+        2 => (int.MaxValue, 10_000),
+        _ => (long.MaxValue, 1_000_000_000_000),
+    };
+    grid.SimulateRounds(rounds, maxGhostCollisions);
+    long count = part == 1 ? grid.Collisions : grid.Rounds;
     Assert.ActualEqualsExpected(count, expected);
 });
 
@@ -16,8 +20,8 @@ class Grid {
     int width, height;
     readonly Dictionary<Point, bool> walkableCells = [];
     readonly List<NullGhost> ghosts = [];
-    public int Collisions { get; private set; }
-    public int Rounds { get; private set; }
+    public long Collisions { get; private set; }
+    public long Rounds { get; private set; }
     readonly Dictionary<Point, int> roundCollisions = [];
 
     public void Init(string notes) {
@@ -36,12 +40,13 @@ class Grid {
         }
     }
 
-    public void SimulateRounds(int max) {
+    public void SimulateRounds(long maxRounds, long maxGhostCollisions) {
         Collisions = 0;
         Rounds = 0;
-        for (; Rounds < max && ghosts.Count > 0; Rounds++) {
+        var interval = 10;
+        for (; Rounds < maxRounds && ghosts.Count > 0; Rounds++) {
             roundCollisions.Clear();
-            Test.Log($"Round: {Rounds + 1}");
+            // Test.Log($"Round: {Rounds + 1}");
             foreach (var ghost in ghosts) {
                 var next = ghost.Point + ghost.Direction;
                 if (walkableCells[next]) {
@@ -57,10 +62,18 @@ class Grid {
                     AddCollision(ghost.Point, ghost);
                 }
             }
-            Test.Log($"Collisions: {roundCollisions.Values.Sum()}");
-            Test.Log();
-            Test.Log(this);
-            ghosts.RemoveAll(it => it.Collisions >= NullGhost.MAX_COLLISIONS);
+            // Test.Log($"Collisions: {roundCollisions.Values.Sum()}");
+            // Test.Log();
+            // Test.Log(this);
+            ghosts.RemoveAll(it => it.Collisions >= maxGhostCollisions);
+            if (ghosts.Count <= 0) {
+                continue;
+            }
+            int maxCollisions = ghosts.Max(it => it.Collisions);
+            if (maxCollisions % interval == 0) {
+                Test.Log($"ghosts: {ghosts.Count}, maxCollisions: {maxCollisions}", console: true);
+                interval *= 10;
+            }
         }
     }
 
@@ -101,8 +114,6 @@ static class Cells {
 }
 
 class NullGhost(Point point, Point direction) {
-    public const int MAX_COLLISIONS = 10_000;
-
     public Point Point { get; set; } = point;
     public Point Direction { get; set; } = direction;
     public int Collisions { get; set; }
