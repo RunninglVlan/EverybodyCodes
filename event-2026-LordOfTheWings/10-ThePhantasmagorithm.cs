@@ -1,7 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Text;
 
-// Test.LogEnabled = false;
+Test.StepEnabled = false;
+// Test.From = "Part III Example";
+Test.Until = "Part III Example";
+Test.LogEnabled = false;
 // https://everybody.codes/event/2026/quests/10
 Test.Run((notes, part, expected) => {
     var grid = new Grid();
@@ -41,12 +44,13 @@ class Grid {
     }
 
     public void SimulateRounds(long maxRounds, long maxGhostCollisions) {
+        const bool console = true;
         Collisions = 0;
         Rounds = 0;
         var interval = 10;
         for (; Rounds < maxRounds && ghosts.Count > 0; Rounds++) {
             roundCollisions.Clear();
-            // Test.Log($"Round: {Rounds + 1}");
+            Test.Log($"Round: {Rounds + 1}", console);
             foreach (var ghost in ghosts) {
                 var next = ghost.Point + ghost.Direction;
                 if (walkableCells[next]) {
@@ -62,16 +66,17 @@ class Grid {
                     AddCollision(ghost.Point, ghost);
                 }
             }
-            // Test.Log($"Collisions: {roundCollisions.Values.Sum()}");
-            // Test.Log();
-            // Test.Log(this);
+            Test.Log($"Collisions: {roundCollisions.Values.Sum()}", console);
+            Test.Log(console: console);
+            Test.Log(this, console);
+            Test.Step();
             ghosts.RemoveAll(it => it.Collisions >= maxGhostCollisions);
             if (ghosts.Count <= 0) {
                 continue;
             }
             int maxCollisions = ghosts.Max(it => it.Collisions);
             if (maxCollisions % interval == 0) {
-                Test.Log($"ghosts: {ghosts.Count}, maxCollisions: {maxCollisions}", console: true);
+                Test.Log($"ghosts: {ghosts.Count}, maxCollisions: {maxCollisions}", console);
                 interval *= 10;
             }
         }
