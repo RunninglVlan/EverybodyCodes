@@ -15,18 +15,15 @@ Test.Run((notes, part, expected) => {
 });
 
 class Grid {
-    int width, height;
     readonly Dictionary<Point, bool> walkableCells = [];
     readonly List<NullGhost> ghosts = [];
     readonly List<GhostState[]> roundGhosts = [];
     public long Collisions { get; private set; }
     public long Rounds { get; private set; }
-    readonly Dictionary<Point, int> roundCollisions = [];
 
     public void Init(string notes) {
         string[] rows = notes.Split(Environment.NewLine);
-        width = rows.First().Length;
-        height = rows.Length;
+        int width = rows.First().Length, height = rows.Length;
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < width; x++) {
                 char cell = rows[y][x];
@@ -41,47 +38,48 @@ class Grid {
 
     public void SimulateRounds(long maxRounds, long maxGhostCollisions, bool skip) {
         Collisions = 0;
-        Rounds = 0;
-        for (; Rounds < maxRounds && ghosts.Count > 0; Rounds++) {
-            roundCollisions.Clear();
-            foreach (var ghost in ghosts) {
-                var next = ghost.Point + ghost.Direction;
-                if (walkableCells[next]) {
-                    ghost.Point = next;
-                } else {
-                    ghost.Direction = Screen.TurnRight(ghost.Direction);
-                    AddCollision(next, ghost);
-                }
-            }
-            foreach (var collision in ghosts.GroupBy(it => it.Point).Where(it => it.Count() > 1)) {
-                foreach (var ghost in collision) {
-                    ghost.Direction = -ghost.Direction;
-                    AddCollision(ghost.Point, ghost);
-                }
-            }
-            ghosts.RemoveAll(it => it.Collisions >= maxGhostCollisions);
-            if (!skip) {
-                continue;
-            }
-            var currentGhosts = ghosts.Select(it => it.State()).ToArray();
-            roundGhosts.Add(currentGhosts);
-            for (var i = 0; i < roundGhosts.Count - 1; i++) {
-                var pastGhosts = roundGhosts[i];
-                if (!currentGhosts.SequenceEqual(pastGhosts)) {
-                    continue;
-                }
-                SkipRounds(maxGhostCollisions, roundGhosts.Count - 1 - i, pastGhosts);
-                roundGhosts.Clear();
-                break;
-            }
+        for (Rounds = 0; Rounds < maxRounds && ghosts.Count > 0; Rounds++) {
+            SimulateRound(maxGhostCollisions, skip);
         }
     }
 
-    void AddCollision(Point point, NullGhost ghost) {
-        int count = roundCollisions.GetValueOrDefault(point);
-        roundCollisions[point] = count + 1;
-        Collisions++;
-        ghost.Collisions++;
+    void SimulateRound(long maxGhostCollisions, bool skip) {
+        MoveAndCollide();
+        ghosts.RemoveAll(it => it.Collisions >= maxGhostCollisions);
+        if (!skip) {
+            return;
+        }
+        var currentGhosts = ghosts.Select(it => it.State()).ToArray();
+        for (var i = 0; i < roundGhosts.Count; i++) {
+            var pastGhosts = roundGhosts[i];
+            if (!currentGhosts.SequenceEqual(pastGhosts)) {
+                continue;
+            }
+            SkipRounds(maxGhostCollisions, roundGhosts.Count - i, pastGhosts);
+            roundGhosts.Clear();
+            return;
+        }
+        roundGhosts.Add(currentGhosts);
+    }
+
+    void MoveAndCollide() {
+        foreach (var ghost in ghosts) {
+            var next = ghost.Point + ghost.Direction;
+            if (walkableCells[next]) {
+                ghost.Point = next;
+            } else {
+                ghost.Direction = Screen.TurnRight(ghost.Direction);
+                Collisions++;
+                ghost.Collisions++;
+            }
+        }
+        foreach (var collision in ghosts.GroupBy(it => it.Point).Where(it => it.Count() > 1)) {
+            foreach (var ghost in collision) {
+                ghost.Direction = -ghost.Direction;
+                Collisions++;
+                ghost.Collisions++;
+            }
+        }
     }
 
     void SkipRounds(long maxGhostCollisions, long skipRounds, GhostState[] past) {
@@ -91,10 +89,10 @@ class Grid {
             long diff = ghosts[i].Collisions - past[i].Collisions;
             collisionDiffs[i] = diff;
             long times = (maxGhostCollisions - ghosts[i].Collisions) / diff;
-            skipTimes = Math.Min(times, skipTimes);
-            if (maxGhostCollisions - ghosts[i].Collisions <= diff * times) {
+            if (ghosts[i].Collisions + diff * times >= maxGhostCollisions) {
                 return;
             }
+            skipTimes = Math.Min(times, skipTimes);
         }
         Rounds += skipRounds * skipTimes;
         for (var i = 0; i < ghosts.Count; i++) {
