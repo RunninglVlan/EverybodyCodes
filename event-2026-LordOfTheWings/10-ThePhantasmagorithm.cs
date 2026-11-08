@@ -2,9 +2,9 @@
 using System.Text;
 
 Test.StepEnabled = false;
-// Test.From = "Part III Example";
-Test.Until = "Part III Example";
-Test.LogEnabled = false;
+Test.From = "Part III Example";
+// Test.Until = "Part III Example";
+// Test.LogEnabled = false;
 // https://everybody.codes/event/2026/quests/10
 Test.Run((notes, part, expected) => {
     var grid = new Grid();
@@ -12,7 +12,7 @@ Test.Run((notes, part, expected) => {
     (long rounds, long maxGhostCollisions) = part switch {
         1 => (10, 10_000),
         2 => (int.MaxValue, 10_000),
-        _ => (long.MaxValue, 1_000_000_000_000),
+        _ => (long.MaxValue, 1_000_000_000_000)
     };
     grid.SimulateRounds(rounds, maxGhostCollisions);
     long count = part == 1 ? grid.Collisions : grid.Rounds;
@@ -47,10 +47,9 @@ class Grid {
         const bool console = true;
         Collisions = 0;
         Rounds = 0;
-        var interval = 10;
         for (; Rounds < maxRounds && ghosts.Count > 0; Rounds++) {
             roundCollisions.Clear();
-            Test.Log($"Round: {Rounds + 1}", console);
+            // Test.Log($"Round: {Rounds + 1}", console);
             foreach (var ghost in ghosts) {
                 var next = ghost.Point + ghost.Direction;
                 if (walkableCells[next]) {
@@ -66,19 +65,11 @@ class Grid {
                     AddCollision(ghost.Point, ghost);
                 }
             }
-            Test.Log($"Collisions: {roundCollisions.Values.Sum()}", console);
-            Test.Log(console: console);
-            Test.Log(this, console);
-            Test.Step();
+            // Test.Log($"Collisions: {roundCollisions.Values.Sum()}", console);
+            // Test.Log(console: console);
+            // Test.Log(this, console);
             ghosts.RemoveAll(it => it.Collisions >= maxGhostCollisions);
-            if (ghosts.Count <= 0) {
-                continue;
-            }
-            int maxCollisions = ghosts.Max(it => it.Collisions);
-            if (maxCollisions % interval == 0) {
-                Test.Log($"ghosts: {ghosts.Count}, maxCollisions: {maxCollisions}", console);
-                interval *= 10;
-            }
+            Progress();
         }
     }
 
@@ -87,6 +78,20 @@ class Grid {
         roundCollisions[point] = count + 1;
         Collisions++;
         ghost.Collisions++;
+    }
+
+    int interval = 10;
+
+    void Progress() {
+        if (ghosts.Count <= 0) {
+            return;
+        }
+        int maxCollisions = ghosts.Max(it => it.Collisions);
+        if (maxCollisions % interval != 0) {
+            return;
+        }
+        Test.Log($"Round: {Rounds + 1}, ghosts: {ghosts.Count}, maxCollisions: {maxCollisions}", console: true);
+        interval *= 10;
     }
 
     public override string ToString() {
