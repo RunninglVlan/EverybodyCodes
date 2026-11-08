@@ -1,7 +1,5 @@
 ﻿using System.Diagnostics;
-using System.Text;
 
-Test.StepEnabled = false;
 // https://everybody.codes/event/2026/quests/10
 Test.Run((notes, part, expected) => {
     var grid = new Grid();
@@ -33,7 +31,7 @@ class Grid {
             for (var x = 0; x < width; x++) {
                 char cell = rows[y][x];
                 var point = new Point(x, y);
-                walkableCells[point] = cell != Cells.WALL;
+                walkableCells[point] = cell != '#';
                 if (Screen.TryParseDirection(cell, out var ghostDirection)) {
                     ghosts.Add(new NullGhost(point, ghostDirection));
                 }
@@ -42,7 +40,6 @@ class Grid {
     }
 
     public void SimulateRounds(long maxRounds, long maxGhostCollisions, bool skip) {
-        const bool console = true;
         Collisions = 0;
         Rounds = 0;
         for (; Rounds < maxRounds && ghosts.Count > 0; Rounds++) {
@@ -63,7 +60,6 @@ class Grid {
                 }
             }
             ghosts.RemoveAll(it => it.Collisions >= maxGhostCollisions);
-            Progress();
             if (!skip) {
                 continue;
             }
@@ -74,8 +70,6 @@ class Grid {
                 if (!currentGhosts.SequenceEqual(pastGhosts)) {
                     continue;
                 }
-                Test.Log($"Round: {Rounds + 1}, same ghosts at {i}", console);
-                Test.Step();
                 SkipRounds(maxGhostCollisions, roundGhosts.Count - 1 - i, pastGhosts);
                 roundGhosts.Clear();
                 break;
@@ -106,54 +100,7 @@ class Grid {
         for (var i = 0; i < ghosts.Count; i++) {
             ghosts[i].Collisions += collisionDiffs[i] * skipTimes;
         }
-        Progress();
     }
-
-    int interval = 10;
-    int ghostsBefore;
-
-    void Progress() {
-        if (ghosts.Count <= 0) {
-            return;
-        }
-        long maxCollisions = ghosts.Max(it => it.Collisions);
-        if (maxCollisions % interval != 0 && ghosts.Count == ghostsBefore) {
-            return;
-        }
-        Test.Log($"Round: {Rounds + 1}, ghosts: {ghosts.Count}, maxCollisions: {maxCollisions}", console: true);
-        if (maxCollisions % interval == 0) {
-            interval *= 10;
-        }
-        ghostsBefore = ghosts.Count;
-    }
-
-    public override string ToString() {
-        var result = new StringBuilder();
-        for (var y = 0; y < height; y++) {
-            for (var x = 0; x < width; x++) {
-                var point = new Point(x, y);
-                char cell = walkableCells[point] ? Cells.EMPTY : Cells.WALL;
-                var ghost = ghosts.FirstOrDefault(it => it.Point == point);
-                if (ghost != null) {
-                    cell = Screen.ToChar(ghost.Direction);
-                }
-                if (cell != Cells.WALL && roundCollisions.TryGetValue(point, out int count)) {
-                    result.Append(count);
-                } else {
-                    result.Append(cell);
-                }
-            }
-            if (y != height - 1) {
-                result.AppendLine();
-            }
-        }
-        return result.ToString();
-    }
-}
-
-static class Cells {
-    public const char EMPTY = '.';
-    public const char WALL = '#';
 }
 
 class NullGhost(Point point, Point direction) {
@@ -172,8 +119,6 @@ readonly record struct GhostState(Point Point, Point Direction, long Collisions)
 readonly record struct Point(int X, int Y) {
     public static Point operator +(Point a, Point b) => new(a.X + b.X, a.Y + b.Y);
     public static Point operator -(Point value) => new(-value.X, -value.Y);
-
-    public override string ToString() => $"({X}, {Y})";
 }
 
 static class Screen {
