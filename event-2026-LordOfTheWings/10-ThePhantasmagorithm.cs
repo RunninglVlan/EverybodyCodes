@@ -1,18 +1,23 @@
 ﻿using System.Diagnostics;
 using System.Text;
 
+Test.Until = "Part II Example";
 // https://everybody.codes/event/2026/quests/10
 Test.Run((notes, part, expected) => {
     var grid = new Grid();
     grid.Init(notes);
-    int collisions = grid.CollisionsAfter(10);
-    Assert.ActualEqualsExpected(collisions, expected);
+    int rounds = part == 1 ? 10 : int.MaxValue;
+    grid.SimulateRounds(rounds);
+    int count = part == 1 ? grid.Collisions : grid.Rounds;
+    Assert.ActualEqualsExpected(count, expected);
 });
 
 class Grid {
     int width, height;
     readonly Dictionary<Point, bool> walkableCells = [];
     readonly List<NullGhost> ghosts = [];
+    public int Collisions { get; private set; }
+    public int Rounds { get; private set; }
     readonly Dictionary<Point, int> roundCollisions = [];
 
     public void Init(string notes) {
@@ -31,11 +36,12 @@ class Grid {
         }
     }
 
-    public int CollisionsAfter(int rounds) {
-        var collisions = 0;
-        for (var r = 0; r < rounds; r++) {
+    public void SimulateRounds(int max) {
+        Collisions = 0;
+        Rounds = 0;
+        for (; Rounds < max; Rounds++) {
             roundCollisions.Clear();
-            Test.Log($"Round: {r + 1}");
+            Test.Log($"Round: {Rounds + 1}");
             foreach (var ghost in ghosts) {
                 var next = ghost.Point + ghost.Direction;
                 if (walkableCells[next]) {
@@ -55,12 +61,12 @@ class Grid {
             Test.Log();
             Test.Log(this);
         }
-        return collisions;
+        return;
 
         void AddCollision(Point point) {
             int count = roundCollisions.GetValueOrDefault(point);
             roundCollisions[point] = count + 1;
-            collisions++;
+            Collisions++;
         }
     }
 
