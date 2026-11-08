@@ -17,7 +17,7 @@ Test.Run((notes, part, expected) => {
 class Grid {
     readonly Dictionary<Point, bool> walkableCells = [];
     readonly List<NullGhost> ghosts = [];
-    readonly List<NullGhost[]> roundGhosts = [];
+    readonly List<NullGhost[]> pastGhosts = [];
     public long Collisions { get; private set; }
     public long Rounds { get; private set; }
 
@@ -49,17 +49,17 @@ class Grid {
         if (!skip) {
             return;
         }
-        var currentGhosts = ghosts.ToArray();
-        for (var i = 0; i < roundGhosts.Count; i++) {
-            var pastGhosts = roundGhosts[i];
-            if (!currentGhosts.SequenceEqual(pastGhosts)) {
+        var current = ghosts.ToArray();
+        for (var i = 0; i < pastGhosts.Count; i++) {
+            var past = pastGhosts[i];
+            if (!current.SequenceEqual(past)) {
                 continue;
             }
-            SkipRounds(maxGhostCollisions, roundGhosts.Count - i, pastGhosts);
-            roundGhosts.Clear();
+            SkipRounds(past, maxGhostCollisions, pastGhosts.Count - i);
+            pastGhosts.Clear();
             return;
         }
-        roundGhosts.Add(currentGhosts);
+        pastGhosts.Add(current);
     }
 
     void MoveAndCollide() {
@@ -90,7 +90,7 @@ class Grid {
         }
     }
 
-    void SkipRounds(long maxGhostCollisions, long skipRounds, NullGhost[] past) {
+    void SkipRounds(NullGhost[] past, long maxGhostCollisions, long skipRounds) {
         var collisionDiffs = new long[ghosts.Count];
         var skipTimes = long.MaxValue;
         for (var i = 0; i < ghosts.Count; i++) {
