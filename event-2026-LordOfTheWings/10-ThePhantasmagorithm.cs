@@ -5,31 +5,26 @@ Test.Run((notes, part, expected) => {
     var grid = new Grid();
     grid.Init(notes);
     int collisions = grid.CollisionsAfter(10);
+    grid.Print();
     Assert.ActualEqualsExpected(collisions, expected);
 });
 
 class Grid {
+    int width, height;
     bool[,] walkableCells = null!;
     readonly List<NullGhost> ghosts = [];
 
     public void Init(string notes) {
         string[] rows = notes.Split(Environment.NewLine);
-        int width = rows.First().Length;
-        int height = rows.Length;
+        width = rows.First().Length;
+        height = rows.Length;
         walkableCells = new bool[width, height];
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < width; x++) {
                 char cell = rows[y][x];
                 walkableCells[x, y] = cell != '#';
-                Point? ghostDirection = cell switch {
-                    '>' => Screen.RIGHT,
-                    '<' => Screen.LEFT,
-                    '^' => Screen.UP,
-                    'v' => Screen.DOWN,
-                    _ => null
-                };
-                if (ghostDirection.HasValue) {
-                    ghosts.Add(new NullGhost(new Point(x, y), ghostDirection.Value));
+                if (Screen.TryParseDirection(cell, out var ghostDirection)) {
+                    ghosts.Add(new NullGhost(new Point(x, y), ghostDirection));
                 }
             }
         }
@@ -38,6 +33,26 @@ class Grid {
     public int CollisionsAfter(int rounds) {
         return 0;
     }
+
+    public void Print() {
+        for (var y = 0; y < height; y++) {
+            for (var x = 0; x < width; x++) {
+                char cell = walkableCells[x, y] ? Cells.EMPTY : Cells.WALL;
+                var point = new Point(x, y);
+                var ghost = ghosts.FirstOrDefault(it => it.Point == point);
+                if (ghost != null) {
+                    cell = Screen.ToChar(ghost.Direction);
+                }
+                Console.Write(cell);
+            }
+            Console.WriteLine();
+        }
+    }
+}
+
+static class Cells {
+    public const char EMPTY = '.';
+    public const char WALL = '#';
 }
 
 record NullGhost(Point Point, Point Direction);
@@ -45,10 +60,29 @@ record NullGhost(Point Point, Point Direction);
 readonly record struct Point(int X, int Y);
 
 static class Screen {
-    public static readonly Point UP = new(0, -1);
-    public static readonly Point DOWN = new(0, 1);
-    public static readonly Point LEFT = new(-1, 0);
-    public static readonly Point RIGHT = new(1, 0);
+    static readonly Point UP = new(0, -1);
+    static readonly Point DOWN = new(0, 1);
+    static readonly Point LEFT = new(-1, 0);
+    static readonly Point RIGHT = new(1, 0);
+
+    public static bool TryParseDirection(char c, out Point direction) {
+        direction = c switch {
+            '>' => RIGHT,
+            '<' => LEFT,
+            '^' => UP,
+            'v' => DOWN,
+            _ => default
+        };
+        return direction != default;
+    }
+
+    public static char ToChar(Point direction) => direction switch {
+        _ when direction == RIGHT => '>',
+        _ when direction == LEFT => '<',
+        _ when direction == UP => '^',
+        _ when direction == DOWN => 'v',
+        _ => throw new ArgumentException($"Unsupported direction: {direction}")
+    };
 }
 
 static class Test {
