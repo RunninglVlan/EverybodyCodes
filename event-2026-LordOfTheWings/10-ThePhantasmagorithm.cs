@@ -2,8 +2,8 @@
 using System.Text;
 
 Test.StepEnabled = false;
-Test.From = "Part III Example";
-// Test.Until = "Part III Example";
+Test.From = "Part II Example";
+Test.Until = "Part II";
 // Test.LogEnabled = false;
 // https://everybody.codes/event/2026/quests/10
 Test.Run((notes, part, expected) => {
