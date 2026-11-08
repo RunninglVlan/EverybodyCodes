@@ -73,37 +73,18 @@ class Grid {
             ghosts.RemoveAll(it => it.Collisions >= maxGhostCollisions);
             Progress();
             var currentGhosts = ghosts.Select(it => it.State()).ToArray();
-            for (var i = 0; i < roundGhosts.Count; i++) {
+            roundGhosts.Add(currentGhosts);
+            for (var i = 0; i < roundGhosts.Count - 1; i++) {
                 var pastGhosts = roundGhosts[i];
                 if (!currentGhosts.SequenceEqual(pastGhosts)) {
                     continue;
                 }
-                long skipRounds = Rounds - i;
                 Test.Log($"same ghosts at {i}", console);
                 Test.Step();
-                var collisionDiffs = new int[currentGhosts.Length];
-                for (var j = 0; j < currentGhosts.Length; j++) {
-                    var ghost = currentGhosts[j];
-                    collisionDiffs[j] = ghost.Collisions - pastGhosts[j].Collisions;
-                }
-                while (true) {
-                    Rounds += skipRounds;
-                    var safe = true;
-                    for (var i1 = 0; i1 < ghosts.Count; i1++) {
-                        ghosts[i1].Collisions += collisionDiffs[i1];
-                        if (maxGhostCollisions - ghosts[i1].Collisions < collisionDiffs[i1]) {
-                            safe = false;
-                        }
-                    }
-                    Progress();
-                    if (!safe) {
-                        break;
-                    }
-                }
+                SkipRounds(maxGhostCollisions, Rounds - i, pastGhosts, currentGhosts);
                 roundGhosts.Clear();
                 break;
             }
-            roundGhosts.Add(currentGhosts);
         }
     }
 
@@ -112,6 +93,28 @@ class Grid {
         roundCollisions[point] = count + 1;
         Collisions++;
         ghost.Collisions++;
+    }
+
+    void SkipRounds(long maxGhostCollisions, long skipRounds, GhostState[] past, GhostState[] current) {
+        var collisionDiffs = new int[current.Length];
+        for (var i = 0; i < current.Length; i++) {
+            collisionDiffs[i] = current[i].Collisions - past[i].Collisions;
+        }
+        // need to get rid of this loop too
+        while (true) {
+            Rounds += skipRounds;
+            var safe = true;
+            for (var i = 0; i < ghosts.Count; i++) {
+                ghosts[i].Collisions += collisionDiffs[i];
+                if (maxGhostCollisions - ghosts[i].Collisions < collisionDiffs[i]) {
+                    safe = false;
+                }
+            }
+            Progress();
+            if (!safe) {
+                break;
+            }
+        }
     }
 
     int interval = 10;
