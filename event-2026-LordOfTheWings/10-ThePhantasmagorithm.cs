@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text;
 
-Test.Until = "Part II Example";
+Test.LogEnabled = false;
 // https://everybody.codes/event/2026/quests/10
 Test.Run((notes, part, expected) => {
     var grid = new Grid();
@@ -39,7 +39,7 @@ class Grid {
     public void SimulateRounds(int max) {
         Collisions = 0;
         Rounds = 0;
-        for (; Rounds < max; Rounds++) {
+        for (; Rounds < max && ghosts.Count > 0; Rounds++) {
             roundCollisions.Clear();
             Test.Log($"Round: {Rounds + 1}");
             foreach (var ghost in ghosts) {
@@ -48,26 +48,27 @@ class Grid {
                     ghost.Point += ghost.Direction;
                 } else {
                     ghost.Direction = Screen.TurnRight(ghost.Direction);
-                    AddCollision(next);
+                    AddCollision(next, ghost);
                 }
             }
             foreach (var collision in ghosts.GroupBy(it => it.Point).Where(it => it.Count() > 1)) {
                 foreach (var ghost in collision) {
                     ghost.Direction = -ghost.Direction;
-                    AddCollision(ghost.Point);
+                    AddCollision(ghost.Point, ghost);
                 }
             }
             Test.Log($"Collisions: {roundCollisions.Values.Sum()}");
             Test.Log();
             Test.Log(this);
+            ghosts.RemoveAll(it => it.Collisions >= NullGhost.MAX_COLLISIONS);
         }
-        return;
+    }
 
-        void AddCollision(Point point) {
-            int count = roundCollisions.GetValueOrDefault(point);
-            roundCollisions[point] = count + 1;
-            Collisions++;
-        }
+    void AddCollision(Point point, NullGhost ghost) {
+        int count = roundCollisions.GetValueOrDefault(point);
+        roundCollisions[point] = count + 1;
+        Collisions++;
+        ghost.Collisions++;
     }
 
     public override string ToString() {
@@ -100,8 +101,11 @@ static class Cells {
 }
 
 class NullGhost(Point point, Point direction) {
+    public const int MAX_COLLISIONS = 10_000;
+
     public Point Point { get; set; } = point;
     public Point Direction { get; set; } = direction;
+    public int Collisions { get; set; }
 }
 
 readonly record struct Point(int X, int Y) {
