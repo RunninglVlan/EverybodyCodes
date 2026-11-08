@@ -1,52 +1,71 @@
 ﻿using System.Diagnostics;
+using System.Text;
 
 // https://everybody.codes/event/2026/quests/10
 Test.Run((notes, part, expected) => {
     var grid = new Grid();
     grid.Init(notes);
     int collisions = grid.CollisionsAfter(10);
-    grid.Print();
     Assert.ActualEqualsExpected(collisions, expected);
 });
 
 class Grid {
     int width, height;
-    bool[,] walkableCells = null!;
+    readonly Dictionary<Point, bool> walkableCells = [];
     readonly List<NullGhost> ghosts = [];
 
     public void Init(string notes) {
         string[] rows = notes.Split(Environment.NewLine);
         width = rows.First().Length;
         height = rows.Length;
-        walkableCells = new bool[width, height];
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < width; x++) {
                 char cell = rows[y][x];
-                walkableCells[x, y] = cell != '#';
+                var point = new Point(x, y);
+                walkableCells[point] = cell != '#';
                 if (Screen.TryParseDirection(cell, out var ghostDirection)) {
-                    ghosts.Add(new NullGhost(new Point(x, y), ghostDirection));
+                    ghosts.Add(new NullGhost(point, ghostDirection));
                 }
             }
         }
     }
 
     public int CollisionsAfter(int rounds) {
-        return 0;
+        var collisions = 0;
+        for (var r = 0; r < rounds; r++) {
+            Test.Log($"Round: {r + 1}");
+            foreach (var ghost in ghosts) {
+                var next = ghost.Point + ghost.Direction;
+                if (walkableCells[next]) {
+                    ghost.Point += ghost.Direction;
+                } else {
+                    ghost.Direction = Screen.TurnRight(ghost.Direction);
+                    collisions++;
+                }
+            }
+            Test.Log($"Collisions: {collisions}");
+            Test.Log();
+            Test.Log(this);
+            break;
+        }
+        return collisions;
     }
 
-    public void Print() {
+    public override string ToString() {
+        var result = new StringBuilder();
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < width; x++) {
-                char cell = walkableCells[x, y] ? Cells.EMPTY : Cells.WALL;
                 var point = new Point(x, y);
+                char cell = walkableCells[point] ? Cells.EMPTY : Cells.WALL;
                 var ghost = ghosts.FirstOrDefault(it => it.Point == point);
                 if (ghost != null) {
                     cell = Screen.ToChar(ghost.Direction);
                 }
-                Console.Write(cell);
+                result.Append(cell);
             }
-            Console.WriteLine();
+            result.AppendLine();
         }
+        return result.ToString();
     }
 }
 
@@ -55,9 +74,14 @@ static class Cells {
     public const char WALL = '#';
 }
 
-record NullGhost(Point Point, Point Direction);
+class NullGhost(Point point, Point direction) {
+    public Point Point { get; set; } = point;
+    public Point Direction { get; set; } = direction;
+}
 
-readonly record struct Point(int X, int Y);
+readonly record struct Point(int X, int Y) {
+    public static Point operator +(Point a, Point b) => new(a.X + b.X, a.Y + b.Y);
+}
 
 static class Screen {
     static readonly Point UP = new(0, -1);
@@ -83,6 +107,8 @@ static class Screen {
         _ when direction == DOWN => 'v',
         _ => throw new ArgumentException($"Unsupported direction: {direction}")
     };
+
+    public static Point TurnRight(Point direction) => new(-direction.Y, direction.X);
 }
 
 static class Test {
