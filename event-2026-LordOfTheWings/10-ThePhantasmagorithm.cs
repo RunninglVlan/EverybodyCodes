@@ -13,6 +13,7 @@ class Grid {
     int width, height;
     readonly Dictionary<Point, bool> walkableCells = [];
     readonly List<NullGhost> ghosts = [];
+    readonly Dictionary<Point, int> roundCollisions = [];
 
     public void Init(string notes) {
         string[] rows = notes.Split(Environment.NewLine);
@@ -33,6 +34,7 @@ class Grid {
     public int CollisionsAfter(int rounds) {
         var collisions = 0;
         for (var r = 0; r < rounds; r++) {
+            roundCollisions.Clear();
             Test.Log($"Round: {r + 1}");
             foreach (var ghost in ghosts) {
                 var next = ghost.Point + ghost.Direction;
@@ -40,15 +42,26 @@ class Grid {
                     ghost.Point += ghost.Direction;
                 } else {
                     ghost.Direction = Screen.TurnRight(ghost.Direction);
-                    collisions++;
+                    AddCollision(next);
                 }
             }
-            Test.Log($"Collisions: {collisions}");
+            foreach (var collision in ghosts.GroupBy(it => it.Point).Where(it => it.Count() > 1)) {
+                foreach (var ghost in collision) {
+                    AddCollision(ghost.Point);
+                }
+            }
+            Test.Log($"Collisions: {roundCollisions.Values.Sum()}");
             Test.Log();
             Test.Log(this);
             break;
         }
         return collisions;
+
+        void AddCollision(Point point) {
+            int count = roundCollisions.GetValueOrDefault(point);
+            roundCollisions[point] = count + 1;
+            collisions++;
+        }
     }
 
     public override string ToString() {
@@ -61,7 +74,11 @@ class Grid {
                 if (ghost != null) {
                     cell = Screen.ToChar(ghost.Direction);
                 }
-                result.Append(cell);
+                if (cell != Cells.WALL && roundCollisions.TryGetValue(point, out int count)) {
+                    result.Append(count);
+                } else {
+                    result.Append(cell);
+                }
             }
             result.AppendLine();
         }
