@@ -4,12 +4,12 @@
 Test.Run((notes, part, expected) => {
     var grid = new Grid();
     grid.Init(notes);
-    (long rounds, long maxGhostCollisions, bool skip) = part switch {
-        1 => (10, 10_000, false),
-        2 => (int.MaxValue, 10_000, false),
-        _ => (long.MaxValue, 1_000_000_000_000, true)
+    (long rounds, long maxGhostCollisions) = part switch {
+        1 => (10, 10_000),
+        2 => (int.MaxValue, 10_000),
+        _ => (long.MaxValue, 1_000_000_000_000)
     };
-    grid.SimulateRounds(rounds, maxGhostCollisions, skip);
+    grid.SimulateRounds(rounds, maxGhostCollisions);
     long count = part == 1 ? grid.Collisions : grid.Rounds;
     Assert.ActualEqualsExpected(count, expected);
 });
@@ -17,7 +17,7 @@ Test.Run((notes, part, expected) => {
 class Grid {
     readonly Dictionary<Point, bool> walkableCells = [];
     readonly List<NullGhost> ghosts = [];
-    readonly List<GhostState[]> pastGhosts = [];
+    readonly Dictionary<GhostState[], (int index, long[] collisions)> pastGhosts = new(GhostState.Comparer);
     public long Collisions { get; private set; }
     public long Rounds { get; private set; }
 
@@ -36,30 +36,27 @@ class Grid {
         }
     }
 
-    public void SimulateRounds(long maxRounds, long maxGhostCollisions, bool skip) {
+    public void SimulateRounds(long maxRounds, long maxGhostCollisions) {
         Collisions = 0;
         for (Rounds = 0; Rounds < maxRounds && ghosts.Count > 0; Rounds++) {
-            SimulateRound(maxGhostCollisions, skip);
+            SimulateRound(maxGhostCollisions);
         }
     }
 
-    void SimulateRound(long maxGhostCollisions, bool skip) {
+    void SimulateRound(long maxGhostCollisions) {
         MoveAndCollide();
         ghosts.RemoveAll(it => it.Collisions >= maxGhostCollisions);
-        if (!skip) {
-            return;
+        var current = new GhostState[ghosts.Count];
+        var currentCollisions = new long[ghosts.Count];
+        for (var i = 0; i < ghosts.Count; i++) {
+            (current[i], currentCollisions[i]) = ghosts[i].State();
         }
-        var current = ghosts.Select(it => it.State()).ToArray();
-        for (var i = 0; i < pastGhosts.Count; i++) {
-            var past = pastGhosts[i];
-            if (!current.SequenceEqual(past)) {
-                continue;
-            }
-            SkipRounds(past, maxGhostCollisions, pastGhosts.Count - i);
+        if (pastGhosts.TryGetValue(current, out var past)) {
+            SkipRounds(past.collisions, maxGhostCollisions, pastGhosts.Count - past.index);
             pastGhosts.Clear();
             return;
         }
-        pastGhosts.Add(current);
+        pastGhosts.Add(current, (pastGhosts.Count, currentCollisions));
     }
 
     void MoveAndCollide() {
@@ -82,12 +79,12 @@ class Grid {
         }
     }
 
-    void SkipRounds(GhostState[] past, long maxGhostCollisions, long skipRounds) {
+    void SkipRounds(long[] pastCollisions, long maxGhostCollisions, long skipRounds) {
         var collisionDiffs = new long[ghosts.Count];
         var skipTimes = long.MaxValue;
         for (var i = 0; i < ghosts.Count; i++) {
             long collisions = ghosts[i].Collisions;
-            long diff = collisions - past[i].Collisions;
+            long diff = collisions - pastCollisions[i];
             collisionDiffs[i] = diff;
             long times = (maxGhostCollisions - collisions) / diff;
             if (collisions + diff * times >= maxGhostCollisions) {
@@ -107,17 +104,32 @@ class NullGhost(Point point, Point direction) {
     public Point Direction { get; set; } = direction;
     public long Collisions { get; set; }
 
-    public GhostState State() => new(Point, Direction, Collisions);
+    public (GhostState, long) State() => (new(Point, Direction), Collisions);
 }
 
-readonly record struct GhostState(Point Point, Point Direction, long Collisions) {
-    public bool Equals(GhostState other) => Point == other.Point && Direction == other.Direction;
-    public override int GetHashCode() => HashCode.Combine(Point, Direction);
+readonly record struct GhostState(Point Point, Point Direction) {
+    public static GhostComparer Comparer { get; } = new();
+
+    public class GhostComparer : IEqualityComparer<GhostState[]> {
+        public bool Equals(GhostState[]? a, GhostState[]? b) {
+            return a == b || a != null && b != null && a.SequenceEqual(b);
+        }
+
+        public int GetHashCode(GhostState[] states) {
+            var hash = new HashCode();
+            foreach (var state in states) {
+                hash.Add(state);
+            }
+            return hash.ToHashCode();
+        }
+    }
 }
 
 readonly record struct Point(int X, int Y) {
     public static Point operator +(Point a, Point b) => new(a.X + b.X, a.Y + b.Y);
     public static Point operator -(Point value) => new(-value.X, -value.Y);
+
+    public override string ToString() => $"({X}, {Y})";
 }
 
 static class Screen {
