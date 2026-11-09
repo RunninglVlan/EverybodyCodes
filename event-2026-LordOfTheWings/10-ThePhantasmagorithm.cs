@@ -39,24 +39,21 @@ class Grid {
     public void SimulateRounds(long maxRounds, long maxGhostCollisions) {
         Collisions = 0;
         for (Rounds = 0; Rounds < maxRounds && ghosts.Count > 0; Rounds++) {
-            SimulateRound(maxGhostCollisions);
+            MoveAndCollide();
+            ghosts.RemoveAll(it => it.Collisions >= maxGhostCollisions);
+            var current = new GhostState[ghosts.Count];
+            var currentCollisions = new long[ghosts.Count];
+            for (var i = 0; i < ghosts.Count; i++) {
+                var ghost = ghosts[i];
+                (current[i], currentCollisions[i]) = (new GhostState(ghost.Point, ghost.Direction), ghost.Collisions);
+            }
+            if (pastGhosts.TryGetValue(current, out var past)) {
+                SkipRounds(past.collisions, maxGhostCollisions, pastGhosts.Count - past.index);
+                pastGhosts.Clear();
+                continue;
+            }
+            pastGhosts.Add(current, (pastGhosts.Count, currentCollisions));
         }
-    }
-
-    void SimulateRound(long maxGhostCollisions) {
-        MoveAndCollide();
-        ghosts.RemoveAll(it => it.Collisions >= maxGhostCollisions);
-        var current = new GhostState[ghosts.Count];
-        var currentCollisions = new long[ghosts.Count];
-        for (var i = 0; i < ghosts.Count; i++) {
-            (current[i], currentCollisions[i]) = ghosts[i].State();
-        }
-        if (pastGhosts.TryGetValue(current, out var past)) {
-            SkipRounds(past.collisions, maxGhostCollisions, pastGhosts.Count - past.index);
-            pastGhosts.Clear();
-            return;
-        }
-        pastGhosts.Add(current, (pastGhosts.Count, currentCollisions));
     }
 
     void MoveAndCollide() {
@@ -103,8 +100,6 @@ class NullGhost(Point point, Point direction) {
     public Point Point { get; set; } = point;
     public Point Direction { get; set; } = direction;
     public long Collisions { get; set; }
-
-    public (GhostState, long) State() => (new(Point, Direction), Collisions);
 }
 
 readonly record struct GhostState(Point Point, Point Direction) {
