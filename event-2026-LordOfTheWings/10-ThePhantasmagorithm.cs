@@ -94,10 +94,11 @@ class Grid {
         var collisionDiffs = new long[ghosts.Count];
         var skipTimes = long.MaxValue;
         for (var i = 0; i < ghosts.Count; i++) {
-            long diff = ghosts[i].Collisions - past[i].Collisions;
+            long collisions = ghosts[i].Collisions;
+            long diff = collisions - past[i].Collisions;
             collisionDiffs[i] = diff;
-            long times = (maxGhostCollisions - ghosts[i].Collisions) / diff;
-            if (ghosts[i].Collisions + diff * times >= maxGhostCollisions) {
+            long times = (maxGhostCollisions - collisions) / diff;
+            if (collisions + diff * times >= maxGhostCollisions) {
                 return;
             }
             skipTimes = Math.Min(times, skipTimes);
