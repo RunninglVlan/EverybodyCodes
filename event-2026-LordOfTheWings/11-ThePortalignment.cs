@@ -18,16 +18,18 @@ class Portals {
         string[] portalsData = data[0].Split(' ');
         int portalCount = int.Parse(portalsData.Last());
         graph = new Portal[portalCount];
-        for (var i = 0; i < portalCount; i++) {
+        for (var id = 0; id < portalCount; id++) {
             var portal = new Portal([]);
-            graph[i] = portal;
-            portal.Connections.Add(i > 0 ? i - 1 : portalCount - 1);
-            portal.Connections.Add(i < portalCount - 1 ? i + 1 : 0);
+            graph[id] = portal;
+            portal.Connections.Add(Wrap(id - 1));
+            portal.Connections.Add(Wrap(id + 1));
         }
         for (var i = 2; i < data.Length; i++) {
             AddShortcut(data[i]);
         }
         return;
+
+        int Wrap(int id) => (id + portalCount) % portalCount;
 
         void AddShortcut(string shortcutData) {
             int[] shortcut = [.. shortcutData.Split(' ').Select(int.Parse).Select(it => it - 1)];
