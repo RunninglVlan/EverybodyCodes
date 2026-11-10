@@ -24,19 +24,19 @@ class Portals {
             portal.Connections.Add(i > 0 ? i - 1 : portalCount - 1);
             portal.Connections.Add(i < portalCount - 1 ? i + 1 : 0);
         }
+        AddShortcut(data[2]);
+        AddShortcut(data[3]);
+        return;
+
+        void AddShortcut(string shortcutData) {
+            int[] shortcut1 = [.. shortcutData.Split(' ').Select(int.Parse).Select(it => it - 1)];
+            graph[shortcut1.First()].Connections.Add(shortcut1.Last());
+            graph[shortcut1.Last()].Connections.Add(shortcut1.First());
+        }
     }
 
     public int Resonance() {
-        var strain = 0;
-        for (var i = 0; i < graph.Length; i++) {
-            for (var j = 0; j < graph.Length; j++) {
-                if (i == j) {
-                    continue;
-                }
-                strain += Pathfinding.Shortest(i, j, current => graph[current].Connections)!.Count - 1;
-            }
-        }
-        return strain;
+        return Strain() - StrainWithShortcuts();
     }
 
     int Strain() {
@@ -45,6 +45,19 @@ class Portals {
             result += i * 2;
         }
         return result * graph.Length;
+    }
+
+    int StrainWithShortcuts() {
+        var result = 0;
+        for (var i = 0; i < graph.Length; i++) {
+            for (var j = 0; j < graph.Length; j++) {
+                if (i == j) {
+                    continue;
+                }
+                result += Pathfinding.Shortest(i, j, current => graph[current].Connections)!.Count - 1;
+            }
+        }
+        return result;
     }
 }
 
