@@ -82,12 +82,9 @@ class Portals(int sideNeighbors) {
     int MinimizeStrain() {
         var result = int.MaxValue;
         for (var i = 0; i < graph.Length; i++) {
+            var portal = graph[i];
             for (var j = 0; j < graph.Length; j++) {
-                if (i == j) {
-                    continue;
-                }
-                var portal = graph[i];
-                if (portal.Connections.Contains(j)) {
+                if (i == j || portal.Connections.Contains(j)) {
                     continue;
                 }
                 Connect(i, j);
