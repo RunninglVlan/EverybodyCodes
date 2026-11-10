@@ -5,8 +5,21 @@ const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
 const int part = 3;
 Test.Run((notes, part, expected) => {
-    Assert.ActualEqualsExpected(0, expected);
+    string[] data = notes.Split(Environment.NewLine);
+    string[] portalsData = data[0].Split(' ');
+    int portals = int.Parse(portalsData.Last());
+    int strain = Strain(portals);
+    Assert.ActualEqualsExpected(strain, expected);
 });
+return;
+
+int Strain(int portals) {
+    int result = portals / 2;
+    for (var i = 1; i < portals / 2; i++) {
+        result += i * 2;
+    }
+    return result * portals;
+}
 
 static class Test {
     const string CASE_FILE = "../Test.Cases.txt";
