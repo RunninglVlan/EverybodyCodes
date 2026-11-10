@@ -119,8 +119,8 @@ static class Test {
             string name = Console.ReadLine()!;
             LogInternal(name, console: true, color: ConsoleColor.Cyan);
             int part = int.Parse(Console.ReadLine()!);
-            string notes = ReadUntilLine(EXPECTED_SEPARATOR);
-            string expected = ReadUntilLine(null);
+            string notes = ReadUntilLine(it => it == EXPECTED_SEPARATOR);
+            string expected = ReadUntilLine(string.IsNullOrEmpty);
             try {
                 action(notes, part, expected);
             } catch (Exception e) {
@@ -158,9 +158,9 @@ static class Test {
         return cases;
     }
 
-    static string ReadUntilLine(string? separator) {
+    static string ReadUntilLine(Predicate<string> endPredicate) {
         List<string> lines = [];
-        for (string line; (line = Console.ReadLine()!) != separator;) {
+        for (string line; !endPredicate(line = Console.ReadLine()!);) {
             lines.Add(line);
         }
         return string.Join(Environment.NewLine, lines);
