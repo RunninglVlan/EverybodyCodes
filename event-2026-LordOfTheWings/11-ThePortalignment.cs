@@ -18,10 +18,25 @@ class Portals {
         string[] portalsData = data[0].Split(' ');
         int portalCount = int.Parse(portalsData.Last());
         graph = new Portal[portalCount];
+        for (var i = 0; i < portalCount; i++) {
+            var portal = new Portal([]);
+            graph[i] = portal;
+            portal.Connections.Add(i > 0 ? i - 1 : portalCount - 1);
+            portal.Connections.Add(i < portalCount - 1 ? i + 1 : 0);
+        }
     }
 
     public int Resonance() {
-        return Strain();
+        var strain = 0;
+        for (var i = 0; i < graph.Length; i++) {
+            for (var j = 0; j < graph.Length; j++) {
+                if (i == j) {
+                    continue;
+                }
+                strain += Pathfinding.Shortest(i, j, current => graph[current].Connections)!.Count - 1;
+            }
+        }
+        return strain;
     }
 
     int Strain() {
