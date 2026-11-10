@@ -56,14 +56,10 @@ class Portals(int sideNeighbors) {
 
     public int Resonance(bool minimizeStrain) {
         int strain = Strain();
-        ConnectShortcuts();
-        return strain - (minimizeStrain ? MinimizeStrain() : Strain());
-
-        void ConnectShortcuts() {
-            foreach ((int from, int to) in shortcuts) {
-                Connect(from, to);
-            }
+        foreach ((int from, int to) in shortcuts) {
+            Connect(from, to);
         }
+        return strain - (minimizeStrain ? MinimizeStrain() : Strain());
     }
 
     int Strain() {
