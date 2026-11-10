@@ -5,21 +5,35 @@ const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
 const int part = 3;
 Test.Run((notes, part, expected) => {
-    string[] data = notes.Split(Environment.NewLine);
-    string[] portalsData = data[0].Split(' ');
-    int portals = int.Parse(portalsData.Last());
-    int strain = Strain(portals);
-    Assert.ActualEqualsExpected(strain, expected);
+    var portals = new Portals();
+    portals.Build(notes);
+    Assert.ActualEqualsExpected(portals.Resonance(), expected);
 });
-return;
 
-int Strain(int portals) {
-    int result = portals / 2;
-    for (var i = 1; i < portals / 2; i++) {
-        result += i * 2;
+class Portals {
+    Portal[] graph = null!;
+
+    public void Build(string notes) {
+        string[] data = notes.Split(Environment.NewLine);
+        string[] portalsData = data[0].Split(' ');
+        int portalCount = int.Parse(portalsData.Last());
+        graph = new Portal[portalCount];
     }
-    return result * portals;
+
+    public int Resonance() {
+        return Strain();
+    }
+
+    int Strain() {
+        int result = graph.Length / 2;
+        for (var i = 1; i < graph.Length / 2; i++) {
+            result += i * 2;
+        }
+        return result * graph.Length;
+    }
 }
+
+readonly record struct Portal(List<int> Connections);
 
 static class Pathfinding {
     /// BFS to end
