@@ -1,4 +1,4 @@
-﻿Part 1 Example
+﻿Part I Example
 1
 portals: 10
 
@@ -7,7 +7,7 @@ portals: 10
 ---
 60
 
-Part 1
+Part I
 1
 portals: 34
 
@@ -15,3 +15,12 @@ portals: 34
 31 3
 ---
 1240
+
+Part II Example
+2
+portals: 10
+
+5 10
+2 7
+---
+6

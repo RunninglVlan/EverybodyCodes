@@ -5,13 +5,18 @@ const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
 const int part = 3;
 Test.Run((notes, part, expected) => {
-    var portals = new Portals();
+    (int sideNeighbors, bool minimizeStrain) = part switch {
+        1 => (1, false),
+        _ => (3, true)
+    };
+    var portals = new Portals(sideNeighbors);
     portals.Build(notes);
-    Assert.ActualEqualsExpected(portals.Resonance(), expected);
+    Assert.ActualEqualsExpected(portals.Resonance(minimizeStrain), expected);
 });
 
-class Portals {
+class Portals(int sideNeighbors) {
     Portal[] graph = null!;
+    readonly List<(int a, int b)> shortcuts = [];
 
     public void Build(string notes) {
         string[] data = notes.Split(Environment.NewLine);
@@ -21,8 +26,10 @@ class Portals {
         for (var id = 0; id < portalCount; id++) {
             var portal = new Portal([]);
             graph[id] = portal;
-            portal.Connections.Add(Wrap(id - 1));
-            portal.Connections.Add(Wrap(id + 1));
+            for (var i = 1; i <= sideNeighbors; i++) {
+                portal.Connections.Add(Wrap(id - i));
+                portal.Connections.Add(Wrap(id + i));
+            }
         }
         for (var i = 2; i < data.Length; i++) {
             AddShortcut(data[i]);
@@ -33,24 +40,33 @@ class Portals {
 
         void AddShortcut(string shortcutData) {
             int[] shortcut = [.. shortcutData.Split(' ').Select(int.Parse).Select(it => it - 1)];
-            graph[shortcut.First()].Connections.Add(shortcut.Last());
-            graph[shortcut.Last()].Connections.Add(shortcut.First());
+            shortcuts.Add((shortcut.First(), shortcut.Last()));
         }
     }
 
-    public int Resonance() {
-        return Strain() - StrainWithShortcuts();
+    void Connect(int a, int b) {
+        graph[a].Connections.Add(b);
+        graph[b].Connections.Add(a);
+    }
+
+    void Disconnect(int a, int b) {
+        graph[a].Connections.Remove(b);
+        graph[b].Connections.Remove(a);
+    }
+
+    public int Resonance(bool minimizeStrain) {
+        int strain = Strain();
+        ConnectShortcuts();
+        return strain - (minimizeStrain ? MinimizeStrain() : Strain());
+
+        void ConnectShortcuts() {
+            foreach ((int from, int to) in shortcuts) {
+                Connect(from, to);
+            }
+        }
     }
 
     int Strain() {
-        int result = graph.Length / 2;
-        for (var i = 1; i < graph.Length / 2; i++) {
-            result += i * 2;
-        }
-        return result * graph.Length;
-    }
-
-    int StrainWithShortcuts() {
         var result = 0;
         for (var i = 0; i < graph.Length; i++) {
             for (var j = 0; j < graph.Length; j++) {
@@ -58,6 +74,25 @@ class Portals {
                     continue;
                 }
                 result += Pathfinding.Shortest(i, j, current => graph[current].Connections)!.Count - 1;
+            }
+        }
+        return result;
+    }
+
+    int MinimizeStrain() {
+        var result = int.MaxValue;
+        for (var i = 0; i < graph.Length; i++) {
+            for (var j = 0; j < graph.Length; j++) {
+                if (i == j) {
+                    continue;
+                }
+                var portal = graph[i];
+                if (portal.Connections.Contains(j)) {
+                    continue;
+                }
+                Connect(i, j);
+                result = Math.Min(Strain(), result);
+                Disconnect(i, j);
             }
         }
         return result;
