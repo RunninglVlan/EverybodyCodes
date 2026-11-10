@@ -24,8 +24,9 @@ class Portals {
             portal.Connections.Add(i > 0 ? i - 1 : portalCount - 1);
             portal.Connections.Add(i < portalCount - 1 ? i + 1 : 0);
         }
-        AddShortcut(data[2]);
-        AddShortcut(data[3]);
+        for (var i = 2; i < data.Length; i++) {
+            AddShortcut(data[i]);
+        }
         return;
 
         void AddShortcut(string shortcutData) {
