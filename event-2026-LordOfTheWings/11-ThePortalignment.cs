@@ -75,6 +75,7 @@ class Portals(int sideNeighbors) {
         return result;
     }
 
+    /// Adds connection that minimizes strain
     int MinimizeStrain() {
         var result = int.MaxValue;
         for (var i = 0; i < graph.Length; i++) {
