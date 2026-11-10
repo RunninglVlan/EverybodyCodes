@@ -29,9 +29,9 @@ class Portals {
         return;
 
         void AddShortcut(string shortcutData) {
-            int[] shortcut1 = [.. shortcutData.Split(' ').Select(int.Parse).Select(it => it - 1)];
-            graph[shortcut1.First()].Connections.Add(shortcut1.Last());
-            graph[shortcut1.Last()].Connections.Add(shortcut1.First());
+            int[] shortcut = [.. shortcutData.Split(' ').Select(int.Parse).Select(it => it - 1)];
+            graph[shortcut.First()].Connections.Add(shortcut.Last());
+            graph[shortcut.Last()].Connections.Add(shortcut.First());
         }
     }
 
