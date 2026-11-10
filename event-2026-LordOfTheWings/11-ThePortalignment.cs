@@ -73,7 +73,7 @@ class Portals(int sideNeighbors) {
                 if (i == j) {
                     continue;
                 }
-                result += Pathfinding.Shortest(i, j, current => graph[current].Connections)!.Count - 1;
+                result += Pathfinding<int>.Shortest(i, j, current => graph[current].Connections)!.Count - 1;
             }
         }
         return result;
@@ -98,9 +98,9 @@ class Portals(int sideNeighbors) {
 
 readonly record struct Portal(List<int> Connections);
 
-static class Pathfinding {
+static class Pathfinding<T> where T : IEquatable<T> {
     /// BFS to end
-    public static List<T>? Shortest<T>(T start, T end, Func<T, IEnumerable<T>> getNext) where T : IEquatable<T> {
+    public static List<T>? Shortest(T start, T end, Func<T, IEnumerable<T>> getNext) {
         Dictionary<T, T> parents = [];
         Queue<T> queue = [];
         HashSet<T> visited = [];
@@ -121,7 +121,7 @@ static class Pathfinding {
         return null;
     }
 
-    static List<T> Reconstruct<T>(Dictionary<T, T> parents, T start, T end) where T : IEquatable<T> {
+    static List<T> Reconstruct(Dictionary<T, T> parents, T start, T end) {
         var path = new List<T>();
         var current = end;
         while (!current.Equals(start)) {
