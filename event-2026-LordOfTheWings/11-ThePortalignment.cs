@@ -89,6 +89,7 @@ static class Pathfinding {
 static class Test {
     const string CASE_FILE = "../Test.Cases.txt";
     const string LOG_FILE = "../Test.Log.txt";
+    const string EXPECTED_SEPARATOR = "---";
 
     public static bool StepEnabled { get; set; } = true;
     public static string? From { get; set; }
@@ -105,8 +106,8 @@ static class Test {
             string name = Console.ReadLine()!;
             LogInternal(name, console: true, color: ConsoleColor.Cyan);
             int part = int.Parse(Console.ReadLine()!);
-            string notes = ReadUntilNewLine();
-            string expected = ReadUntilNewLine();
+            string notes = ReadUntilLine(EXPECTED_SEPARATOR);
+            string expected = ReadUntilLine(null);
             try {
                 action(notes, part, expected);
             } catch (Exception e) {
@@ -144,9 +145,9 @@ static class Test {
         return cases;
     }
 
-    static string ReadUntilNewLine() {
+    static string ReadUntilLine(string? separator) {
         List<string> lines = [];
-        for (string line; !string.IsNullOrEmpty(line = Console.ReadLine()!);) {
+        for (string line; (line = Console.ReadLine()!) != separator;) {
             lines.Add(line);
         }
         return string.Join(Environment.NewLine, lines);
