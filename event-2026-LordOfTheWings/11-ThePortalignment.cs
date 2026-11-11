@@ -1,8 +1,10 @@
 ﻿using System.Diagnostics;
 
-// Test.From = "Part II Example";
-// Test.Until = "Part II";
-Assert.Throw = false;
+Test.StepEnabled = false;
+Test.From = "Part III Example 1";
+Test.Until = "Part III Example 2";
+Test.LogEnabled = false;
+// Assert.Throw = false;
 // https://everybody.codes/event/2026/quests/11
 const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
@@ -103,7 +105,89 @@ class Portals(int sideNeighbors, int crystalConnections) {
     }
 
     int MinimizeStrainWith4Extras() {
-        return 0;
+        HashSet<int> usedCrystals = [];
+        HashSet<(CrystalPair, CrystalPair, CrystalPair, CrystalPair)> usedOptions = [];
+        var result = int.MaxValue;
+        int crystalDistance = graph.Length / (4 * 2);
+        for (var i0 = 0; i0 < crystalDistance; i0++) {
+            var i0Portal = graph[i0];
+            for (int i1 = i0 + crystalDistance; i1 < graph.Length; i1 += crystalDistance) {
+                if (i0Portal.Connections.Contains(i1)) {
+                    continue;
+                }
+                usedCrystals.Add(i1);
+                Connect(i0, i1);
+                var iPair = CrystalPair.From(i0, i1);
+                Test.Log($"1st pair: {(i0, i1)}");
+                Test.Step();
+                for (int j0 = i0 + crystalDistance; j0 < graph.Length; j0 += crystalDistance) {
+                    if (!usedCrystals.Add(j0)) {
+                        continue;
+                    }
+                    var j0Portal = graph[j0];
+                    for (int j1 = i0 + crystalDistance; j1 < graph.Length; j1 += crystalDistance) {
+                        if (!usedCrystals.Add(j1) || j0Portal.Connections.Contains(j1)) {
+                            continue;
+                        }
+                        Connect(j0, j1);
+                        var jPair = CrystalPair.From(j0, j1);
+                        Test.Log($"  2nd pair: {(j0, j1)}");
+                        Test.Step();
+                        for (int k0 = i0 + crystalDistance; k0 < graph.Length; k0 += crystalDistance) {
+                            if (!usedCrystals.Add(k0)) {
+                                continue;
+                            }
+                            var k0Portal = graph[k0];
+                            for (int k1 = i0 + crystalDistance; k1 < graph.Length; k1 += crystalDistance) {
+                                if (!usedCrystals.Add(k1) || k0Portal.Connections.Contains(k1)) {
+                                    continue;
+                                }
+                                Connect(k0, k1);
+                                var kPair = CrystalPair.From(k0, k1);
+                                Test.Log($"    3rd pair: {(k0, k1)}");
+                                Test.Step();
+                                for (int l0 = i0 + crystalDistance; l0 < graph.Length; l0 += crystalDistance) {
+                                    if (!usedCrystals.Add(l0)) {
+                                        continue;
+                                    }
+                                    var l0Portal = graph[l0];
+                                    for (int l1 = i0 + crystalDistance; l1 < graph.Length; l1 += crystalDistance) {
+                                        if (usedCrystals.Contains(l1) || l0Portal.Connections.Contains(l1)) {
+                                            continue;
+                                        }
+                                        var lPair = CrystalPair.From(l0, l1);
+                                        if (!usedOptions.Add((iPair, jPair, kPair, lPair))) {
+                                            continue;
+                                        }
+                                        Connect(l0, l1);
+                                        Test.Log($"      4th pair: {(l0, l1)}");
+                                        Test.Step();
+                                        result = Math.Min(Strain(), result);
+                                        Disconnect(l0, l1);
+                                    }
+                                    usedCrystals.Remove(l0);
+                                }
+                                usedCrystals.Remove(k1);
+                                Disconnect(k0, k1);
+                            }
+                            usedCrystals.Remove(k0);
+                        }
+                        usedCrystals.Remove(j1);
+                        Disconnect(j0, j1);
+                    }
+                    usedCrystals.Remove(j0);
+                }
+                usedCrystals.Remove(i1);
+                Disconnect(i0, i1);
+            }
+        }
+        return result;
+    }
+}
+
+readonly record struct CrystalPair(int A, int B) {
+    public static CrystalPair From(int a, int b) {
+        return a < b ? new CrystalPair(a, b) : new CrystalPair(b, a);
     }
 }
 
