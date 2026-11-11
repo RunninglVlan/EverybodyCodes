@@ -1,22 +1,26 @@
 ﻿using System.Diagnostics;
 
+// Test.From = "Part II Example";
+// Test.Until = "Part II";
+Assert.Throw = false;
 // https://everybody.codes/event/2026/quests/11
 const string noteFile = "../Notes.txt";
 string notes = File.ReadAllText(noteFile);
 const int part = 3;
 Test.Run((notes, part, expected) => {
-    (int sideNeighbors, bool minimizeStrain) = part switch {
-        1 => (1, false),
-        _ => (3, true)
+    (int sideNeighbors, int crystalConnections) = part switch {
+        1 => (1, 0),
+        2 => (3, 1),
+        _ => (3, 4)
     };
-    var portals = new Portals(sideNeighbors);
+    var portals = new Portals(sideNeighbors, crystalConnections);
     portals.Build(notes);
-    int resonance = portals.Resonance(minimizeStrain);
+    int resonance = portals.Resonance();
     Assert.ActualEqualsExpected(resonance, expected);
     // Console.WriteLine(resonance);
 });
 
-class Portals(int sideNeighbors) {
+class Portals(int sideNeighbors, int crystalConnections) {
     Portal[] graph = null!;
     readonly List<(int a, int b)> shortcuts = [];
 
@@ -56,12 +60,17 @@ class Portals(int sideNeighbors) {
         graph[b].Connections.Remove(a);
     }
 
-    public int Resonance(bool minimizeStrain) {
+    public int Resonance() {
         int strain = Strain();
         foreach ((int from, int to) in shortcuts) {
             Connect(from, to);
         }
-        return strain - (minimizeStrain ? MinimizeStrain() : Strain());
+        int strainWithShortcuts = crystalConnections switch {
+            0 => Strain(),
+            1 => MinimizeStrainWith1Extra(),
+            _ => MinimizeStrainWith4Extras()
+        };
+        return strain - strainWithShortcuts;
     }
 
     int Strain() {
@@ -77,8 +86,7 @@ class Portals(int sideNeighbors) {
         return result;
     }
 
-    /// Adds connection that minimizes strain
-    int MinimizeStrain() {
+    int MinimizeStrainWith1Extra() {
         var result = int.MaxValue;
         for (var i = 0; i < graph.Length; i++) {
             var portal = graph[i];
@@ -92,6 +100,10 @@ class Portals(int sideNeighbors) {
             }
         }
         return result;
+    }
+
+    int MinimizeStrainWith4Extras() {
+        return 0;
     }
 }
 
