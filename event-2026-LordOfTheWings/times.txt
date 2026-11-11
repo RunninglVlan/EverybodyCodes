@@ -1,5 +1,5 @@
 ﻿Quest	Part	Global Rank	Global Score	Global Time	Local Time
-30	12d 01h 39m 20s 650ms	2d 11h 45m 25s 068ms
+30	13d 16h 53m 09s 177ms	3d 05h 16m 03s 104ms
 1	I	245	0	15h 03m 12s 315ms	41m 34s 099ms
 II	227	0	15h 28m 28s 415ms	1h 06m 50s 199ms
 III	217	0	15h 37m 44s 844ms	1h 16m 06s 628ms
@@ -30,3 +30,6 @@ III	165	0	1d 20h 17m 40s 315ms	1d 00h 42m 02s 610ms
 10	I	170	0	1d 15h 09m 34s 971ms	2h 17m 46s 182ms
 II	164	0	1d 15h 29m 42s 309ms	2h 37m 53s 520ms
 III	136	15	1d 23h 38m 43s 657ms	10h 46m 54s 868ms
+11	I	192	0	22h 57m 11s 346ms	1h 14m 00s 855ms
+II	179	0	1d 00h 19m 46s 311ms	2h 36m 35s 820ms
+III	162	0	1d 15h 13m 48s 527ms	17h 30m 38s 036ms
