@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 
 Test.StepEnabled = false;
-Test.From = "Part III Example 2";
-// Test.Until = "Part III Example 2";
+Test.From = "Part III Example 1";
+Test.Until = "Part III Example 2";
 Test.LogEnabled = false;
 // Assert.Throw = false;
 // https://everybody.codes/event/2026/quests/11
@@ -105,6 +105,7 @@ class Portals(int sideNeighbors, int crystalConnections) {
     }
 
     int MinimizeStrainWith4Extras() {
+        int progress = -1;
         HashSet<int> usedCrystals = [];
         HashSet<(CrystalPair, CrystalPair, CrystalPair, CrystalPair)> usedOptions = [];
         var result = int.MaxValue;
@@ -162,6 +163,10 @@ class Portals(int sideNeighbors, int crystalConnections) {
                                         Connect(l0, l1);
                                         Test.Log($"      4th pair: {(l0, l1)}");
                                         Test.Step();
+                                        if (i0 != progress) {
+                                            Console.Error.WriteLine($"progress: {i0 / (float)crystalDistance:F}");
+                                            progress = i0;
+                                        }
                                         result = Math.Min(Strain(), result);
                                         Disconnect(l0, l1);
                                     }
