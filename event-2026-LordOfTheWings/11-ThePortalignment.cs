@@ -93,9 +93,9 @@ class Portals(int sideNeighbors, int crystalConnections) {
 
     int MinimizeStrainWith1Extra() {
         var result = int.MaxValue;
-        for (var offset = 0; offset < graph.Length; offset++) {
-            result = Math.Min(Search(offset, 1, 1, []), result);
-            AddProgress(offset, graph.Length);
+        for (var i = 0; i < graph.Length; i++) {
+            result = Math.Min(Search(i, 1, 1, []), result);
+            AddProgress(i, graph.Length);
         }
         return result;
     }
@@ -112,18 +112,18 @@ class Portals(int sideNeighbors, int crystalConnections) {
         const int extras = 4;
         var result = int.MaxValue;
         int crystalDistance = graph.Length / (extras * 2);
-        for (var offset = 0; offset < crystalDistance; offset++) {
-            result = Math.Min(Search(offset, crystalDistance, extras, []), result);
-            AddProgress(offset, crystalDistance);
+        for (var i = 0; i < crystalDistance; i++) {
+            result = Math.Min(Search(i, crystalDistance, extras, []), result);
+            AddProgress(i, crystalDistance);
         }
         return result;
     }
 
-    int Search(int offset, int step, int pairsLeft, HashSet<int> used) {
+    int Search(int start, int step, int pairsLeft, HashSet<int> used) {
         if (pairsLeft == 0) {
             return Strain();
         }
-        int first = offset;
+        int first = start;
         while (used.Contains(first)) {
             first += step;
         }
