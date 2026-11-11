@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 
 Test.StepEnabled = false;
-// Test.From = "Part III Example 1";
-Test.Until = "Part III Example 2";
+Test.From = "Part III Example 1";
+Test.Until = "Part III";
 Test.LogEnabled = false;
 Test.ExpectedSeparator = "---";
 // Assert.Throw = false;
@@ -82,10 +82,11 @@ class Portals(int sideNeighbors, int crystalConnections) {
 
     int MinimizeStrainWith1Extra(Portal[] graph) {
         var result = int.MaxValue;
-        for (var i = 0; i < graph.Length; i++) {
-            result = Math.Min(Search(graph, i, 1, 1, []), result);
+        Parallel.For(0, graph.Length, i => {
+            var portals = Portal.Copy(graph);
+            result = Math.Min(Search(portals, i, 1, 1, []), result);
             AddProgress(i, graph.Length);
-        }
+        });
         return result;
     }
 
@@ -101,10 +102,11 @@ class Portals(int sideNeighbors, int crystalConnections) {
         const int extras = 4;
         var result = int.MaxValue;
         int crystalDistance = graph.Length / (extras * 2);
-        for (var i = 0; i < crystalDistance; i++) {
-            result = Math.Min(Search(graph, i, crystalDistance, extras, []), result);
+        Parallel.For(0, crystalDistance, i => {
+            var portals = Portal.Copy(graph);
+            result = Math.Min(Search(portals, i, crystalDistance, extras, []), result);
             AddProgress(i, crystalDistance);
-        }
+        });
         return result;
     }
 
@@ -142,6 +144,10 @@ readonly record struct Portal(List<int> Connections) {
     public static void Disconnect(Portal[] graph, int a, int b) {
         graph[a].Connections.Remove(b);
         graph[b].Connections.Remove(a);
+    }
+
+    public static Portal[] Copy(Portal[] graph) {
+        return [.. graph.Select(it => new Portal([.. it.Connections]))];
     }
 }
 
