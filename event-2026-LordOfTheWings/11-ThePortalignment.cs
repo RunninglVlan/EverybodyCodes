@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
 
 Test.StepEnabled = false;
+Test.From = "Part III Example 1";
+Test.Until = "Part III";
 Test.LogEnabled = false;
 Test.ExpectedSeparator = "---";
 // Assert.Throw = false;
@@ -52,8 +54,8 @@ class Portals(int sideNeighbors, int crystalConnections) {
 
     public int Resonance(Portal[] graph) {
         int strain = Strain(graph);
-        foreach ((int from, int to) in shortcuts) {
-            Portal.Connect(graph, from, to);
+        foreach ((int a, int b) in shortcuts) {
+            Portal.Connect(graph, a, b);
         }
         int strainWithShortcuts = crystalConnections switch {
             0 => Strain(graph),
