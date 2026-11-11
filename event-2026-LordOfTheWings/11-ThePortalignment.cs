@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 
 Test.StepEnabled = false;
-// Test.From = "Part III Example 1";
-Test.Until = "Part III Example 2";
+Test.From = "Part III Example 1";
+Test.Until = "Part III";
 Test.LogEnabled = false;
 Test.ExpectedSeparator = "---";
 // Assert.Throw = false;
