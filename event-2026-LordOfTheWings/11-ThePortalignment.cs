@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 
 Test.StepEnabled = false;
-Test.From = "Part III Example 1";
-Test.Until = "Part III";
+// Test.From = "Part III Example 1";
+Test.Until = "Part III Example 2";
 Test.LogEnabled = false;
 Test.ExpectedSeparator = "---";
 // Assert.Throw = false;
@@ -17,21 +17,20 @@ Test.Run((notes, part, expected) => {
         _ => (3, 4)
     };
     var portals = new Portals(sideNeighbors, crystalConnections);
-    portals.Build(notes);
-    int resonance = portals.Resonance();
+    var graph = portals.Build(notes);
+    int resonance = portals.Resonance(graph);
     Assert.ActualEqualsExpected(resonance, expected);
     // Console.WriteLine(resonance);
 });
 
 class Portals(int sideNeighbors, int crystalConnections) {
-    Portal[] graph = null!;
     readonly List<(int a, int b)> shortcuts = [];
 
-    public void Build(string notes) {
+    public Portal[] Build(string notes) {
         string[] data = notes.Split(Environment.NewLine);
         string[] portalsData = data[0].Split(' ');
         int portalCount = int.Parse(portalsData.Last());
-        graph = new Portal[portalCount];
+        var graph = new Portal[portalCount];
         for (var id = 0; id < portalCount; id++) {
             var portal = new Portal([]);
             graph[id] = portal;
@@ -43,7 +42,7 @@ class Portals(int sideNeighbors, int crystalConnections) {
         for (var i = 2; i < data.Length; i++) {
             AddShortcut(data[i]);
         }
-        return;
+        return graph;
 
         int Wrap(int id) => (id + portalCount) % portalCount;
 
@@ -53,30 +52,20 @@ class Portals(int sideNeighbors, int crystalConnections) {
         }
     }
 
-    void Connect(int a, int b) {
-        graph[a].Connections.Add(b);
-        graph[b].Connections.Add(a);
-    }
-
-    void Disconnect(int a, int b) {
-        graph[a].Connections.Remove(b);
-        graph[b].Connections.Remove(a);
-    }
-
-    public int Resonance() {
-        int strain = Strain();
+    public int Resonance(Portal[] graph) {
+        int strain = Strain(graph);
         foreach ((int from, int to) in shortcuts) {
-            Connect(from, to);
+            Portal.Connect(graph, from, to);
         }
         int strainWithShortcuts = crystalConnections switch {
-            0 => Strain(),
-            1 => MinimizeStrainWith1Extra(),
-            _ => MinimizeStrainWith4Extras()
+            0 => Strain(graph),
+            1 => MinimizeStrainWith1Extra(graph),
+            _ => MinimizeStrainWith4Extras(graph)
         };
         return strain - strainWithShortcuts;
     }
 
-    int Strain() {
+    static int Strain(Portal[] graph) {
         var result = 0;
         for (var i = 0; i < graph.Length; i++) {
             for (var j = 0; j < graph.Length; j++) {
@@ -91,10 +80,10 @@ class Portals(int sideNeighbors, int crystalConnections) {
 
     int progress = -1;
 
-    int MinimizeStrainWith1Extra() {
+    int MinimizeStrainWith1Extra(Portal[] graph) {
         var result = int.MaxValue;
         for (var i = 0; i < graph.Length; i++) {
-            result = Math.Min(Search(i, 1, 1, []), result);
+            result = Math.Min(Search(graph, i, 1, 1, []), result);
             AddProgress(i, graph.Length);
         }
         return result;
@@ -108,20 +97,20 @@ class Portals(int sideNeighbors, int crystalConnections) {
         progress = i;
     }
 
-    int MinimizeStrainWith4Extras() {
+    int MinimizeStrainWith4Extras(Portal[] graph) {
         const int extras = 4;
         var result = int.MaxValue;
         int crystalDistance = graph.Length / (extras * 2);
         for (var i = 0; i < crystalDistance; i++) {
-            result = Math.Min(Search(i, crystalDistance, extras, []), result);
+            result = Math.Min(Search(graph, i, crystalDistance, extras, []), result);
             AddProgress(i, crystalDistance);
         }
         return result;
     }
 
-    int Search(int start, int step, int pairsLeft, HashSet<int> used) {
+    static int Search(Portal[] graph, int start, int step, int pairsLeft, HashSet<int> used) {
         if (pairsLeft == 0) {
-            return Strain();
+            return Strain(graph);
         }
         int first = start;
         while (used.Contains(first)) {
@@ -134,9 +123,9 @@ class Portals(int sideNeighbors, int crystalConnections) {
             if (firstPortal.Connections.Contains(second) || !used.Add(second)) {
                 continue;
             }
-            Connect(first, second);
-            best = Math.Min(Search(first, step, pairsLeft - 1, used), best);
-            Disconnect(first, second);
+            Portal.Connect(graph, first, second);
+            best = Math.Min(Search(graph, first, step, pairsLeft - 1, used), best);
+            Portal.Disconnect(graph, first, second);
             used.Remove(second);
         }
         used.Remove(first);
@@ -144,7 +133,17 @@ class Portals(int sideNeighbors, int crystalConnections) {
     }
 }
 
-readonly record struct Portal(List<int> Connections);
+readonly record struct Portal(List<int> Connections) {
+    public static void Connect(Portal[] graph, int a, int b) {
+        graph[a].Connections.Add(b);
+        graph[b].Connections.Add(a);
+    }
+
+    public static void Disconnect(Portal[] graph, int a, int b) {
+        graph[a].Connections.Remove(b);
+        graph[b].Connections.Remove(a);
+    }
+}
 
 static class Pathfinding<T> where T : IEquatable<T> {
     /// BFS to end
