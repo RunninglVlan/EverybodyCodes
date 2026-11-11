@@ -124,10 +124,9 @@ class Portals(int sideNeighbors, int crystalConnections) {
         for (var i0 = 0; i0 < crystalDistance; i0++) {
             var i0Portal = graph[i0];
             for (int i1 = i0 + crystalDistance; i1 < graph.Length; i1 += crystalDistance) {
-                if (i0Portal.Connections.Contains(i1)) {
+                if (i0Portal.Connections.Contains(i1) || !usedCrystals.Add(i1)) {
                     continue;
                 }
-                usedCrystals.Add(i1);
                 Connect(i0, i1);
                 var iPair = CrystalPair.From(i0, i1);
                 for (int j0 = i0 + crystalDistance; j0 < graph.Length; j0 += crystalDistance) {
@@ -136,7 +135,7 @@ class Portals(int sideNeighbors, int crystalConnections) {
                     }
                     var j0Portal = graph[j0];
                     for (int j1 = i0 + crystalDistance; j1 < graph.Length; j1 += crystalDistance) {
-                        if (!usedCrystals.Add(j1) || j0Portal.Connections.Contains(j1)) {
+                        if (j0Portal.Connections.Contains(j1) || !usedCrystals.Add(j1)) {
                             continue;
                         }
                         Connect(j0, j1);
@@ -147,7 +146,7 @@ class Portals(int sideNeighbors, int crystalConnections) {
                             }
                             var k0Portal = graph[k0];
                             for (int k1 = i0 + crystalDistance; k1 < graph.Length; k1 += crystalDistance) {
-                                if (!usedCrystals.Add(k1) || k0Portal.Connections.Contains(k1)) {
+                                if (k0Portal.Connections.Contains(k1) || !usedCrystals.Add(k1)) {
                                     continue;
                                 }
                                 Connect(k0, k1);
@@ -158,7 +157,7 @@ class Portals(int sideNeighbors, int crystalConnections) {
                                     }
                                     var l0Portal = graph[l0];
                                     for (int l1 = i0 + crystalDistance; l1 < graph.Length; l1 += crystalDistance) {
-                                        if (usedCrystals.Contains(l1) || l0Portal.Connections.Contains(l1)) {
+                                        if (l0Portal.Connections.Contains(l1) || usedCrystals.Contains(l1)) {
                                             continue;
                                         }
                                         var lPair = CrystalPair.From(l0, l1);
