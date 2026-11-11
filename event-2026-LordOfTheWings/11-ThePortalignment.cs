@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 
 Test.StepEnabled = false;
-Test.From = "Part I Example";
-Test.Until = "Part II";
-// Test.LogEnabled = false;
+// Test.From = "Part III Example 1";
+Test.Until = "Part III Example 2";
+Test.LogEnabled = false;
 Test.ExpectedSeparator = "---";
 // Assert.Throw = false;
 // https://everybody.codes/event/2026/quests/11
@@ -89,6 +89,8 @@ class Portals(int sideNeighbors, int crystalConnections) {
         return result;
     }
 
+    int progress = -1;
+
     int MinimizeStrainWith1Extra() {
         var result = int.MaxValue;
         for (var i = 0; i < graph.Length; i++) {
@@ -98,6 +100,7 @@ class Portals(int sideNeighbors, int crystalConnections) {
                     continue;
                 }
                 Connect(i, j);
+                AddProgress(i, graph.Length);
                 result = Math.Min(Strain(), result);
                 Disconnect(i, j);
             }
@@ -105,8 +108,15 @@ class Portals(int sideNeighbors, int crystalConnections) {
         return result;
     }
 
+    void AddProgress(int i, float length) {
+        if (i == progress) {
+            return;
+        }
+        Console.Error.WriteLine($"progress: {i / length:F}");
+        progress = i;
+    }
+
     int MinimizeStrainWith4Extras() {
-        int progress = -1;
         HashSet<int> usedCrystals = [];
         HashSet<(CrystalPair, CrystalPair, CrystalPair, CrystalPair)> usedOptions = [];
         var result = int.MaxValue;
@@ -164,10 +174,7 @@ class Portals(int sideNeighbors, int crystalConnections) {
                                         Connect(l0, l1);
                                         Test.Log($"      4th pair: {(l0, l1)}");
                                         Test.Step();
-                                        if (i0 != progress) {
-                                            Console.Error.WriteLine($"progress: {i0 / (float)crystalDistance:F}");
-                                            progress = i0;
-                                        }
+                                        AddProgress(i0, crystalDistance);
                                         result = Math.Min(Strain(), result);
                                         Disconnect(l0, l1);
                                     }
