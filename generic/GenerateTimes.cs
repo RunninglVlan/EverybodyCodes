@@ -52,28 +52,30 @@ var table = new StringBuilder();
 
 table.AppendLine("### Local times");
 table.AppendLine();
-table.AppendLine($"| Quest | {string.Join(" | ", partNames.Take(partCount))} | Total |");
-table.AppendLine($"|{string.Join("|", Enumerable.Repeat("---", partCount + 2))}|");
+table.AppendLine($"| Quest | {string.Join(" | ", partNames.Take(partCount))} | Total | Quest by Time |");
+table.AppendLine($"|{string.Join("|", Enumerable.Repeat("---", partCount + 3))}|");
 
-var questTotals = quests.Values.Select(times => times[^1]).ToList();
+var questTotals = quests.Values.Select(times => times[^1]).OrderBy(it => it).ToList();
 
 var allQuestsTotal = TimeSpan.Zero;
 foreach ((int questNumber, var cumulativeTimes) in quests) {
     var partTimes = cumulativeTimes
             .Select((time, index) => index == 0 ? time : time - cumulativeTimes[index - 1])
             .ToList();
+    var orderedTimes = partTimes.OrderBy(it => it).ToList();
     var partCells = partTimes
-            .Select(time => $"{MarkerFor(time, partTimes)} {Format(time)}".Trim())
+            .Select(time => $"{MarkerFor(time, orderedTimes)} {Format(time)}".Trim())
             .Concat(Enumerable.Repeat("", partCount - partTimes.Count));
     var questTotal = cumulativeTimes[^1];
     allQuestsTotal += questTotal;
-    string totalCell = $"{MarkerFor(questTotal, questTotals)} {Format(questTotal)}".Trim();
-    table.AppendLine($"| {questNumber} | {string.Join(" | ", partCells)} | {totalCell} |");
+    var totalCell = $"{MarkerFor(questTotal, questTotals)} {Format(questTotal)}";
+    int totalIndex = questTotals.IndexOf(questTotal);
+    table.AppendLine($"| {questNumber} | {string.Join(" | ", partCells)} | {totalCell} | {totalIndex + 1} |");
 }
 
 table.AppendLine("| **All** |"
         + string.Concat(Enumerable.Repeat(" |", partCount))
-        + $" **{Format(allQuestsTotal)}** |");
+        + $" **{Format(allQuestsTotal)}** | |");
 table.AppendLine();
 table.AppendLine(
         "🟢 fastest · 🟠 in between · 🔴 slowest (parts are compared within their quest, totals across all quests)");
@@ -114,14 +116,14 @@ static string Format(TimeSpan time) =>
 // or the totals of all quests).
 // 🟢 fastest, 🔴 slowest, 🟠 everything in between (no marker if there is nothing to compare with).
 [SuppressMessage("ReSharper", "ConvertIfStatementToReturnStatement")]
-static string MarkerFor(TimeSpan time, List<TimeSpan> comparedTimes) {
-    if (comparedTimes.Count < 2) {
+static string MarkerFor(TimeSpan time, List<TimeSpan> orderedTimes) {
+    if (orderedTimes.Count < 2) {
         return "";
     }
-    if (time == comparedTimes.Min()) {
+    if (time == orderedTimes[0]) {
         return "🟢";
     }
-    if (time == comparedTimes.Max()) {
+    if (time == orderedTimes[^1]) {
         return "🔴";
     }
     return "🟠";
