@@ -23,5 +23,6 @@ static class Perf {
                     $"{block}: {total.TotalMilliseconds:F1}ms total, {calls} calls, "
                     + $"{total.TotalMilliseconds * 1000 / calls:F2}µs/call");
         }
+        blocks.Clear();
     }
 }
