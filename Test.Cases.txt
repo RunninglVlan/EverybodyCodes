@@ -36,3 +36,25 @@ portals: 50
 31 13
 ---
 3356
+
+Part III Example 1
+3
+portals: 32
+
+1 10
+20 30
+15 29
+13 10
+---
+854
+
+Part III Example 2
+3
+portals: 64
+
+1 40
+3 35
+5 42
+7 50
+---
+9634
