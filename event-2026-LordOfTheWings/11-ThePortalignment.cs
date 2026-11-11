@@ -130,8 +130,6 @@ class Portals(int sideNeighbors, int crystalConnections) {
                 usedCrystals.Add(i1);
                 Connect(i0, i1);
                 var iPair = CrystalPair.From(i0, i1);
-                Test.Log($"1st pair: {(i0, i1)}");
-                Test.Step();
                 for (int j0 = i0 + crystalDistance; j0 < graph.Length; j0 += crystalDistance) {
                     if (!usedCrystals.Add(j0)) {
                         continue;
@@ -143,8 +141,6 @@ class Portals(int sideNeighbors, int crystalConnections) {
                         }
                         Connect(j0, j1);
                         var jPair = CrystalPair.From(j0, j1);
-                        Test.Log($"  2nd pair: {(j0, j1)}");
-                        Test.Step();
                         for (int k0 = i0 + crystalDistance; k0 < graph.Length; k0 += crystalDistance) {
                             if (!usedCrystals.Add(k0)) {
                                 continue;
@@ -156,8 +152,6 @@ class Portals(int sideNeighbors, int crystalConnections) {
                                 }
                                 Connect(k0, k1);
                                 var kPair = CrystalPair.From(k0, k1);
-                                Test.Log($"    3rd pair: {(k0, k1)}");
-                                Test.Step();
                                 for (int l0 = i0 + crystalDistance; l0 < graph.Length; l0 += crystalDistance) {
                                     if (!usedCrystals.Add(l0)) {
                                         continue;
@@ -172,8 +166,6 @@ class Portals(int sideNeighbors, int crystalConnections) {
                                             continue;
                                         }
                                         Connect(l0, l1);
-                                        Test.Log($"      4th pair: {(l0, l1)}");
-                                        Test.Step();
                                         AddProgress(i0, crystalDistance);
                                         result = Math.Min(Strain(), result);
                                         Disconnect(l0, l1);
