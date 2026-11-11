@@ -1,8 +1,6 @@
 ﻿using System.Diagnostics;
 
 Test.StepEnabled = false;
-Test.From = "Part III Example 1";
-Test.Until = "Part III";
 Test.LogEnabled = false;
 Test.ExpectedSeparator = "---";
 // Assert.Throw = false;
@@ -78,34 +76,22 @@ class Portals(int sideNeighbors, int crystalConnections) {
         return result;
     }
 
-    int progress = -1;
-
-    int MinimizeStrainWith1Extra(Portal[] graph) {
+    static int MinimizeStrainWith1Extra(Portal[] graph) {
         var result = int.MaxValue;
         Parallel.For(0, graph.Length, i => {
             var portals = Portal.Copy(graph);
             result = Math.Min(Search(portals, i, 1, 1, []), result);
-            AddProgress(i, graph.Length);
         });
         return result;
     }
 
-    void AddProgress(int i, float length) {
-        if (i == progress) {
-            return;
-        }
-        Console.Error.WriteLine($"progress: {i / length:F}");
-        progress = i;
-    }
-
-    int MinimizeStrainWith4Extras(Portal[] graph) {
+    static int MinimizeStrainWith4Extras(Portal[] graph) {
         const int extras = 4;
         var result = int.MaxValue;
         int crystalDistance = graph.Length / (extras * 2);
         Parallel.For(0, crystalDistance, i => {
             var portals = Portal.Copy(graph);
             result = Math.Min(Search(portals, i, crystalDistance, extras, []), result);
-            AddProgress(i, crystalDistance);
         });
         return result;
     }
