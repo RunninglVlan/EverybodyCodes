@@ -8,6 +8,7 @@ static class Test {
     public static string? From { get; set; }
     public static string? Until { get; set; }
     public static bool LogEnabled { get; set; } = true;
+    public static string? ExpectedSeparator { get; set; }
 
     public static void Run(Action<string, int, string> action) {
         File.WriteAllText(LOG_FILE, null);
@@ -19,8 +20,11 @@ static class Test {
             string name = Console.ReadLine()!;
             LogInternal(name, console: true, color: ConsoleColor.Cyan);
             int part = int.Parse(Console.ReadLine()!);
-            string notes = ReadUntilNewLine();
-            string expected = ReadUntilNewLine();
+            Predicate<string> noteEnd = ExpectedSeparator != null
+                    ? it => it == ExpectedSeparator
+                    : string.IsNullOrEmpty;
+            string notes = ReadLinesUntil(noteEnd);
+            string expected = ReadLinesUntil(string.IsNullOrEmpty);
             try {
                 action(notes, part, expected);
             } catch (Exception e) {
@@ -58,9 +62,9 @@ static class Test {
         return cases;
     }
 
-    static string ReadUntilNewLine() {
+    static string ReadLinesUntil(Predicate<string> endPredicate) {
         List<string> lines = [];
-        for (string line; !string.IsNullOrEmpty(line = Console.ReadLine()!);) {
+        for (string line; !endPredicate(line = Console.ReadLine()!);) {
             lines.Add(line);
         }
         return string.Join(Environment.NewLine, lines);
@@ -73,11 +77,11 @@ static class Test {
         Console.ReadKey();
     }
 
-    public static void Log(object? line = null, bool console = false, ConsoleColor? color = null) {
+    public static void Log(object? line = null, bool console = true, ConsoleColor? color = null) {
         if (!LogEnabled) {
             return;
         }
-        LogInternal(line, console, color);
+        LogInternal(line, console, color ?? ConsoleColor.Red);
     }
 
     static void LogInternal(object? line = null, bool console = false, ConsoleColor? color = null) {
