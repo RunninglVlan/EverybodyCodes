@@ -26,7 +26,7 @@ var durationPattern = new Regex(@"(?:\d+d\s+)?(?:\d+h\s+)?(?:\d+m\s+)?(?:\d+s\s+
 // Cumulative local time of every part, grouped by quest number.
 var quests = new SortedDictionary<int, List<TimeSpan>>();
 TimeSpan? reportedTotal = null;
-int currentQuest = 0;
+var currentQuest = 0;
 
 foreach (string line in File.ReadLines(inputPath)) {
     if (line.TrimStart().StartsWith('-')) {
