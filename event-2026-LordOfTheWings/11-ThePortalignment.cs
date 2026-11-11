@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 
 Test.StepEnabled = false;
-Test.From = "Part III Example 1";
-Test.Until = "Part III";
+// Test.From = "Part III Example 1";
+// Test.Until = "Part III";
 Test.LogEnabled = false;
 Test.ExpectedSeparator = "---";
 // Assert.Throw = false;
@@ -67,12 +67,18 @@ class Portals(int sideNeighbors, int crystalConnections) {
 
     static int Strain(Portal[] graph) {
         var result = 0;
-        for (var i = 0; i < graph.Length; i++) {
-            for (var j = 0; j < graph.Length; j++) {
-                if (i == j) {
-                    continue;
+        var distances = new int?[graph.Length];
+        var queue = new Queue<int>();
+        for (var start = 0; start < graph.Length; start++) {
+            Array.Fill(distances, null);
+            distances[start] = 0;
+            queue.Enqueue(start);
+            while (queue.TryDequeue(out int current)) {
+                foreach (int next in graph[current].Connections.Where(next => distances[next] == null)) {
+                    distances[next] = distances[current] + 1;
+                    result += distances[next]!.Value;
+                    queue.Enqueue(next);
                 }
-                result += Pathfinding<int>.Shortest(i, j, current => graph[current].Connections)!.Count - 1;
             }
         }
         return result;
@@ -136,42 +142,6 @@ readonly record struct Portal(List<int> Connections) {
 
     public static Portal[] Copy(Portal[] graph) {
         return [.. graph.Select(it => new Portal([.. it.Connections]))];
-    }
-}
-
-static class Pathfinding<T> where T : IEquatable<T> {
-    /// BFS to end
-    public static List<T>? Shortest(T start, T end, Func<T, IEnumerable<T>> getNext) {
-        Dictionary<T, T> parents = [];
-        Queue<T> queue = [];
-        HashSet<T> visited = [];
-        queue.Enqueue(start);
-        visited.Add(start);
-        while (queue.TryDequeue(out var current)) {
-            if (current.Equals(end)) {
-                return Reconstruct(parents, start, current);
-            }
-            foreach (var next in getNext(current)) {
-                if (!visited.Add(next)) {
-                    continue;
-                }
-                queue.Enqueue(next);
-                parents[next] = current;
-            }
-        }
-        return null;
-    }
-
-    static List<T> Reconstruct(Dictionary<T, T> parents, T start, T end) {
-        var path = new List<T>();
-        var current = end;
-        while (!current.Equals(start)) {
-            path.Add(current);
-            current = parents[current];
-        }
-        path.Add(start);
-        path.Reverse();
-        return path;
     }
 }
 
