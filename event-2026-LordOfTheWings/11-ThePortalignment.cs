@@ -11,7 +11,9 @@ Test.Run((notes, part, expected) => {
     };
     var portals = new Portals(sideNeighbors);
     portals.Build(notes);
-    Assert.ActualEqualsExpected(portals.Resonance(minimizeStrain), expected);
+    int resonance = portals.Resonance(minimizeStrain);
+    Assert.ActualEqualsExpected(resonance, expected);
+    // Console.WriteLine(resonance);
 });
 
 class Portals(int sideNeighbors) {
