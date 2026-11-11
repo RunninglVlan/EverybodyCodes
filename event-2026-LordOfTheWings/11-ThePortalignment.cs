@@ -118,7 +118,7 @@ class Portals(int sideNeighbors, int crystalConnections) {
 
     int MinimizeStrainWith4Extras() {
         HashSet<int> usedCrystals = [];
-        HashSet<(CrystalPair, CrystalPair, CrystalPair, CrystalPair)> usedOptions = [];
+        HashSet<CrystalPairs> usedPairs = [];
         var result = int.MaxValue;
         int crystalDistance = graph.Length / (4 * 2);
         for (var i0 = 0; i0 < crystalDistance; i0++) {
@@ -168,7 +168,7 @@ class Portals(int sideNeighbors, int crystalConnections) {
                                             continue;
                                         }
                                         var lPair = CrystalPair.From(l0, l1);
-                                        if (!usedOptions.Add((iPair, jPair, kPair, lPair))) {
+                                        if (!usedPairs.Add(CrystalPairs.From(iPair, jPair, kPair, lPair))) {
                                             continue;
                                         }
                                         Connect(l0, l1);
@@ -203,6 +203,23 @@ readonly record struct Portal(List<int> Connections);
 readonly record struct CrystalPair(int A, int B) {
     public static CrystalPair From(int a, int b) {
         return a < b ? new CrystalPair(a, b) : new CrystalPair(b, a);
+    }
+}
+
+readonly record struct CrystalPairs(CrystalPair A, CrystalPair B, CrystalPair C, CrystalPair D) {
+    public static CrystalPairs From(CrystalPair a, CrystalPair b, CrystalPair c, CrystalPair d) {
+        Order(ref a, ref b);
+        Order(ref c, ref d);
+        Order(ref a, ref c);
+        Order(ref b, ref d);
+        Order(ref b, ref c);
+        return new CrystalPairs(a, b, c, d);
+
+        void Order(ref CrystalPair x, ref CrystalPair y) {
+            if (x.A > y.A) {
+                (x, y) = (y, x);
+            }
+        }
     }
 }
 
