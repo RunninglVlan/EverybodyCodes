@@ -1,9 +1,10 @@
 ﻿using System.Diagnostics;
 
 Test.StepEnabled = false;
-Test.From = "Part III Example 1";
-Test.Until = "Part III Example 2";
-Test.LogEnabled = false;
+Test.From = "Part I Example";
+Test.Until = "Part II";
+// Test.LogEnabled = false;
+Test.ExpectedSeparator = "---";
 // Assert.Throw = false;
 // https://everybody.codes/event/2026/quests/11
 const string noteFile = "../Notes.txt";
@@ -237,12 +238,12 @@ static class Pathfinding<T> where T : IEquatable<T> {
 static class Test {
     const string CASE_FILE = "../Test.Cases.txt";
     const string LOG_FILE = "../Test.Log.txt";
-    const string EXPECTED_SEPARATOR = "---";
 
     public static bool StepEnabled { get; set; } = true;
     public static string? From { get; set; }
     public static string? Until { get; set; }
     public static bool LogEnabled { get; set; } = true;
+    public static string? ExpectedSeparator { get; set; }
 
     public static void Run(Action<string, int, string> action) {
         File.WriteAllText(LOG_FILE, null);
@@ -254,8 +255,11 @@ static class Test {
             string name = Console.ReadLine()!;
             LogInternal(name, console: true, color: ConsoleColor.Cyan);
             int part = int.Parse(Console.ReadLine()!);
-            string notes = ReadUntilLine(it => it == EXPECTED_SEPARATOR);
-            string expected = ReadUntilLine(string.IsNullOrEmpty);
+            Predicate<string> noteEnd = ExpectedSeparator != null
+                    ? it => it == ExpectedSeparator
+                    : string.IsNullOrEmpty;
+            string notes = ReadLinesUntil(noteEnd);
+            string expected = ReadLinesUntil(string.IsNullOrEmpty);
             try {
                 action(notes, part, expected);
             } catch (Exception e) {
@@ -293,7 +297,7 @@ static class Test {
         return cases;
     }
 
-    static string ReadUntilLine(Predicate<string> endPredicate) {
+    static string ReadLinesUntil(Predicate<string> endPredicate) {
         List<string> lines = [];
         for (string line; !endPredicate(line = Console.ReadLine()!);) {
             lines.Add(line);
