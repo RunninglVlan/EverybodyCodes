@@ -207,11 +207,11 @@ static class Test {
         Console.ReadKey();
     }
 
-    public static void Log(object? line = null, bool console = false, ConsoleColor? color = null) {
+    public static void Log(object? line = null, bool console = true, ConsoleColor? color = null) {
         if (!LogEnabled) {
             return;
         }
-        LogInternal(line, console, color);
+        LogInternal(line, console, color ?? ConsoleColor.Red);
     }
 
     static void LogInternal(object? line = null, bool console = false, ConsoleColor? color = null) {
