@@ -190,13 +190,13 @@ class Portals(int sideNeighbors, int crystalConnections) {
     }
 }
 
+readonly record struct Portal(List<int> Connections);
+
 readonly record struct CrystalPair(int A, int B) {
     public static CrystalPair From(int a, int b) {
         return a < b ? new CrystalPair(a, b) : new CrystalPair(b, a);
     }
 }
-
-readonly record struct Portal(List<int> Connections);
 
 static class Pathfinding<T> where T : IEquatable<T> {
     /// BFS to end
