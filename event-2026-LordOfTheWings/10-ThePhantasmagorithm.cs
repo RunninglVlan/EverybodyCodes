@@ -15,7 +15,7 @@ long count = part == 1 ? grid.Collisions : grid.Rounds;
 Console.WriteLine(count);
 
 class Grid {
-    readonly Dictionary<Point, bool> walkableCells = [];
+    readonly HashSet<Point> walkableCells = [];
     readonly List<NullGhost> ghosts = [];
     readonly Dictionary<GhostState[], (int index, long[] collisions)> pastGhosts = new(GhostState.Comparer);
     public long Collisions { get; private set; }
@@ -28,7 +28,9 @@ class Grid {
             for (var x = 0; x < width; x++) {
                 char cell = rows[y][x];
                 var point = new Point(x, y);
-                walkableCells[point] = cell != '#';
+                if (cell != '#') {
+                    walkableCells.Add(point);
+                }
                 if (Screen.TryParseDirection(cell, out var ghostDirection)) {
                     ghosts.Add(new NullGhost(point, ghostDirection));
                 }
@@ -59,7 +61,7 @@ class Grid {
     void MoveAndCollide() {
         foreach (var ghost in ghosts) {
             var next = ghost.Point + ghost.Direction;
-            if (walkableCells[next]) {
+            if (walkableCells.Contains(next)) {
                 ghost.Point = next;
             } else {
                 ghost.Direction = Screen.TurnRight(ghost.Direction);
