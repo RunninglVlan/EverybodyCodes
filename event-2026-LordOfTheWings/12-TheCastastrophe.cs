@@ -13,8 +13,8 @@ class Grid {
     string[] rows = null!;
     int width;
 
-    public List<Stack> ReadAttack(string notes) {
-        List<Stack> stacks = [];
+    public List<MagmaStack> ReadAttack(string notes) {
+        List<MagmaStack> stacks = [];
         rows = notes.Split(Environment.NewLine);
         width = rows.First().Length;
         int height = rows.Length;
@@ -30,7 +30,7 @@ class Grid {
                 var endNeighbor = stackLine.Max + Screen.TOP_LEFT + Screen.UP;
                 var stack = stacks.FirstOrDefault(it => it.Contains(startNeighbor, endNeighbor));
                 if (stack == null) {
-                    stacks.Add(stack = new Stack([]));
+                    stacks.Add(stack = new MagmaStack([]));
                 }
                 stack.Add(stackLine);
                 x += stackLine.Size.X;
@@ -49,7 +49,7 @@ class Grid {
     }
 }
 
-class Stack(List<Rect> lines) {
+class MagmaStack(List<Rect> lines) {
     StackType type = StackType.Rect;
     (int min, int max) widths = (int.MaxValue, int.MinValue);
     (int min, int max) heights;
