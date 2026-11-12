@@ -1,11 +1,13 @@
 ﻿using System.Diagnostics;
 
+Test.From = "Part II Example 1";
+Test.Until = "Part II Example 2";
 // https://everybody.codes/event/2026/quests/12
 Test.Run((notes, part, expected) => {
     var grid = new Grid();
     var magmaBlocks = grid.ReadAttack(notes);
-    int spells = magmaBlocks.Select(it => Math.Min(it.Size.X, it.Size.Y)).Sum();
-    Assert.ActualEqualsExpected(spells, expected);
+    // int spells = magmaBlocks.Select(it => Math.Min(it.Size.X, it.Size.Y)).Sum();
+    // Assert.ActualEqualsExpected(spells, expected);
 });
 
 class Grid {
@@ -14,8 +16,8 @@ class Grid {
     string[] rows = null!;
     int width, height;
 
-    public List<Rect> ReadAttack(string notes) {
-        List<Rect> blocks = [];
+    public List<List<Rect>> ReadAttack(string notes) {
+        List<List<Rect>> blocks = [];
         rows = notes.Split(Environment.NewLine);
         width = rows.First().Length;
         height = rows.Length;
@@ -27,25 +29,44 @@ class Grid {
                     x++;
                     continue;
                 }
-                var block = blocks.FirstOrDefault(it => it.Contains(point));
-                if (block == default) {
-                    block = FindBlockAt(point);
+                var rect = blocks.SelectMany(it => it).FirstOrDefault(it => it.Contains(point));
+                if (rect == default) {
+                    var block = FindBlockAt(point);
                     blocks.Add(block);
+                    rect = block.First(it => it.Contains(point));
                 }
-                x += block.Size.X;
+                x += rect.Size.X;
             }
         }
         return blocks;
     }
 
-    Rect FindBlockAt(Point min) {
+    List<Rect> FindBlockAt(Point current) {
+        Test.Log($"block at {current}");
+        List<Rect> lines = [];
+        while (true) {
+            var line = FindLineAt(current);
+            Test.Log($"  {line}");
+            lines.Add(line);
+            int nextY = current.Y + 1;
+            if (nextY >= height) {
+                break;
+            }
+            if (rows[nextY][line.Min.X] == MAGMA) {
+                current.Y = nextY;
+            } else {
+                break;
+            }
+        }
+        return lines;
+    }
+
+    Rect FindLineAt(Point min) {
         var max = min;
         while (max.X < width && rows[max.Y][max.X] == MAGMA) {
             max.X++;
         }
-        while (max.Y < height && rows[max.Y][max.X - 1] == MAGMA) {
-            max.Y++;
-        }
+        max.Y++;
         return new Rect(min, max);
     }
 }
