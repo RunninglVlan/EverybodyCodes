@@ -25,6 +25,7 @@ int Reflect(List<List<Rect>> blocks) {
             spells += Math.Min(widths.min, height);
             continue;
         }
+        // L-shaped
         (int min, int max) heights = (block.Count(it => it.Size.X == widths.max), height);
         int option1 = Math.Min(widths.max, heights.max);
         int option2 = widths.min + heights.min;
