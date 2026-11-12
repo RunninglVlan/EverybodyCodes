@@ -1,7 +1,5 @@
 ﻿using System.Diagnostics;
 
-// Test.From = "Part III Example 1";
-// Test.Until = "Part III Example 1";
 // https://everybody.codes/event/2026/quests/12
 Test.Run((notes, part, expected) => {
     var grid = new Grid();
@@ -116,8 +114,12 @@ class Stack(List<Rect> lines) {
             int horizontalLines = height - gap.Size.Y;
             int horizontalRect1 = Rect(widths.min, gap.Size.Y);
             int horizontalRect2 = Rect(width - widths.min - gap.Size.X, gap.Size.Y);
-            int option1 = horizontalLines + horizontalRect1 + horizontalRect2;
-            return option1;
+            int horizontal = horizontalLines + horizontalRect1 + horizontalRect2;
+            int verticalLines = width - gap.Size.X;
+            int verticalRect1 = Rect(gap.Size.X, gap.Min.Y - lines.First().Min.Y);
+            int verticalRect2 = Rect(gap.Size.X, lines.Last().Max.Y - gap.Max.Y);
+            int vertical = verticalLines + verticalRect1 + verticalRect2;
+            return Math.Min(horizontal, vertical);
         }
     }
 }
