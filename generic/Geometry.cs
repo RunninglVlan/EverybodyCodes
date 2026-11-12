@@ -10,6 +10,7 @@
     ];
 
     public static Point operator +(Point a, Point b) => new(a.X + b.X, a.Y + b.Y);
+    public static Point operator -(Point a, Point b) => new(a.X - b.X, a.Y - b.Y);
     public static Point operator +(Point a, int value) => new(a.X + value, a.Y + value);
     public static Point operator -(Point a, int value) => new(a.X - value, a.Y - value);
     public static Point operator -(Point value) => new(-value.X, -value.Y);
@@ -41,4 +42,13 @@ static class Screen {
     }
 
     public static Point TurnRight(Point direction) => new(-direction.Y, direction.X);
+}
+
+readonly record struct Rect(Point Min, Point Max) {
+    public Point Size => Max - Min;
+
+    public bool Contains(Point point) {
+        (int x, int y) = point;
+        return x >= Min.X && y >= Min.Y && x < Max.X && y < Max.Y;
+    }
 }
