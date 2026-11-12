@@ -1,14 +1,31 @@
 ﻿using System.Diagnostics;
 
-Test.From = "Part II Example 2";
-// Test.Until = "Part II Example 2";
+// Test.From = "Part II Example 2";
+Test.Until = "Part II Example 1";
 // https://everybody.codes/event/2026/quests/12
 Test.Run((notes, part, expected) => {
     var grid = new Grid();
     var magmaBlocks = grid.ReadAttack(notes);
-    // int spells = magmaBlocks.Select(it => Math.Min(it.Size.X, it.Size.Y)).Sum();
-    // Assert.ActualEqualsExpected(spells, expected);
+    int spells = Reflect(magmaBlocks);
+    Assert.ActualEqualsExpected(spells, expected);
 });
+return;
+
+int Reflect(List<List<Rect>> blocks) {
+    var spells = 0;
+    foreach (var block in blocks) {
+        var firstLine = block.First();
+        if (block.Count == 1) {
+            spells++;
+            continue;
+        }
+        if (block.All(it => it.Size.X == firstLine.Size.X)) {
+            spells += Math.Min(firstLine.Size.X, block.Count);
+            continue;
+        }
+    }
+    return spells;
+}
 
 class Grid {
     const char MAGMA = '#';
@@ -77,8 +94,7 @@ class Grid {
             }
             return true;
         }
-        while (nextX < last.Max.X) {
-            nextX++;
+        for (nextX++; nextX < last.Max.X; nextX++) {
             if (rows[nextY][nextX] != MAGMA) {
                 continue;
             }
