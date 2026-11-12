@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 
 Test.From = "Part II Example 1";
-Test.Until = "Part II Example 2";
+// Test.Until = "Part II Example 2";
 // https://everybody.codes/event/2026/quests/12
 Test.Run((notes, part, expected) => {
     var grid = new Grid();
@@ -19,13 +19,14 @@ int Reflect(List<List<Rect>> blocks) {
             spells++;
             continue;
         }
-        var widths = block.Aggregate((min: int.MaxValue, max: int.MinValue),
-                (current, it) => (Math.Min(current.min, it.Size.X), Math.Max(current.max, it.Size.X)));
+        var widths = block.Select(it => it.Size.X).Aggregate((min: int.MaxValue, max: int.MinValue),
+                (current, x) => (Math.Min(current.min, x), Math.Max(current.max, x)));
         if (widths.min == widths.max) {
             spells += Math.Min(widths.min, height);
             continue;
         }
         (int min, int max) heights = (block.Count(it => it.Size.X == widths.max), height);
+        // need to expand this
         if (widths.min == 1 && heights.min == 1) {
             spells += 2;
             Test.Log($"{widths}, {heights}");
