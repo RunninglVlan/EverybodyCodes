@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
-// Test.From = "Part III Example 1";
+Test.From = "Part III Example 1";
 // Test.Until = "Part III Example 1";
 // https://everybody.codes/event/2026/quests/12
 Test.Run((notes, part, expected) => {
@@ -58,25 +57,39 @@ class Stack(List<Rect> lines) {
     StackType type = StackType.Rect;
     (int min, int max) widths = (int.MaxValue, int.MinValue);
     (int min, int max) heights;
+    Rect gap;
 
     public bool Contains(Point a, Point b) {
         return lines.Any(it => it.Contains(a) || it.Contains(b));
     }
 
-    [SuppressMessage("ReSharper", "ConvertIfStatementToSwitchStatement")]
     public void Add(Rect line) {
         int width = line.Size.X;
         widths = (Math.Min(widths.min, width), Math.Max(widths.max, width));
         lines.Add(line);
-        heights = (lines.Count(it => it.Size.X == widths.max), lines.Count);
-        if (type == StackType.Rect) {
-            if (widths.min != widths.max || heights.min != heights.max) {
-                type = StackType.LShaped;
-            }
-        } else if (type == StackType.LShaped) {
-            if (lines.Count > 1 && lines[^2].Min.Y == line.Min.Y) {
+        heights = (lines.Count(it => it.Size.X == widths.max), lines.DistinctBy(it => it.Min.Y).Count());
+        switch (type) {
+            case StackType.Rect:
+                if (widths.min != widths.max || heights.min != heights.max) {
+                    type = StackType.LShaped;
+                }
+                break;
+            case StackType.LShaped:
+                if (lines.Count <= 1) {
+                    break;
+                }
+                var previous = lines[^2];
+                if (previous.Min.Y != line.Min.Y) {
+                    break;
+                }
                 type = StackType.RectWithGap;
-            }
+                gap = new Rect(previous.Max + Screen.UP, line.Min + Screen.DOWN);
+                break;
+            case StackType.RectWithGap:
+                // here i need to extend the gap if needed, but not for example 1
+                break;
+            default:
+                throw new ArgumentException("Unknown stack type");
         }
     }
 
@@ -84,7 +97,7 @@ class Stack(List<Rect> lines) {
         return type switch {
             StackType.Rect => Math.Min(widths.min, heights.min),
             StackType.LShaped => LShaped(),
-            // StackType.RectWithGap => expr,
+            StackType.RectWithGap => RectWithGap(),
             _ => throw new ArgumentException("Unknown stack type")
         };
 
@@ -92,6 +105,15 @@ class Stack(List<Rect> lines) {
             int option1 = Math.Min(widths.max, heights.max);
             int option2 = widths.min + heights.min;
             return Math.Min(option1, option2);
+        }
+
+        int RectWithGap() {
+            var result = 0;
+            if (widths.max > heights.max && gap.Size.X > gap.Size.Y) {
+                result = heights.max - gap.Size.Y + 2;
+            }
+            Test.Log($"{gap}: {result}");
+            return result;
         }
     }
 }
@@ -120,6 +142,7 @@ record struct Point(int X, int Y) {
 
 static class Screen {
     public static readonly Point UP = new(0, -1);
+    public static readonly Point DOWN = new(0, 1);
     public static readonly Point TOP_LEFT = new(-1, -1);
 }
 
