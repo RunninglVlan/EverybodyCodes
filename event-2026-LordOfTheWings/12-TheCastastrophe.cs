@@ -69,9 +69,12 @@ class Grid {
         if (nextY >= height) {
             return false;
         }
+        current.Y = nextY;
         int nextX = last.Min.X;
         if (rows[nextY][nextX] == MAGMA) {
-            current.Y = nextY;
+            for (nextX--; nextX > 0 && rows[nextY][nextX] == MAGMA; nextX--) {
+                current.X = nextX;
+            }
             return true;
         }
         while (nextX < last.Max.X) {
