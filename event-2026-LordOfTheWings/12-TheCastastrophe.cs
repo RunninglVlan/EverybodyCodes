@@ -22,12 +22,11 @@ class Grid {
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < width;) {
                 char cell = rows[y][x];
-                var point = new Point(x, y);
                 if (cell != MAGMA) {
                     x++;
                     continue;
                 }
-                var stackLine = FindLineAt(point);
+                var stackLine = FindLineAt(new Point(x, y));
                 var startNeighbor = stackLine.Min + Screen.UP;
                 var endNeighbor = stackLine.Max + Screen.TOP_LEFT + Screen.UP;
                 var stack = stacks.FirstOrDefault(it => it.Contains(startNeighbor, endNeighbor));
@@ -94,33 +93,29 @@ class Stack(List<Rect> lines) {
     }
 
     public int Reflect() {
-        return type switch {
-            StackType.Rect => Rect(widths.min, heights.min),
-            StackType.LShaped => LShaped(),
-            StackType.RectWithGap => RectWithGap(),
-            _ => throw new ArgumentException("Unknown stack type")
-        };
+        switch (type) {
+            case StackType.Rect:
+                return Rect(widths.min, heights.min);
+            case StackType.LShaped:
+                int option1 = Math.Min(widths.max, heights.max);
+                int option2 = widths.min + heights.min;
+                return Math.Min(option1, option2);
+            case StackType.RectWithGap:
+                int width = widths.max, height = heights.max;
+                int horizontalLines = height - gap.Size.Y;
+                int horizontalRect1 = Rect(widths.min, gap.Size.Y);
+                int horizontalRect2 = Rect(width - widths.min - gap.Size.X, gap.Size.Y);
+                int horizontal = horizontalLines + horizontalRect1 + horizontalRect2;
+                int verticalLines = width - gap.Size.X;
+                int verticalRect1 = Rect(gap.Size.X, gap.Min.Y - lines.First().Min.Y);
+                int verticalRect2 = Rect(gap.Size.X, lines.Last().Max.Y - gap.Max.Y);
+                int vertical = verticalLines + verticalRect1 + verticalRect2;
+                return Math.Min(horizontal, vertical);
+            default:
+                throw new ArgumentException("Unknown stack type");
+        }
 
         int Rect(int width, int height) => Math.Min(width, height);
-
-        int LShaped() {
-            int option1 = Math.Min(widths.max, heights.max);
-            int option2 = widths.min + heights.min;
-            return Math.Min(option1, option2);
-        }
-
-        int RectWithGap() {
-            int width = widths.max, height = heights.max;
-            int horizontalLines = height - gap.Size.Y;
-            int horizontalRect1 = Rect(widths.min, gap.Size.Y);
-            int horizontalRect2 = Rect(width - widths.min - gap.Size.X, gap.Size.Y);
-            int horizontal = horizontalLines + horizontalRect1 + horizontalRect2;
-            int verticalLines = width - gap.Size.X;
-            int verticalRect1 = Rect(gap.Size.X, gap.Min.Y - lines.First().Min.Y);
-            int verticalRect2 = Rect(gap.Size.X, lines.Last().Max.Y - gap.Max.Y);
-            int vertical = verticalLines + verticalRect1 + verticalRect2;
-            return Math.Min(horizontal, vertical);
-        }
     }
 }
 
