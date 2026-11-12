@@ -5,28 +5,28 @@
 // https://everybody.codes/event/2026/quests/12
 Test.Run((notes, part, expected) => {
     var grid = new Grid();
-    var magmaBlocks = grid.ReadAttack(notes);
-    int spells = Reflect(magmaBlocks);
+    var magmaStacks = grid.ReadAttack(notes);
+    int spells = Reflect(magmaStacks);
     Assert.ActualEqualsExpected(spells, expected);
 });
 return;
 
-int Reflect(List<List<Rect>> blocks) {
+int Reflect(List<Stack> stacks) {
     var spells = 0;
-    foreach (var block in blocks) {
-        int height = block.Count;
+    foreach (var stack in stacks) {
+        int height = stack.Lines.Count;
         if (height == 1) {
             spells++;
             continue;
         }
-        var widths = block.Select(it => it.Size.X).Aggregate((min: int.MaxValue, max: int.MinValue),
+        var widths = stack.Lines.Select(it => it.Size.X).Aggregate((min: int.MaxValue, max: int.MinValue),
                 (current, x) => (Math.Min(current.min, x), Math.Max(current.max, x)));
         if (widths.min == widths.max) {
             spells += Math.Min(widths.min, height);
             continue;
         }
         // L-shaped
-        (int min, int max) heights = (block.Count(it => it.Size.X == widths.max), height);
+        (int min, int max) heights = (stack.Lines.Count(it => it.Size.X == widths.max), height);
         int option1 = Math.Min(widths.max, heights.max);
         int option2 = widths.min + heights.min;
         spells += Math.Min(option1, option2);
@@ -40,8 +40,8 @@ class Grid {
     string[] rows = null!;
     int width, height;
 
-    public List<List<Rect>> ReadAttack(string notes) {
-        List<List<Rect>> blocks = [];
+    public List<Stack> ReadAttack(string notes) {
+        List<Stack> stacks = [];
         rows = notes.Split(Environment.NewLine);
         width = rows.First().Length;
         height = rows.Length;
@@ -53,20 +53,20 @@ class Grid {
                     x++;
                     continue;
                 }
-                var blockLine = FindLineAt(point);
-                var startNeighbor = blockLine.Min + Screen.UP;
-                var endNeighbor = blockLine.Max + Screen.TOP_LEFT + Screen.UP;
-                var block = blocks.FirstOrDefault(existing => {
-                    return existing.Any(it => it.Contains(startNeighbor) || it.Contains(endNeighbor));
+                var stackLine = FindLineAt(point);
+                var startNeighbor = stackLine.Min + Screen.UP;
+                var endNeighbor = stackLine.Max + Screen.TOP_LEFT + Screen.UP;
+                var stack = stacks.FirstOrDefault(existing => {
+                    return existing.Lines.Any(it => it.Contains(startNeighbor) || it.Contains(endNeighbor));
                 });
-                if (block == null) {
-                    blocks.Add(block = []);
+                if (stack == default) {
+                    stacks.Add(stack = new Stack([]));
                 }
-                block.Add(blockLine);
-                x += blockLine.Size.X;
+                stack.Lines.Add(stackLine);
+                x += stackLine.Size.X;
             }
         }
-        return blocks;
+        return stacks;
     }
 
     Rect FindLineAt(Point min) {
@@ -78,6 +78,8 @@ class Grid {
         return new Rect(min, max);
     }
 }
+
+readonly record struct Stack(List<Rect> Lines);
 
 readonly record struct Rect(Point Min, Point Max) {
     public Point Size => Max - Min;
