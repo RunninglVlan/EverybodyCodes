@@ -1,8 +1,69 @@
 ﻿using System.Diagnostics;
 
+// https://everybody.codes/event/2026/quests/12
 Test.Run((notes, part, expected) => {
-    Assert.ActualEqualsExpected(0, expected);
+    var grid = new Grid();
+    var magmaBlocks = grid.ReadAttack(notes);
+    int spells = magmaBlocks.Select(it => Math.Min(it.Size.X, it.Size.Y)).Sum();
+    Assert.ActualEqualsExpected(spells, expected);
 });
+
+class Grid {
+    const char MAGMA = '#';
+
+    string[] rows = null!;
+    int width, height;
+
+    public List<Rect> ReadAttack(string notes) {
+        List<Rect> blocks = [];
+        rows = notes.Split(Environment.NewLine);
+        width = rows.First().Length;
+        height = rows.Length;
+        for (var y = 0; y < height; y++) {
+            for (var x = 0; x < width;) {
+                char cell = rows[y][x];
+                var point = new Point(x, y);
+                if (cell != MAGMA) {
+                    x++;
+                    continue;
+                }
+                var block = blocks.FirstOrDefault(it => it.Contains(point));
+                if (block == default) {
+                    block = FindBlockAt(point);
+                    blocks.Add(block);
+                }
+                x += block.Size.X;
+            }
+        }
+        return blocks;
+    }
+
+    Rect FindBlockAt(Point min) {
+        var max = min;
+        while (max.X < width && rows[max.Y][max.X] == MAGMA) {
+            max.X++;
+        }
+        while (max.Y < height && rows[max.Y][max.X - 1] == MAGMA) {
+            max.Y++;
+        }
+        return new Rect(min, max);
+    }
+}
+
+readonly record struct Rect(Point Min, Point Max) {
+    public Point Size => Max - Min;
+
+    public bool Contains(Point point) {
+        (int x, int y) = point;
+        return x >= Min.X && y >= Min.Y && x < Max.X && y < Max.Y;
+    }
+}
+
+record struct Point(int X, int Y) {
+    public static Point operator -(Point a, Point b) => new(a.X - b.X, a.Y - b.Y);
+
+    public override string ToString() => $"({X}, {Y})";
+}
 
 static class Test {
     const string CASE_FILE = "../Test.Cases.txt";
