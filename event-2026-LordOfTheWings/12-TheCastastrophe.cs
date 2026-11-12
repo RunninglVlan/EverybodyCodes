@@ -48,13 +48,7 @@ class Grid {
             var line = FindLineAt(current);
             Test.Log($"  {line}");
             lines.Add(line);
-            int nextY = current.Y + 1;
-            if (nextY >= height) {
-                break;
-            }
-            if (rows[nextY][line.Min.X] == MAGMA) {
-                current.Y = nextY;
-            } else {
+            if (!TryNext(line, ref current)) {
                 break;
             }
         }
@@ -68,6 +62,27 @@ class Grid {
         }
         max.Y++;
         return new Rect(min, max);
+    }
+
+    bool TryNext(Rect last, ref Point current) {
+        int nextY = current.Y + 1;
+        if (nextY >= height) {
+            return false;
+        }
+        int nextX = last.Min.X;
+        if (rows[nextY][nextX] == MAGMA) {
+            current.Y = nextY;
+            return true;
+        }
+        while (nextX < last.Max.X) {
+            nextX++;
+            if (rows[nextY][nextX] != MAGMA) {
+                continue;
+            }
+            current.X = nextX;
+            return true;
+        }
+        return false;
     }
 }
 
