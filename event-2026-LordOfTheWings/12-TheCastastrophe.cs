@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 // Test.From = "Part III Example 1";
 // Test.Until = "Part III Example 1";
@@ -6,45 +7,21 @@
 Test.Run((notes, part, expected) => {
     var grid = new Grid();
     var magmaStacks = grid.ReadAttack(notes);
-    int spells = Reflect(magmaStacks);
+    int spells = magmaStacks.Sum(it => it.Reflect());
     Assert.ActualEqualsExpected(spells, expected);
 });
-return;
-
-int Reflect(List<Stack> stacks) {
-    var spells = 0;
-    foreach (var stack in stacks) {
-        int height = stack.Lines.Count;
-        if (height == 1) {
-            spells++;
-            continue;
-        }
-        var widths = stack.Lines.Select(it => it.Size.X).Aggregate((min: int.MaxValue, max: int.MinValue),
-                (current, x) => (Math.Min(current.min, x), Math.Max(current.max, x)));
-        if (widths.min == widths.max) {
-            spells += Math.Min(widths.min, height);
-            continue;
-        }
-        // L-shaped
-        (int min, int max) heights = (stack.Lines.Count(it => it.Size.X == widths.max), height);
-        int option1 = Math.Min(widths.max, heights.max);
-        int option2 = widths.min + heights.min;
-        spells += Math.Min(option1, option2);
-    }
-    return spells;
-}
 
 class Grid {
     const char MAGMA = '#';
 
     string[] rows = null!;
-    int width, height;
+    int width;
 
     public List<Stack> ReadAttack(string notes) {
         List<Stack> stacks = [];
         rows = notes.Split(Environment.NewLine);
         width = rows.First().Length;
-        height = rows.Length;
+        int height = rows.Length;
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < width;) {
                 char cell = rows[y][x];
@@ -56,13 +33,11 @@ class Grid {
                 var stackLine = FindLineAt(point);
                 var startNeighbor = stackLine.Min + Screen.UP;
                 var endNeighbor = stackLine.Max + Screen.TOP_LEFT + Screen.UP;
-                var stack = stacks.FirstOrDefault(existing => {
-                    return existing.Lines.Any(it => it.Contains(startNeighbor) || it.Contains(endNeighbor));
-                });
-                if (stack == default) {
+                var stack = stacks.FirstOrDefault(it => it.Contains(startNeighbor, endNeighbor));
+                if (stack == null) {
                     stacks.Add(stack = new Stack([]));
                 }
-                stack.Lines.Add(stackLine);
+                stack.Add(stackLine);
                 x += stackLine.Size.X;
             }
         }
@@ -79,7 +54,53 @@ class Grid {
     }
 }
 
-readonly record struct Stack(List<Rect> Lines);
+class Stack(List<Rect> lines) {
+    StackType type = StackType.Rect;
+    (int min, int max) widths = (int.MaxValue, int.MinValue);
+    (int min, int max) heights;
+
+    public bool Contains(Point a, Point b) {
+        return lines.Any(it => it.Contains(a) || it.Contains(b));
+    }
+
+    [SuppressMessage("ReSharper", "ConvertIfStatementToSwitchStatement")]
+    public void Add(Rect line) {
+        int width = line.Size.X;
+        widths = (Math.Min(widths.min, width), Math.Max(widths.max, width));
+        lines.Add(line);
+        heights = (lines.Count(it => it.Size.X == widths.max), lines.Count);
+        if (type == StackType.Rect) {
+            if (widths.min != widths.max || heights.min != heights.max) {
+                type = StackType.LShaped;
+            }
+        } else if (type == StackType.LShaped) {
+            if (lines.Count > 1 && lines[^2].Min.Y == line.Min.Y) {
+                type = StackType.RectWithGap;
+            }
+        }
+    }
+
+    public int Reflect() {
+        return type switch {
+            StackType.Rect => Math.Min(widths.min, heights.min),
+            StackType.LShaped => LShaped(),
+            // StackType.RectWithGap => expr,
+            _ => throw new ArgumentException("Unknown stack type")
+        };
+
+        int LShaped() {
+            int option1 = Math.Min(widths.max, heights.max);
+            int option2 = widths.min + heights.min;
+            return Math.Min(option1, option2);
+        }
+    }
+}
+
+enum StackType {
+    Rect,
+    LShaped,
+    RectWithGap
+}
 
 readonly record struct Rect(Point Min, Point Max) {
     public Point Size => Max - Min;
