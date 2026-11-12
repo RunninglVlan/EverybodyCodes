@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-Test.From = "Part II Example 1";
+// Test.From = "Part II Example 1";
 // Test.Until = "Part II Example 2";
 // https://everybody.codes/event/2026/quests/12
 Test.Run((notes, part, expected) => {
