@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-Test.From = "Part III Example 1";
+// Test.From = "Part III Example 1";
 // Test.Until = "Part III Example 1";
 // https://everybody.codes/event/2026/quests/12
 Test.Run((notes, part, expected) => {
@@ -86,7 +86,9 @@ class Stack(List<Rect> lines) {
                 gap = new Rect(previous.Max + Screen.UP, line.Min + Screen.DOWN);
                 break;
             case StackType.RectWithGap:
-                // here i need to extend the gap if needed, but not for example 1
+                if (line.Max.X == gap.Min.X) {
+                    gap = gap with { Max = gap.Max + Screen.DOWN };
+                }
                 break;
             default:
                 throw new ArgumentException("Unknown stack type");
@@ -95,11 +97,13 @@ class Stack(List<Rect> lines) {
 
     public int Reflect() {
         return type switch {
-            StackType.Rect => Math.Min(widths.min, heights.min),
+            StackType.Rect => Rect(widths.min, heights.min),
             StackType.LShaped => LShaped(),
             StackType.RectWithGap => RectWithGap(),
             _ => throw new ArgumentException("Unknown stack type")
         };
+
+        int Rect(int width, int height) => Math.Min(width, height);
 
         int LShaped() {
             int option1 = Math.Min(widths.max, heights.max);
@@ -108,12 +112,12 @@ class Stack(List<Rect> lines) {
         }
 
         int RectWithGap() {
-            var result = 0;
-            if (widths.max > heights.max && gap.Size.X > gap.Size.Y) {
-                result = heights.max - gap.Size.Y + 2;
-            }
-            Test.Log($"{gap}: {result}");
-            return result;
+            int width = widths.max, height = heights.max;
+            int horizontalLines = height - gap.Size.Y;
+            int horizontalRect1 = Rect(widths.min, gap.Size.Y);
+            int horizontalRect2 = Rect(width - widths.min - gap.Size.X, gap.Size.Y);
+            int option1 = horizontalLines + horizontalRect1 + horizontalRect2;
+            return option1;
         }
     }
 }
