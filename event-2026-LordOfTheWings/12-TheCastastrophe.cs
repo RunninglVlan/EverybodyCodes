@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 
-// Test.From = "Part II Example 1";
-// Test.Until = "Part II Example 2";
+// Test.From = "Part III Example 1";
+// Test.Until = "Part III Example 1";
 // https://everybody.codes/event/2026/quests/12
 Test.Run((notes, part, expected) => {
     var grid = new Grid();
@@ -53,28 +53,20 @@ class Grid {
                     x++;
                     continue;
                 }
-                var rect = blocks.SelectMany(it => it).FirstOrDefault(it => it.Contains(point));
-                if (rect == default) {
-                    var block = FindBlockAt(point);
-                    blocks.Add(block);
-                    rect = block.First(it => it.Contains(point));
+                var blockLine = FindLineAt(point);
+                var startNeighbor = blockLine.Min + Screen.UP;
+                var endNeighbor = blockLine.Max + Screen.TOP_LEFT + Screen.UP;
+                var block = blocks.FirstOrDefault(existing => {
+                    return existing.Any(it => it.Contains(startNeighbor) || it.Contains(endNeighbor));
+                });
+                if (block == null) {
+                    blocks.Add(block = []);
                 }
-                x += rect.Size.X;
+                block.Add(blockLine);
+                x += blockLine.Size.X;
             }
         }
         return blocks;
-    }
-
-    List<Rect> FindBlockAt(Point current) {
-        List<Rect> lines = [];
-        while (true) {
-            var line = FindLineAt(current);
-            lines.Add(line);
-            if (!TryNext(line, ref current)) {
-                break;
-            }
-        }
-        return lines;
     }
 
     Rect FindLineAt(Point min) {
@@ -84,29 +76,6 @@ class Grid {
         }
         max.Y++;
         return new Rect(min, max);
-    }
-
-    bool TryNext(Rect last, ref Point current) {
-        int nextY = current.Y + 1;
-        if (nextY >= height) {
-            return false;
-        }
-        current.Y = nextY;
-        int nextX = last.Min.X;
-        if (rows[nextY][nextX] == MAGMA) {
-            for (nextX--; nextX > 0 && rows[nextY][nextX] == MAGMA; nextX--) {
-                current.X = nextX;
-            }
-            return true;
-        }
-        for (nextX++; nextX < last.Max.X; nextX++) {
-            if (rows[nextY][nextX] != MAGMA) {
-                continue;
-            }
-            current.X = nextX;
-            return true;
-        }
-        return false;
     }
 }
 
@@ -120,9 +89,15 @@ readonly record struct Rect(Point Min, Point Max) {
 }
 
 record struct Point(int X, int Y) {
+    public static Point operator +(Point a, Point b) => new(a.X + b.X, a.Y + b.Y);
     public static Point operator -(Point a, Point b) => new(a.X - b.X, a.Y - b.Y);
 
     public override string ToString() => $"({X}, {Y})";
+}
+
+static class Screen {
+    public static readonly Point UP = new(0, -1);
+    public static readonly Point TOP_LEFT = new(-1, -1);
 }
 
 static class Test {
