@@ -26,6 +26,11 @@ int Reflect(List<List<Rect>> blocks) {
             continue;
         }
         (int min, int max) heights = (block.Count(it => it.Size.X == widths.max), height);
+        if (widths.min == 1 && heights.min == 1) {
+            spells += 2;
+            Test.Log($"{widths}, {heights}");
+            continue;
+        }
         int count = Math.Min(widths.max, heights.max);
         Test.Log($"{widths}, {heights}: {count}");
         spells += count;
