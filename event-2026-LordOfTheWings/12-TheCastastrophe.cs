@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 
-// Test.From = "Part II Example 2";
-Test.Until = "Part II Example 1";
+Test.From = "Part II Example 1";
+Test.Until = "Part II Example 2";
 // https://everybody.codes/event/2026/quests/12
 Test.Run((notes, part, expected) => {
     var grid = new Grid();
@@ -14,15 +14,21 @@ return;
 int Reflect(List<List<Rect>> blocks) {
     var spells = 0;
     foreach (var block in blocks) {
-        var firstLine = block.First();
-        if (block.Count == 1) {
+        int height = block.Count;
+        if (height == 1) {
             spells++;
             continue;
         }
-        if (block.All(it => it.Size.X == firstLine.Size.X)) {
-            spells += Math.Min(firstLine.Size.X, block.Count);
+        var widths = block.Aggregate((min: int.MaxValue, max: int.MinValue),
+                (current, it) => (Math.Min(current.min, it.Size.X), Math.Max(current.max, it.Size.X)));
+        if (widths.min == widths.max) {
+            spells += Math.Min(widths.min, height);
             continue;
         }
+        (int min, int max) heights = (block.Count(it => it.Size.X == widths.max), height);
+        int count = Math.Min(widths.max, heights.max);
+        Test.Log($"{widths}, {heights}: {count}");
+        spells += count;
     }
     return spells;
 }
@@ -59,11 +65,9 @@ class Grid {
     }
 
     List<Rect> FindBlockAt(Point current) {
-        Test.Log($"block at {current}");
         List<Rect> lines = [];
         while (true) {
             var line = FindLineAt(current);
-            Test.Log($"  {line}");
             lines.Add(line);
             if (!TryNext(line, ref current)) {
                 break;
