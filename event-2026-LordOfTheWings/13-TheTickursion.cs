@@ -2,8 +2,74 @@
 
 // https://everybody.codes/event/2026/quests/13
 Test.Run((notes, part, expected) => {
-    Assert.ActualEqualsExpected(0, expected);
+    var clock = new PortalClock();
+    clock.Read(notes);
+    int signals = clock.Calibrate();
+    Assert.ActualEqualsExpected(signals, expected);
 });
+
+class PortalClock {
+    int[] hands = null!;
+    int[] directions = null!;
+    int[] current = null!;
+    int[] moves = null!;
+
+    public void Read(string notes) {
+        string[] data = notes.Split(Environment.NewLine);
+        hands = [.. Split(data[0]).Select(int.Parse)];
+        directions = [.. Split(data[1]).Select(it => it == "CW" ? 1 : -1)];
+        current = [.. Split(data[2]).Select(int.Parse)];
+        moves = [.. Split(data[3]).Select(int.Parse)];
+        return;
+
+        string[] Split(string row) => row.Split(' ').Last().Split(':');
+    }
+
+    public int Calibrate() {
+        var value = 0;
+        Log();
+        int[] previous = [.. current];
+        while (moves.Any(it => it > 0)) {
+            for (var i = 0; i < hands.Length; i++) {
+                if (moves[i] <= 0) {
+                    continue;
+                }
+                current[i] = (current[i] + directions[i] + hands[i]) % hands[i];
+                moves[i]--;
+            }
+            for (var i = 0; i < hands.Length; i++) {
+                var iRange = Range.From(previous[i], current[i], hands[i]);
+                for (int j = i + 1; j < hands.Length; j++) {
+                    var jRange = Range.From(previous[j], current[j], hands[j]);
+                    if (iRange.Intersects(jRange)) {
+                        Test.Log($"{iRange}, {jRange}");
+                        value++;
+                    }
+                }
+            }
+            for (var i = 0; i < hands.Length; i++) {
+                previous[i] = current[i];
+            }
+            Log();
+        }
+        return value;
+    }
+
+    void Log() => Test.Log(string.Join("\t", current
+            .Select((it, i) => $"{it,2}/{hands[i]} {(float)it / hands[i]:F}")));
+}
+
+readonly record struct Range(float Start, float End) {
+    public static Range From(int previous, int current, float count) {
+        return previous < current
+                ? new Range(previous / count, current / count)
+                : new Range(current / count, previous / count);
+    }
+
+    public bool Intersects(Range other) => Start <= other.End && other.Start <= End;
+
+    public override string ToString() => $"{Start:F} - {End:F}";
+}
 
 static class Test {
     const string CASE_FILE = "../Test.Cases.txt";
