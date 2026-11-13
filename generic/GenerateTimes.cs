@@ -77,7 +77,7 @@ foreach ((int questNumber, var cumulativeTimes) in quests) {
     int totalIndex = questTotals.IndexOf(questTotal);
     string rankCell = $"{MarkerFor(questTotal, questTotals)} {totalIndex + 1}".Trim();
     int loc = questLocs[questNumber];
-    string locCell = $"{MarkerForLoc(loc, orderedLocs)} {loc}".Trim();
+    string locCell = $"{MarkerFor(loc, orderedLocs)} {loc}".Trim();
     table.AppendLine($"| {questNumber} | {string.Join(" | ", partCells)} | {totalCell} | {rankCell} | {locCell} |");
 }
 
@@ -130,32 +130,18 @@ static TimeSpan ParseDuration(string text) {
 static string Format(TimeSpan time) =>
         $"{(int)time.TotalHours:00}:{time.Minutes:00}:{time.Seconds:00}";
 
-// Compares a time with the other times it should be judged against (the parts of one quest,
-// or the totals of all quests).
+// Marks a value against the other values it should be judged against (part times, quest totals,
+// or LOC across quests).
 // 🟢 fastest, 🔴 slowest, 🟠 everything in between (no marker if there is nothing to compare with).
 [SuppressMessage("ReSharper", "ConvertIfStatementToReturnStatement")]
-static string MarkerFor(TimeSpan time, List<TimeSpan> orderedTimes) {
-    if (orderedTimes.Count < 2) {
-        return "";
-    }
-    if (time == orderedTimes[0]) {
-        return "🟢";
-    }
-    if (time == orderedTimes[^1]) {
-        return "🔴";
-    }
-    return "🟠";
-}
-
-[SuppressMessage("ReSharper", "ConvertIfStatementToReturnStatement")]
-static string MarkerForLoc(int value, List<int> orderedValues) {
+static string MarkerFor<T>(T value, List<T> orderedValues) where T : IComparable<T> {
     if (orderedValues.Count < 2) {
         return "";
     }
-    if (value == orderedValues[0]) {
+    if (value.CompareTo(orderedValues[0]) == 0) {
         return "🟢";
     }
-    if (value == orderedValues[^1]) {
+    if (value.CompareTo(orderedValues[^1]) == 0) {
         return "🔴";
     }
     return "🟠";
