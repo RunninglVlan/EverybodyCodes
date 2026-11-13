@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
 // https://everybody.codes/event/2026/quests/13
 Test.Run((notes, part, expected) => {
@@ -67,18 +66,18 @@ class Hand(int count, int direction, int currentIndex, int moves) {
         moves--;
     }
 
-    [SuppressMessage("ReSharper", "InvertIf")]
     public bool Meets(Hand other) {
         if (Mathf.Approximately(previous, other.previous)) {
             return false;
         }
-        var range = Range.From(previous, Current);
-        var otherRange = Range.From(other.previous, other.Current);
+        var interval = new Interval(previous, Current);
+        var otherInterval = new Interval(other.previous, other.Current);
         if (direction != other.direction || moves == 0 || other.moves == 0) {
-            if (range.Intersects(otherRange)) {
+            if (interval.Intersects(otherInterval)) {
                 return true;
             }
-        } else if (direction == other.direction && (range.Contains(otherRange) || otherRange.Contains(range))) {
+        } else if (direction == other.direction
+                && (interval.Contains(otherInterval) || otherInterval.Contains(interval))) {
             return true;
         }
         return Mathf.Approximately(CurrentWrapped, other.CurrentWrapped);
@@ -92,12 +91,14 @@ class Hand(int count, int direction, int currentIndex, int moves) {
     public override string ToString() => $"{previous:F} {(moves > 0 ? "=>" : "ST")} {Current:F}";
 }
 
-readonly record struct Range(float Start, float End) {
-    public static Range From(float a, float b) => a < b ? new Range(a, b) : new Range(b, a);
+readonly struct Interval {
+    readonly float start, end;
 
-    public bool Intersects(Range other) => Start <= other.End && other.Start <= End;
+    public Interval(float a, float b) => (start, end) = a < b ? (a, b) : (b, a);
 
-    public bool Contains(Range other) => Start <= other.Start && other.End <= End;
+    public bool Intersects(Interval other) => start <= other.end && other.start <= end;
+
+    public bool Contains(Interval other) => start <= other.start && other.end <= end;
 }
 
 static class Mathf {
