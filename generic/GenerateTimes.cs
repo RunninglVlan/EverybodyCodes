@@ -86,7 +86,7 @@ table.AppendLine("| **All** |"
         + $" **{Format(allQuestsTotal)}** | | {questLocs.Values.Sum()} |");
 table.AppendLine();
 table.AppendLine(
-        "🟢 lowest/fastest · 🟠 in between · 🔴 highest/slowest (parts are compared within their quest; totals and LOC across quests)");
+        "🟢 lowest/fastest · 🟡 · 🟠 · 🔴 highest/slowest (colors show relative rank; parts are compared within their quest, totals and LOC across quests)");
 
 if (reportedTotal is { } reported && reported != allQuestsTotal) {
     Console.Error.WriteLine(
@@ -135,14 +135,12 @@ static string Format(TimeSpan time) =>
 // 🟢 fastest, 🔴 slowest, 🟠 everything in between (no marker if there is nothing to compare with).
 [SuppressMessage("ReSharper", "ConvertIfStatementToReturnStatement")]
 static string MarkerFor<T>(T value, List<T> orderedValues) where T : IComparable<T> {
-    if (orderedValues.Count < 2) {
+    var distinctValues = orderedValues.Distinct().ToList();
+    if (distinctValues.Count < 2) {
         return "";
     }
-    if (value.CompareTo(orderedValues[0]) == 0) {
-        return "🟢";
-    }
-    if (value.CompareTo(orderedValues[^1]) == 0) {
-        return "🔴";
-    }
-    return "🟠";
+    string[] markers = ["🟢", "🟡", "🟠", "🔴"];
+    int rank = distinctValues.FindIndex(it => value.CompareTo(it) == 0);
+    var markerIndex = (int)Math.Round((double)rank * (markers.Length - 1) / (distinctValues.Count - 1));
+    return markers[markerIndex];
 }
