@@ -60,6 +60,7 @@ table.AppendLine($"| Quest | {string.Join(" | ", partNames.Take(partCount))} | T
 table.AppendLine($"|{string.Join("|", Enumerable.Repeat("---", partCount + 4))}|");
 
 var questTotals = quests.Values.Select(times => times[^1]).OrderBy(it => it).ToList();
+var orderedLocs = questLocs.Values.OrderBy(loc => loc).ToList();
 
 var allQuestsTotal = TimeSpan.Zero;
 foreach ((int questNumber, var cumulativeTimes) in quests) {
@@ -72,9 +73,12 @@ foreach ((int questNumber, var cumulativeTimes) in quests) {
             .Concat(Enumerable.Repeat("", partCount - partTimes.Count));
     var questTotal = cumulativeTimes[^1];
     allQuestsTotal += questTotal;
-    var totalCell = $"{MarkerFor(questTotal, questTotals)} {Format(questTotal)}";
+    string totalCell = Format(questTotal);
     int totalIndex = questTotals.IndexOf(questTotal);
-    table.AppendLine($"| {questNumber} | {string.Join(" | ", partCells)} | {totalCell} | {totalIndex + 1} | {questLocs[questNumber]} |");
+    string rankCell = $"{MarkerFor(questTotal, questTotals)} {totalIndex + 1}".Trim();
+    int loc = questLocs[questNumber];
+    string locCell = $"{MarkerForLoc(loc, orderedLocs)} {loc}".Trim();
+    table.AppendLine($"| {questNumber} | {string.Join(" | ", partCells)} | {totalCell} | {rankCell} | {locCell} |");
 }
 
 table.AppendLine("| **All** |"
@@ -82,7 +86,7 @@ table.AppendLine("| **All** |"
         + $" **{Format(allQuestsTotal)}** | | {questLocs.Values.Sum()} |");
 table.AppendLine();
 table.AppendLine(
-        "🟢 fastest · 🟠 in between · 🔴 slowest (parts are compared within their quest, totals across all quests)");
+        "🟢 lowest/fastest · 🟠 in between · 🔴 highest/slowest (parts are compared within their quest; totals and LOC across quests)");
 
 if (reportedTotal is { } reported && reported != allQuestsTotal) {
     Console.Error.WriteLine(
@@ -138,6 +142,20 @@ static string MarkerFor(TimeSpan time, List<TimeSpan> orderedTimes) {
         return "🟢";
     }
     if (time == orderedTimes[^1]) {
+        return "🔴";
+    }
+    return "🟠";
+}
+
+[SuppressMessage("ReSharper", "ConvertIfStatementToReturnStatement")]
+static string MarkerForLoc(int value, List<int> orderedValues) {
+    if (orderedValues.Count < 2) {
+        return "";
+    }
+    if (value == orderedValues[0]) {
+        return "🟢";
+    }
+    if (value == orderedValues[^1]) {
         return "🔴";
     }
     return "🟠";
