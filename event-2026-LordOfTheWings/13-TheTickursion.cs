@@ -1,8 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-Test.From = "Part I";
-// Test.LogEnabled = false;
 // https://everybody.codes/event/2026/quests/13
 Test.Run((notes, part, expected) => {
     var clock = new PortalClock();
@@ -74,10 +72,14 @@ class Hand(int count, int direction, int currentIndex, int moves) {
         if (Mathf.Approximately(previous, other.previous)) {
             return false;
         }
+        var range = Range.From(previous, Current);
+        var otherRange = Range.From(other.previous, other.Current);
         if (direction != other.direction || moves == 0 || other.moves == 0) {
-            if (Range.From(previous, Current).Intersects(Range.From(other.previous, other.Current))) {
+            if (range.Intersects(otherRange)) {
                 return true;
             }
+        } else if (direction == other.direction && (range.Contains(otherRange) || otherRange.Contains(range))) {
+            return true;
         }
         return Mathf.Approximately(CurrentWrapped, other.CurrentWrapped);
     }
@@ -94,6 +96,8 @@ readonly record struct Range(float Start, float End) {
     public static Range From(float a, float b) => a < b ? new Range(a, b) : new Range(b, a);
 
     public bool Intersects(Range other) => Start <= other.End && other.Start <= End;
+
+    public bool Contains(Range other) => Start <= other.Start && other.End <= End;
 }
 
 static class Mathf {
