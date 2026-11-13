@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 // https://everybody.codes/event/2026/quests/13
 Test.Run((notes, part, expected) => {
@@ -12,6 +13,7 @@ class PortalClock {
     int[] hands = null!;
     int[] directions = null!;
     int[] current = null!;
+    int[] previous = null!;
     int[] moves = null!;
 
     public void Read(string notes) {
@@ -28,7 +30,7 @@ class PortalClock {
     public int Calibrate() {
         var value = 0;
         Log();
-        int[] previous = [.. current];
+        previous = [.. current];
         while (moves.Any(it => it > 0)) {
             for (var i = 0; i < hands.Length; i++) {
                 if (moves[i] <= 0) {
@@ -37,26 +39,44 @@ class PortalClock {
                 current[i] = (current[i] + directions[i] + hands[i]) % hands[i];
                 moves[i]--;
             }
+            Log();
+            Test.Log("  " + string.Join("  ", current
+                            .Select((it, i) => $"{Range.From(previous[i], it, hands[i])}, {directions[i]}")));
             for (var i = 0; i < hands.Length; i++) {
-                var iRange = Range.From(previous[i], current[i], hands[i]);
                 for (int j = i + 1; j < hands.Length; j++) {
-                    var jRange = Range.From(previous[j], current[j], hands[j]);
-                    if (iRange.Intersects(jRange)) {
-                        Test.Log($"{iRange}, {jRange}");
+                    if (Meet(i, j)) {
                         value++;
+                        Test.Log($"    {i + 1} and {j + 1} meet");
                     }
                 }
             }
             for (var i = 0; i < hands.Length; i++) {
                 previous[i] = current[i];
             }
-            Log();
         }
         return value;
     }
 
-    void Log() => Test.Log(string.Join("\t", current
-            .Select((it, i) => $"{it,2}/{hands[i]} {(float)it / hands[i]:F}")));
+    [SuppressMessage("ReSharper", "InvertIf")]
+    bool Meet(int i, int j) {
+        float iCount = hands[i];
+        float jCount = hands[j];
+        float iCurrent = current[i] / iCount;
+        float jCurrent = current[j] / jCount;
+        if (directions[i] != directions[j]) {
+            var iRange = Range.From(previous[i], current[i], iCount);
+            var jRange = Range.From(previous[j], current[j], jCount);
+            if (iRange.Intersects(jRange)) {
+                return true;
+            }
+        }
+        return Mathf.Approximately(iCurrent, jCurrent);
+    }
+
+    void Log() {
+        Test.Log(string.Join("  ", current
+                .Select((it, i) => $"{it,2}/{hands[i]} {(float)it / hands[i]:F}")));
+    }
 }
 
 readonly record struct Range(float Start, float End) {
@@ -68,7 +88,11 @@ readonly record struct Range(float Start, float End) {
 
     public bool Intersects(Range other) => Start <= other.End && other.Start <= End;
 
-    public override string ToString() => $"{Start:F} - {End:F}";
+    public override string ToString() => $"{Start:F}-{End:F}";
+}
+
+static class Mathf {
+    public static bool Approximately(double a, double b) => Math.Abs(a - b) < 0.001;
 }
 
 static class Test {
