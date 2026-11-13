@@ -10,18 +10,17 @@ Test.Run((notes, part, expected) => {
 });
 
 class PortalClock {
-    int[] hands = null!;
-    int[] directions = null!;
-    int[] current = null!;
-    int[] previous = null!;
-    int[] moves = null!;
+    readonly Hand[] hands = new Hand[3];
 
     public void Read(string notes) {
         string[] data = notes.Split(Environment.NewLine);
-        hands = [.. Split(data[0]).Select(int.Parse)];
-        directions = [.. Split(data[1]).Select(it => it == "CW" ? 1 : -1)];
-        current = [.. Split(data[2]).Select(int.Parse)];
-        moves = [.. Split(data[3]).Select(int.Parse)];
+        int[] counts = [.. Split(data[0]).Select(int.Parse)];
+        int[] directions = [.. Split(data[1]).Select(it => it == "CW" ? 1 : -1)];
+        int[] positions = [.. Split(data[2]).Select(int.Parse)];
+        int[] moves = [.. Split(data[3]).Select(int.Parse)];
+        for (var i = 0; i < hands.Length; i++) {
+            hands[i] = new Hand(counts[i], directions[i], positions[i], moves[i]);
+        }
         return;
 
         string[] Split(string row) => row.Split(' ').Last().Split(':');
@@ -29,66 +28,64 @@ class PortalClock {
 
     public int Calibrate() {
         var value = 0;
-        Log();
-        previous = [.. current];
-        while (moves.Any(it => it > 0)) {
-            for (var i = 0; i < hands.Length; i++) {
-                if (moves[i] <= 0) {
+        while (hands.Any(it => it.CanMove)) {
+            foreach (var hand in hands) {
+                if (!hand.CanMove) {
                     continue;
                 }
-                current[i] = (current[i] + directions[i] + hands[i]) % hands[i];
-                moves[i]--;
+                hand.Move();
             }
-            Log();
-            Test.Log("  " + string.Join("  ", current
-                            .Select((it, i) => $"{Range.From(previous[i], it, hands[i])}, {directions[i]}")));
+            Test.Log(string.Join("  ", hands));
             for (var i = 0; i < hands.Length; i++) {
+                var iHand = hands[i];
                 for (int j = i + 1; j < hands.Length; j++) {
-                    if (Meet(i, j)) {
+                    if (iHand.Meets(hands[j])) {
                         value++;
                         Test.Log($"    {i + 1} and {j + 1} meet");
                     }
                 }
             }
-            for (var i = 0; i < hands.Length; i++) {
-                previous[i] = current[i];
+            foreach (var hand in hands) {
+                hand.SetPrevious();
             }
         }
         return value;
     }
+}
+
+class Hand(int count, int direction, int currentIndex, int moves) {
+    readonly int direction = direction;
+    int currentIndex = currentIndex;
+    float current = currentIndex / (float)count;
+    float previous = currentIndex / (float)count;
+    int moves = moves;
+    public bool CanMove => moves > 0;
+
+    public void Move() {
+        currentIndex = (currentIndex + direction + count) % count;
+        current = currentIndex / (float)count;
+        moves--;
+    }
 
     [SuppressMessage("ReSharper", "InvertIf")]
-    bool Meet(int i, int j) {
-        float iCount = hands[i];
-        float jCount = hands[j];
-        float iCurrent = current[i] / iCount;
-        float jCurrent = current[j] / jCount;
-        if (directions[i] != directions[j]) {
-            var iRange = Range.From(previous[i], current[i], iCount);
-            var jRange = Range.From(previous[j], current[j], jCount);
-            if (iRange.Intersects(jRange)) {
+    public bool Meets(Hand other) {
+        if (direction != other.direction) {
+            if (Range.From(previous, current).Intersects(Range.From(other.previous, other.current))) {
                 return true;
             }
         }
-        return Mathf.Approximately(iCurrent, jCurrent);
+        return Mathf.Approximately(current, other.current);
     }
 
-    void Log() {
-        Test.Log(string.Join("  ", current
-                .Select((it, i) => $"{it,2}/{hands[i]} {(float)it / hands[i]:F}")));
-    }
+    public void SetPrevious() => previous = current;
+
+    public override string ToString() => $"{previous:F}-{current:F}";
 }
 
 readonly record struct Range(float Start, float End) {
-    public static Range From(int previous, int current, float count) {
-        return previous < current
-                ? new Range(previous / count, current / count)
-                : new Range(current / count, previous / count);
-    }
+    public static Range From(float a, float b) => a < b ? new Range(a, b) : new Range(b, a);
 
     public bool Intersects(Range other) => Start <= other.End && other.Start <= End;
-
-    public override string ToString() => $"{Start:F}-{End:F}";
 }
 
 static class Mathf {
