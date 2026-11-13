@@ -58,6 +58,7 @@ class Hand(int count, int direction, int currentIndex, int moves) {
     readonly int direction = direction;
     int currentIndex = currentIndex;
     float Current => currentIndex / (float)count;
+    float CurrentWrapped => Mathf.Wrap(currentIndex, count) / (float)count;
     float previous = currentIndex / (float)count;
     int moves = moves;
     public bool CanMove => moves > 0;
@@ -77,11 +78,11 @@ class Hand(int count, int direction, int currentIndex, int moves) {
                 return true;
             }
         }
-        return Mathf.Approximately(Current, other.Current);
+        return Mathf.Approximately(CurrentWrapped, other.CurrentWrapped);
     }
 
     public void EndTurn() {
-        currentIndex = (currentIndex + count) % count;
+        currentIndex = Mathf.Wrap(currentIndex, count);
         previous = Current;
     }
 
@@ -96,6 +97,7 @@ readonly record struct Range(float Start, float End) {
 
 static class Mathf {
     public static bool Approximately(double a, double b) => Math.Abs(a - b) < 0.001;
+    public static int Wrap(int value, int max) => (value + max) % max;
 }
 
 static class Test {
