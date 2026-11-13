@@ -1,6 +1,8 @@
-﻿// Generated with the help of Claude AI
+﻿// Initially generated with the help of Claude AI.
+// Later modified manually and with the help of GitHub Copilot Fusion.
 //
-// Turns the raw results text into a Markdown table of local times.
+// Turns the raw results text into a Markdown table of local times and solution LOC.
+// LOC excludes blank lines and lines whose first non-whitespace characters are //.
 //
 // Usage:
 //   dotnet run Report.cs  -> reads the times file and writes the table next to it (see the paths below)
@@ -12,8 +14,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.RegularExpressions;
 
-const string inputPath = "../event-2026-LordOfTheWings/times.txt";
-const string outputPath = "../event-2026-LordOfTheWings/README.md";
+const string folder = "../event-2026-LordOfTheWings/";
+const string inputPath = folder + "times.txt";
+const string outputPath = folder + "README.md";
 
 string[] partNames = ["I", "II", "III"];
 
@@ -48,12 +51,13 @@ foreach (string line in File.ReadLines(inputPath)) {
 }
 
 int partCount = quests.Values.Max(times => times.Count);
+var questLocs = quests.Keys.ToDictionary(questNumber => questNumber, CountLinesOfCode);
 var table = new StringBuilder();
 
 table.AppendLine("### Local times");
 table.AppendLine();
-table.AppendLine($"| Quest | {string.Join(" | ", partNames.Take(partCount))} | Total | Quest by Time |");
-table.AppendLine($"|{string.Join("|", Enumerable.Repeat("---", partCount + 3))}|");
+table.AppendLine($"| Quest | {string.Join(" | ", partNames.Take(partCount))} | Total | Quest by Time | LOC |");
+table.AppendLine($"|{string.Join("|", Enumerable.Repeat("---", partCount + 4))}|");
 
 var questTotals = quests.Values.Select(times => times[^1]).OrderBy(it => it).ToList();
 
@@ -70,12 +74,12 @@ foreach ((int questNumber, var cumulativeTimes) in quests) {
     allQuestsTotal += questTotal;
     var totalCell = $"{MarkerFor(questTotal, questTotals)} {Format(questTotal)}";
     int totalIndex = questTotals.IndexOf(questTotal);
-    table.AppendLine($"| {questNumber} | {string.Join(" | ", partCells)} | {totalCell} | {totalIndex + 1} |");
+    table.AppendLine($"| {questNumber} | {string.Join(" | ", partCells)} | {totalCell} | {totalIndex + 1} | {questLocs[questNumber]} |");
 }
 
 table.AppendLine("| **All** |"
         + string.Concat(Enumerable.Repeat(" |", partCount))
-        + $" **{Format(allQuestsTotal)}** | |");
+        + $" **{Format(allQuestsTotal)}** | | {questLocs.Values.Sum()} |");
 table.AppendLine();
 table.AppendLine(
         "🟢 fastest · 🟠 in between · 🔴 slowest (parts are compared within their quest, totals across all quests)");
@@ -91,6 +95,16 @@ return;
 TimeSpan LastDurationIn(string line) {
     var matches = durationPattern.Matches(line);
     return ParseDuration(matches[^1].Value);
+}
+
+int CountLinesOfCode(int questNumber) {
+    string[] files = Directory.GetFiles(folder, $"{questNumber:00}-*.cs");
+    if (files.Length != 1) {
+        throw new InvalidOperationException(
+                $"Expected one solution file for quest {questNumber}, found {files.Length}.");
+    }
+    return File.ReadLines(files[0])
+            .Count(line => !string.IsNullOrWhiteSpace(line) && !line.TrimStart().StartsWith("//"));
 }
 
 static TimeSpan ParseDuration(string text) {
