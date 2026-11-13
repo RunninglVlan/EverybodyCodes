@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-Test.From = "Part I Example 2";
+Test.From = "Part I";
+// Test.LogEnabled = false;
 // https://everybody.codes/event/2026/quests/13
 Test.Run((notes, part, expected) => {
     var clock = new PortalClock();
@@ -42,7 +43,7 @@ class PortalClock {
                 for (int j = i + 1; j < hands.Length; j++) {
                     if (iHand.Meets(hands[j])) {
                         value++;
-                        Test.Log($"    {i + 1} and {j + 1} meet");
+                        Test.Log($"  {i + 1} and {j + 1} meet: {value}");
                     }
                 }
             }
@@ -73,7 +74,7 @@ class Hand(int count, int direction, int currentIndex, int moves) {
         if (Mathf.Approximately(previous, other.previous)) {
             return false;
         }
-        if (direction != other.direction) {
+        if (direction != other.direction || moves == 0 || other.moves == 0) {
             if (Range.From(previous, Current).Intersects(Range.From(other.previous, other.Current))) {
                 return true;
             }
@@ -86,7 +87,7 @@ class Hand(int count, int direction, int currentIndex, int moves) {
         previous = Current;
     }
 
-    public override string ToString() => $"{previous:F} => {Current:F}";
+    public override string ToString() => $"{previous:F} {(moves > 0 ? "=>" : "ST")} {Current:F}";
 }
 
 readonly record struct Range(float Start, float End) {

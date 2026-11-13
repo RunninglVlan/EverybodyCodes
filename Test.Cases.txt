@@ -24,3 +24,12 @@ current 1:2:2
 move 10:12:20
 
 9
+
+Part I
+1
+hands 7:13:10
+direction CCW:CW:CCW
+current 3:11:5
+move 70:50:40
+
+0
