@@ -69,6 +69,9 @@ class Hand(int count, int direction, int currentIndex, int moves) {
 
     [SuppressMessage("ReSharper", "InvertIf")]
     public bool Meets(Hand other) {
+        if (Mathf.Approximately(previous, other.previous)) {
+            return false;
+        }
         if (direction != other.direction) {
             if (Range.From(previous, current).Intersects(Range.From(other.previous, other.current))) {
                 return true;
