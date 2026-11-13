@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
+Test.From = "Part I Example 2";
 // https://everybody.codes/event/2026/quests/13
 Test.Run((notes, part, expected) => {
     var clock = new PortalClock();
@@ -46,7 +47,7 @@ class PortalClock {
                 }
             }
             foreach (var hand in hands) {
-                hand.SetPrevious();
+                hand.EndTurn();
             }
         }
         return value;
@@ -56,14 +57,13 @@ class PortalClock {
 class Hand(int count, int direction, int currentIndex, int moves) {
     readonly int direction = direction;
     int currentIndex = currentIndex;
-    float current = currentIndex / (float)count;
+    float Current => currentIndex / (float)count;
     float previous = currentIndex / (float)count;
     int moves = moves;
     public bool CanMove => moves > 0;
 
     public void Move() {
-        currentIndex = (currentIndex + direction + count) % count;
-        current = currentIndex / (float)count;
+        currentIndex += direction;
         moves--;
     }
 
@@ -73,16 +73,19 @@ class Hand(int count, int direction, int currentIndex, int moves) {
             return false;
         }
         if (direction != other.direction) {
-            if (Range.From(previous, current).Intersects(Range.From(other.previous, other.current))) {
+            if (Range.From(previous, Current).Intersects(Range.From(other.previous, other.Current))) {
                 return true;
             }
         }
-        return Mathf.Approximately(current, other.current);
+        return Mathf.Approximately(Current, other.Current);
     }
 
-    public void SetPrevious() => previous = current;
+    public void EndTurn() {
+        currentIndex = (currentIndex + count) % count;
+        previous = Current;
+    }
 
-    public override string ToString() => $"{previous:F}-{current:F}";
+    public override string ToString() => $"{previous:F} => {Current:F}";
 }
 
 readonly record struct Range(float Start, float End) {
