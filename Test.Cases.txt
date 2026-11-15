@@ -4,7 +4,7 @@ hands 6:8:12
 direction CW:CCW:CW
 current 2:4:8
 move 9:7:4
-
+---
 5
 
 Part I Example 2
@@ -13,7 +13,7 @@ hands 6:8:12
 direction CW:CCW:CW
 current 1:2:2
 move 10:12:15
-
+---
 7
 
 Part I Example 3
@@ -22,7 +22,7 @@ hands 6:8:12
 direction CW:CCW:CW
 current 1:2:2
 move 10:12:20
-
+---
 9
 
 Part I
@@ -31,5 +31,24 @@ hands 7:13:10
 direction CCW:CW:CCW
 current 3:11:5
 move 70:50:40
-
+---
 28
+
+Part II Example
+2
+hands 6:8:12
+direction CW:CCW:CW
+current 2:4:8
+move 9:7:4
+
+hands 6:8:12
+direction CW:CCW:CW
+current 1:2:2
+move 10:12:15
+
+hands 6:8:12
+direction CW:CCW:CW
+current 1:2:2
+move 10:12:20
+---
+21

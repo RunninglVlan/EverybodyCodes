@@ -1,22 +1,28 @@
 ﻿using System.Diagnostics;
 
+Test.ExpectedSeparator = "---";
+Test.LogEnabled = false;
 // https://everybody.codes/event/2026/quests/13
 Test.Run((notes, part, expected) => {
-    var clock = new PortalClock();
-    clock.Read(notes);
-    int signals = clock.Calibrate();
+    string[] data = notes.Split(Environment.NewLine);
+    List<PortalClock> clocks = [];
+    for (var i = 0; i < data.Length; i++) {
+        var clock = new PortalClock();
+        clock.Read((data[i++], data[i++], data[i++], data[i++]));
+        clocks.Add(clock);
+    }
+    int signals = clocks.Sum(it => it.Calibrate());
     Assert.ActualEqualsExpected(signals, expected);
 });
 
 class PortalClock {
     readonly Hand[] hands = new Hand[3];
 
-    public void Read(string notes) {
-        string[] data = notes.Split(Environment.NewLine);
-        int[] counts = [.. Split(data[0]).Select(int.Parse)];
-        int[] directions = [.. Split(data[1]).Select(it => it == "CW" ? 1 : -1)];
-        int[] positions = [.. Split(data[2]).Select(int.Parse)];
-        int[] moves = [.. Split(data[3]).Select(int.Parse)];
+    public void Read((string counts, string directions, string positions, string moves) data) {
+        int[] counts = [.. Split(data.counts).Select(int.Parse)];
+        int[] directions = [.. Split(data.directions).Select(it => it == "CW" ? 1 : -1)];
+        int[] positions = [.. Split(data.positions).Select(int.Parse)];
+        int[] moves = [.. Split(data.moves).Select(int.Parse)];
         for (var i = 0; i < hands.Length; i++) {
             hands[i] = new Hand(counts[i], directions[i], positions[i], moves[i]);
         }
