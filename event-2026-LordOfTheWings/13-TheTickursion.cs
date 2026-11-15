@@ -74,10 +74,10 @@ class PortalClock {
 
 class Hand(int count, int direction, int currentIndex, long moves) {
     readonly int direction = direction;
+    float previous = currentIndex / (float)count;
     int currentIndex = currentIndex;
     float Current => currentIndex / (float)count;
     float CurrentWrapped => Mathf.Wrap(currentIndex, count) / (float)count;
-    float previous = currentIndex / (float)count;
     long moves = moves;
     public bool Finished { get; set; }
     public bool CanMove => moves > 0;
