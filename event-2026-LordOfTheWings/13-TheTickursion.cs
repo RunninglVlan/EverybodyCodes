@@ -12,8 +12,9 @@ Test.Run((notes, part, expected) => {
         Test.Log($"Clock {j + 1:000}");
         var clock = new PortalClock();
         clock.Read((data[i++], data[i++], data[i++], data[i++]));
-        signals += clock.Calibrate(j + 1 == 99);
+        signals += clock.Calibrate(j + 1 == 1);
         Test.Log();
+        break;
     }
     Assert.ActualEqualsExpected(signals, expected);
 });
