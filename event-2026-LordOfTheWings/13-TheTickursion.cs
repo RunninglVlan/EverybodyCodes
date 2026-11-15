@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 
 Test.ExpectedSeparator = "---";
-Test.LogEnabled = false;
-// Test.From = "Part II Example 2";
+// Test.LogEnabled = false;
+Test.From = "Part III Example";
 // Test.Until = "Part II Example 2";
 // https://everybody.codes/event/2026/quests/13
 Test.Run((notes, part, expected) => {
@@ -29,7 +29,7 @@ class PortalClock {
         int[] counts = [.. Split(data.counts).Select(int.Parse)];
         int[] directions = [.. Split(data.directions).Select(it => it == "CW" ? 1 : -1)];
         int[] positions = [.. Split(data.positions).Select(int.Parse)];
-        int[] moves = [.. Split(data.moves).Select(int.Parse)];
+        long[] moves = [.. Split(data.moves).Select(long.Parse)];
         for (var i = 0; i < hands.Length; i++) {
             hands[i] = new Hand(counts[i], directions[i], positions[i], moves[i]);
         }
@@ -71,13 +71,13 @@ class PortalClock {
     }
 }
 
-class Hand(int count, int direction, int currentIndex, int moves) {
+class Hand(int count, int direction, int currentIndex, long moves) {
     readonly int direction = direction;
     int currentIndex = currentIndex;
     float Current => currentIndex / (float)count;
     float CurrentWrapped => Mathf.Wrap(currentIndex, count) / (float)count;
     float previous = currentIndex / (float)count;
-    int moves = moves;
+    long moves = moves;
     public bool Finished { get; set; }
     public bool CanMove => moves > 0;
 
