@@ -1059,4 +1059,4 @@ direction CW:CCW:CW
 current 0:2:4
 move 16:16:16
 ---
-0
+140210

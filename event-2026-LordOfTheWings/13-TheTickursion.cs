@@ -3,7 +3,7 @@
 Test.ExpectedSeparator = "---";
 Test.LogEnabled = false;
 // Test.From = "Part II Example 2";
-Test.Until = "Part II Example 2";
+// Test.Until = "Part II Example 2";
 // https://everybody.codes/event/2026/quests/13
 Test.Run((notes, part, expected) => {
     string[] data = notes.Split(Environment.NewLine);
@@ -101,15 +101,20 @@ class Hand(int count, int direction, int currentIndex, int moves) {
     }
 
     bool IntervalsIntersect(Hand other) {
-        var interval = new Interval(previous, Current);
-        var otherInterval = new Interval(other.previous, other.Current);
-        return interval.Intersects(otherInterval);
+        return Interval().Intersects(other.Interval());
     }
 
     bool AnyIntervalContains(Hand other) {
-        var interval = new Interval(previous, Current);
-        var otherInterval = new Interval(other.previous, other.Current);
+        var interval = Interval();
+        var otherInterval = other.Interval();
         return interval.Contains(otherInterval) || otherInterval.Contains(interval);
+    }
+
+    Interval Interval() {
+        if (Current < 0 && Mathf.Approximately(previous, 0)) {
+            return new Interval(previous + 1, Current + 1);
+        }
+        return new Interval(previous, Current);
     }
 
     public void EndTurn() {
