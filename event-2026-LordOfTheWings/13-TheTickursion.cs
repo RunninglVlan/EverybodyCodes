@@ -12,7 +12,7 @@ Test.Run((notes, part, expected) => {
         Test.Log($"Clock {j + 1:000}");
         var clock = new PortalClock();
         clock.Read((data[i++], data[i++], data[i++], data[i++]));
-        signals += clock.Calibrate();
+        signals += clock.Calibrate(j == 98);
         Test.Log();
     }
     Assert.ActualEqualsExpected(signals, expected);
@@ -38,7 +38,7 @@ class PortalClock {
         string[] Split(string row) => row.Split(' ').Last().Split(':');
     }
 
-    public int Calibrate() {
+    public int Calibrate(bool log) {
         var value = 0;
         while (hands.Any(it => it.CanMove)) {
             foreach (var hand in hands) {
@@ -47,13 +47,17 @@ class PortalClock {
                 }
                 hand.Move();
             }
-            // Test.Log(string.Join("  ", hands));
+            if (log) {
+                Test.Log(string.Join("  ", hands));
+            }
             for (var i = 0; i < hands.Length; i++) {
                 var iHand = hands[i];
                 for (int j = i + 1; j < hands.Length; j++) {
                     if (iHand.Meets(hands[j])) {
                         value++;
-                        // Test.Log($"  {i + 1} and {j + 1} meet: {value}");
+                        if (log) {
+                            Test.Log($"  {i + 1} and {j + 1} meet: {value}");
+                        }
                     }
                 }
             }
