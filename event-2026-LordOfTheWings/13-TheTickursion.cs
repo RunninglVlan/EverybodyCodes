@@ -1,17 +1,20 @@
 ﻿using System.Diagnostics;
 
 Test.ExpectedSeparator = "---";
-Test.LogEnabled = false;
+// Test.LogEnabled = false;
+Test.From = "Part II Example 2";
+Test.Until = "Part II";
 // https://everybody.codes/event/2026/quests/13
 Test.Run((notes, part, expected) => {
     string[] data = notes.Split(Environment.NewLine);
-    List<PortalClock> clocks = [];
-    for (var i = 0; i < data.Length; i++) {
+    var signals = 0;
+    for (int i = 0, j = 0; i < data.Length; i++, j++) {
+        Test.Log($"Clock {j + 1:000}");
         var clock = new PortalClock();
         clock.Read((data[i++], data[i++], data[i++], data[i++]));
-        clocks.Add(clock);
+        signals += clock.Calibrate();
+        Test.Log();
     }
-    int signals = clocks.Sum(it => it.Calibrate());
     Assert.ActualEqualsExpected(signals, expected);
 });
 
@@ -19,6 +22,10 @@ class PortalClock {
     readonly Hand[] hands = new Hand[3];
 
     public void Read((string counts, string directions, string positions, string moves) data) {
+        Test.Log(data.counts);
+        Test.Log(data.directions);
+        Test.Log(data.positions);
+        Test.Log(data.moves);
         int[] counts = [.. Split(data.counts).Select(int.Parse)];
         int[] directions = [.. Split(data.directions).Select(it => it == "CW" ? 1 : -1)];
         int[] positions = [.. Split(data.positions).Select(int.Parse)];
@@ -40,13 +47,13 @@ class PortalClock {
                 }
                 hand.Move();
             }
-            Test.Log(string.Join("  ", hands));
+            // Test.Log(string.Join("  ", hands));
             for (var i = 0; i < hands.Length; i++) {
                 var iHand = hands[i];
                 for (int j = i + 1; j < hands.Length; j++) {
                     if (iHand.Meets(hands[j])) {
                         value++;
-                        Test.Log($"  {i + 1} and {j + 1} meet: {value}");
+                        // Test.Log($"  {i + 1} and {j + 1} meet: {value}");
                     }
                 }
             }
@@ -54,6 +61,7 @@ class PortalClock {
                 hand.EndTurn();
             }
         }
+        Test.Log($"meetings {value}");
         return value;
     }
 }
