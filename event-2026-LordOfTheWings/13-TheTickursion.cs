@@ -5,8 +5,8 @@ Test.ExpectedSeparator = "---";
 Test.Run((notes, part, expected) => {
     string[] data = notes.Split(Environment.NewLine);
     var signals = 0L;
+    var clock = new PortalClock();
     for (var i = 0; i < data.Length; i++) {
-        var clock = new PortalClock();
         clock.Read((data[i++], data[i++], data[i++], data[i++]));
         signals += clock.Calibrate();
     }
@@ -17,7 +17,7 @@ class PortalClock {
     const int HANDS = 3;
 
     readonly Hand[] hands = new Hand[HANDS];
-    readonly Dictionary<int[], (long value, long[] moves)> pastHands = new(new ArraySeqComparer<int>());
+    readonly Dictionary<int[], (long value, long[] moves)> pastHands = new(ArrayComparer<int>.Instance);
 
     public void Read((string counts, string directions, string positions, string moves) data) {
         int[] counts = [.. Split(data.counts).Select(int.Parse)];
@@ -27,6 +27,7 @@ class PortalClock {
         for (var i = 0; i < hands.Length; i++) {
             hands[i] = new Hand(counts[i], directions[i], positions[i], moves[i]);
         }
+        pastHands.Clear();
         return;
 
         string[] Split(string row) => row.Split(' ').Last().Split(':');
@@ -35,28 +36,15 @@ class PortalClock {
     public long Calibrate() {
         var value = 0L;
         while (hands.Any(it => it.CanMove)) {
-            foreach (var hand in hands) {
-                if (!hand.CanMove) {
-                    hand.Finished = true;
-                    continue;
-                }
-                hand.Move();
-            }
+            (int[] current, long[] currentMoves) = Move();
             for (var i = 0; i < hands.Length; i++) {
-                var iHand = hands[i];
+                var hand = hands[i];
                 for (int j = i + 1; j < hands.Length; j++) {
-                    if (iHand.Meets(hands[j])) {
+                    if (hand.Meets(hands[j])) {
                         value++;
                     }
                 }
-            }
-            var current = new int[HANDS];
-            var currentMoves = new long[HANDS];
-            for (var i = 0; i < hands.Length; i++) {
-                var hand = hands[i];
                 hand.EndTurn();
-                current[i] = hand.CurrentIndex;
-                currentMoves[i] = hand.Moves;
             }
             if (pastHands.TryGetValue(current, out var past)) {
                 value += SkipMoves(past.moves, value - past.value);
@@ -66,6 +54,22 @@ class PortalClock {
             pastHands.Add(current, (value, currentMoves));
         }
         return value;
+    }
+
+    (int[] current, long[] currentMoves) Move() {
+        var current = new int[HANDS];
+        var currentMoves = new long[HANDS];
+        for (var i = 0; i < hands.Length; i++) {
+            var hand = hands[i];
+            if (!hand.CanMove) {
+                hand.Finished = true;
+                continue;
+            }
+            hand.Move();
+            current[i] = hand.CurrentIndex;
+            currentMoves[i] = hand.Moves;
+        }
+        return (current, currentMoves);
     }
 
     long SkipMoves(long[] pastMoves, long valueDelta) {
@@ -84,20 +88,6 @@ class PortalClock {
             hands[i].Moves -= moveDiffs[i] * skipTimes;
         }
         return valueDelta * skipTimes;
-    }
-}
-
-public class ArraySeqComparer<T> : IEqualityComparer<T[]> {
-    public bool Equals(T[]? a, T[]? b) {
-        return a == b || a != null && b != null && a.SequenceEqual(b);
-    }
-
-    public int GetHashCode(T[] states) {
-        var hash = new HashCode();
-        foreach (var state in states) {
-            hash.Add(state);
-        }
-        return hash.ToHashCode();
     }
 }
 
@@ -156,13 +146,28 @@ class Hand(int count, int direction, int currentIndex, long moves) {
 }
 
 readonly struct Interval {
-    readonly float start, end;
+    readonly float min, max;
 
-    public Interval(float a, float b) => (start, end) = a < b ? (a, b) : (b, a);
+    public Interval(float a, float b) => (min, max) = a < b ? (a, b) : (b, a);
 
-    public bool Intersects(Interval other) => start <= other.end && other.start <= end;
+    public bool Intersects(Interval other) => min <= other.max && other.min <= max;
+    public bool Contains(Interval other) => min <= other.min && other.max <= max;
+}
 
-    public bool Contains(Interval other) => start <= other.start && other.end <= end;
+sealed class ArrayComparer<T> : IEqualityComparer<T[]> {
+    public static readonly ArrayComparer<T> Instance = new();
+
+    public bool Equals(T[]? a, T[]? b) {
+        return a == b || a != null && b != null && a.SequenceEqual(b);
+    }
+
+    public int GetHashCode(T[] items) {
+        var hash = new HashCode();
+        foreach (var item in items) {
+            hash.Add(item);
+        }
+        return hash.ToHashCode();
+    }
 }
 
 static class Mathf {
