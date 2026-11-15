@@ -43,6 +43,7 @@ class PortalClock {
         while (hands.Any(it => it.CanMove)) {
             foreach (var hand in hands) {
                 if (!hand.CanMove) {
+                    hand.Finished = true;
                     continue;
                 }
                 hand.Move();
@@ -77,6 +78,7 @@ class Hand(int count, int direction, int currentIndex, int moves) {
     float CurrentWrapped => Mathf.Wrap(currentIndex, count) / (float)count;
     float previous = currentIndex / (float)count;
     int moves = moves;
+    public bool Finished { get; set; }
     public bool CanMove => moves > 0;
 
     public void Move() {
@@ -90,7 +92,7 @@ class Hand(int count, int direction, int currentIndex, int moves) {
         }
         var interval = new Interval(previous, Current);
         var otherInterval = new Interval(other.previous, other.Current);
-        if (direction != other.direction || moves == 0 || other.moves == 0) {
+        if (direction != other.direction || Finished || other.Finished) {
             if (interval.Intersects(otherInterval)) {
                 return true;
             }
@@ -106,7 +108,7 @@ class Hand(int count, int direction, int currentIndex, int moves) {
         previous = Current;
     }
 
-    public override string ToString() => $"{previous:F} {(moves > 0 ? "=>" : "ST")} {Current:F}";
+    public override string ToString() => $"{previous:F} {(!Finished ? "=>" : "ST")} {Current:F}";
 }
 
 readonly struct Interval {
