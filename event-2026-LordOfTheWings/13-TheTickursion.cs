@@ -1,17 +1,14 @@
 ﻿using System.Diagnostics;
 
 Test.ExpectedSeparator = "---";
-Test.LogEnabled = false;
 // https://everybody.codes/event/2026/quests/13
 Test.Run((notes, part, expected) => {
     string[] data = notes.Split(Environment.NewLine);
     var signals = 0L;
-    for (int i = 0, j = 0; i < data.Length; i++, j++) {
-        Test.Log($"Clock {j + 1:000}");
+    for (var i = 0; i < data.Length; i++) {
         var clock = new PortalClock();
         clock.Read((data[i++], data[i++], data[i++], data[i++]));
-        signals += clock.Calibrate(true);
-        Test.Log();
+        signals += clock.Calibrate();
     }
     Assert.ActualEqualsExpected(signals, expected);
 });
@@ -23,10 +20,6 @@ class PortalClock {
     readonly Dictionary<int[], (long value, long[] moves)> pastHands = new(new ArraySeqComparer<int>());
 
     public void Read((string counts, string directions, string positions, string moves) data) {
-        Test.Log(data.counts);
-        Test.Log(data.directions);
-        Test.Log(data.positions);
-        Test.Log(data.moves);
         int[] counts = [.. Split(data.counts).Select(int.Parse)];
         int[] directions = [.. Split(data.directions).Select(it => it == "CW" ? 1 : -1)];
         int[] positions = [.. Split(data.positions).Select(int.Parse)];
@@ -39,9 +32,9 @@ class PortalClock {
         string[] Split(string row) => row.Split(' ').Last().Split(':');
     }
 
-    public long Calibrate(bool log) {
+    public long Calibrate() {
         var value = 0L;
-        for (var moved = 0; hands.Any(it => it.CanMove); moved++) {
+        while (hands.Any(it => it.CanMove)) {
             foreach (var hand in hands) {
                 if (!hand.CanMove) {
                     hand.Finished = true;
@@ -49,17 +42,11 @@ class PortalClock {
                 }
                 hand.Move();
             }
-            if (log) {
-                Test.Log($"{moved} " + string.Join("  ", hands));
-            }
             for (var i = 0; i < hands.Length; i++) {
                 var iHand = hands[i];
                 for (int j = i + 1; j < hands.Length; j++) {
                     if (iHand.Meets(hands[j])) {
                         value++;
-                        if (log) {
-                            Test.Log($"  {i + 1} and {j + 1} meet: {value}");
-                        }
                     }
                 }
             }
@@ -72,14 +59,12 @@ class PortalClock {
                 currentMoves[i] = hand.Moves;
             }
             if (pastHands.TryGetValue(current, out var past)) {
-                Test.Log($"    cycle: {past}");
                 value += SkipMoves(past.moves, value - past.value);
                 pastHands.Clear();
                 continue;
             }
             pastHands.Add(current, (value, currentMoves));
         }
-        Test.Log($"meetings {value}");
         return value;
     }
 
