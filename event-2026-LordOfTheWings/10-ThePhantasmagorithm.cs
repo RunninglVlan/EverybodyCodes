@@ -78,7 +78,7 @@ class Grid {
         }
     }
 
-    void SkipRounds(long[] pastCollisions, long maxGhostCollisions, long skipRounds) {
+    void SkipRounds(long[] pastCollisions, long maxGhostCollisions, long roundsDelta) {
         var collisionDiffs = new long[ghosts.Count];
         var skipTimes = long.MaxValue;
         for (var i = 0; i < ghosts.Count; i++) {
@@ -91,7 +91,7 @@ class Grid {
             }
             skipTimes = Math.Min(times, skipTimes);
         }
-        Rounds += skipRounds * skipTimes;
+        Rounds += roundsDelta * skipTimes;
         for (var i = 0; i < ghosts.Count; i++) {
             ghosts[i].Collisions += collisionDiffs[i] * skipTimes;
         }
