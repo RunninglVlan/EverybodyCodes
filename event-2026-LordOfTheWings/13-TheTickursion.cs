@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 
 Test.ExpectedSeparator = "---";
-// Test.LogEnabled = false;
-Test.From = "Part II Example 2";
-Test.Until = "Part II";
+Test.LogEnabled = false;
+// Test.From = "Part II Example 2";
+Test.Until = "Part II Example 2";
 // https://everybody.codes/event/2026/quests/13
 Test.Run((notes, part, expected) => {
     string[] data = notes.Split(Environment.NewLine);
@@ -90,17 +90,26 @@ class Hand(int count, int direction, int currentIndex, int moves) {
         if (Mathf.Approximately(previous, other.previous)) {
             return false;
         }
-        var interval = new Interval(previous, Current);
-        var otherInterval = new Interval(other.previous, other.Current);
         if (direction != other.direction || Finished || other.Finished) {
-            if (interval.Intersects(otherInterval)) {
+            if (IntervalsIntersect(other)) {
                 return true;
             }
-        } else if (direction == other.direction
-                && (interval.Contains(otherInterval) || otherInterval.Contains(interval))) {
+        } else if (direction == other.direction && AnyIntervalContains(other)) {
             return true;
         }
         return Mathf.Approximately(CurrentWrapped, other.CurrentWrapped);
+    }
+
+    bool IntervalsIntersect(Hand other) {
+        var interval = new Interval(previous, Current);
+        var otherInterval = new Interval(other.previous, other.Current);
+        return interval.Intersects(otherInterval);
+    }
+
+    bool AnyIntervalContains(Hand other) {
+        var interval = new Interval(previous, Current);
+        var otherInterval = new Interval(other.previous, other.Current);
+        return interval.Contains(otherInterval) || otherInterval.Contains(interval);
     }
 
     public void EndTurn() {
