@@ -1,26 +1,26 @@
 ﻿using System.Diagnostics;
 
 Test.ExpectedSeparator = "---";
-// Test.LogEnabled = false;
-Test.From = "Part III Example";
-// Test.Until = "Part II Example 2";
+Test.LogEnabled = false;
 // https://everybody.codes/event/2026/quests/13
 Test.Run((notes, part, expected) => {
     string[] data = notes.Split(Environment.NewLine);
-    var signals = 0;
+    var signals = 0L;
     for (int i = 0, j = 0; i < data.Length; i++, j++) {
         Test.Log($"Clock {j + 1:000}");
         var clock = new PortalClock();
         clock.Read((data[i++], data[i++], data[i++], data[i++]));
-        signals += clock.Calibrate(j + 1 == 1);
+        signals += clock.Calibrate(true);
         Test.Log();
-        break;
     }
     Assert.ActualEqualsExpected(signals, expected);
 });
 
 class PortalClock {
-    readonly Hand[] hands = new Hand[3];
+    const int HANDS = 3;
+
+    readonly Hand[] hands = new Hand[HANDS];
+    readonly Dictionary<int[], (long value, long[] moves)> pastHands = new(new ArraySeqComparer<int>());
 
     public void Read((string counts, string directions, string positions, string moves) data) {
         Test.Log(data.counts);
@@ -39,9 +39,9 @@ class PortalClock {
         string[] Split(string row) => row.Split(' ').Last().Split(':');
     }
 
-    public int Calibrate(bool log) {
-        var value = 0;
-        while (hands.Any(it => it.CanMove)) {
+    public long Calibrate(bool log) {
+        var value = 0L;
+        for (var moved = 0; hands.Any(it => it.CanMove); moved++) {
             foreach (var hand in hands) {
                 if (!hand.CanMove) {
                     hand.Finished = true;
@@ -50,7 +50,7 @@ class PortalClock {
                 hand.Move();
             }
             if (log) {
-                Test.Log(string.Join("  ", hands));
+                Test.Log($"{moved} " + string.Join("  ", hands));
             }
             for (var i = 0; i < hands.Length; i++) {
                 var iHand = hands[i];
@@ -63,28 +63,72 @@ class PortalClock {
                     }
                 }
             }
-            foreach (var hand in hands) {
+            var current = new int[HANDS];
+            var currentMoves = new long[HANDS];
+            for (var i = 0; i < hands.Length; i++) {
+                var hand = hands[i];
                 hand.EndTurn();
+                current[i] = hand.CurrentIndex;
+                currentMoves[i] = hand.Moves;
             }
+            if (pastHands.TryGetValue(current, out var past)) {
+                Test.Log($"    cycle: {past}");
+                value += SkipMoves(past.moves, value - past.value);
+                pastHands.Clear();
+                continue;
+            }
+            pastHands.Add(current, (value, currentMoves));
         }
         Test.Log($"meetings {value}");
         return value;
+    }
+
+    long SkipMoves(long[] pastMoves, long valueDelta) {
+        var moveDiffs = new long[hands.Length];
+        var skipTimes = long.MaxValue;
+        for (var i = 0; i < hands.Length; i++) {
+            long moves = hands[i].Moves;
+            long diff = pastMoves[i] - moves;
+            if (diff == 0) {
+                continue;
+            }
+            moveDiffs[i] = diff;
+            skipTimes = Math.Min(moves / diff, skipTimes);
+        }
+        for (var i = 0; i < hands.Length; i++) {
+            hands[i].Moves -= moveDiffs[i] * skipTimes;
+        }
+        return valueDelta * skipTimes;
+    }
+}
+
+public class ArraySeqComparer<T> : IEqualityComparer<T[]> {
+    public bool Equals(T[]? a, T[]? b) {
+        return a == b || a != null && b != null && a.SequenceEqual(b);
+    }
+
+    public int GetHashCode(T[] states) {
+        var hash = new HashCode();
+        foreach (var state in states) {
+            hash.Add(state);
+        }
+        return hash.ToHashCode();
     }
 }
 
 class Hand(int count, int direction, int currentIndex, long moves) {
     readonly int direction = direction;
     float previous = currentIndex / (float)count;
-    int currentIndex = currentIndex;
-    float Current => currentIndex / (float)count;
-    float CurrentWrapped => Mathf.Wrap(currentIndex, count) / (float)count;
-    long moves = moves;
+    public int CurrentIndex { get; private set; } = currentIndex;
+    float Current => CurrentIndex / (float)count;
+    float CurrentWrapped => Mathf.Wrap(CurrentIndex, count) / (float)count;
+    public long Moves { get; set; } = moves;
     public bool Finished { get; set; }
-    public bool CanMove => moves > 0;
+    public bool CanMove => Moves > 0;
 
     public void Move() {
-        currentIndex += direction;
-        moves--;
+        CurrentIndex += direction;
+        Moves--;
     }
 
     public bool Meets(Hand other) {
@@ -119,7 +163,7 @@ class Hand(int count, int direction, int currentIndex, long moves) {
     }
 
     public void EndTurn() {
-        currentIndex = Mathf.Wrap(currentIndex, count);
+        CurrentIndex = Mathf.Wrap(CurrentIndex, count);
         previous = Current;
     }
 
