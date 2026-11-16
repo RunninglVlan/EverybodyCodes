@@ -23,17 +23,11 @@ class PortalGrid {
 
     public int Repair() {
         HashSet<Pair> bindings = [];
-        var queue = new Queue<(Point point, char value)>();
-        queue.Enqueue((Point.ZERO, cells[Point.ZERO]));
-        HashSet<Point> visited = [Point.ZERO];
-        while (queue.TryDequeue(out var current)) {
+        foreach ((var point, char value) in cells) {
             foreach (var direction in Point.Directions4) {
-                var nextPoint = current.point + direction;
-                if (cells.TryGetValue(nextPoint, out char nextValue) && visited.Add(nextPoint)) {
-                    queue.Enqueue((nextPoint, nextValue));
-                    if (current.value != nextValue) {
-                        bindings.Add(new Pair(current.point, nextPoint));
-                    }
+                var nextPoint = point + direction;
+                if (!cells.TryGetValue(nextPoint, out char nextValue) || value != nextValue) {
+                    bindings.Add(new Pair(point, nextPoint));
                 }
             }
         }
@@ -44,10 +38,10 @@ class PortalGrid {
 readonly record struct Pair(Point A, Point B) {
     public bool Equals(Pair other) => A == other.A && B == other.B || A == other.B && B == other.A;
     public override int GetHashCode() => A.GetHashCode() ^ B.GetHashCode();
+    public override string ToString() => $"{A}-{B}";
 }
 
 readonly record struct Point(int X, int Y) {
-    public static readonly Point ZERO = new(0, 0);
     static readonly Point UP = new(0, 1);
     static readonly Point DOWN = new(0, -1);
     static readonly Point LEFT = new(-1, 0);
@@ -56,6 +50,8 @@ readonly record struct Point(int X, int Y) {
     public static Point[] Directions4 { get; } = [RIGHT, LEFT, UP, DOWN];
 
     public static Point operator +(Point a, Point b) => new(a.X + b.X, a.Y + b.Y);
+
+    public override string ToString() => $"({X}, {Y})";
 }
 
 static class Test {
