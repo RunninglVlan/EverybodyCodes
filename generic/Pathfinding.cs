@@ -1,5 +1,5 @@
 ﻿static class Pathfinding<T> where T : IEquatable<T> {
-    /// BFS to end
+    /// BFS
     public static List<T>? Shortest(T start, T end, Func<T, IEnumerable<T>> getNext) {
         Dictionary<T, T> parents = [];
         Queue<T> queue = [];
