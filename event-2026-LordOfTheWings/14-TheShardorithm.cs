@@ -11,49 +11,39 @@ Test.Run((notes, part, expected) => {
 class PortalGrid {
     const char FRAME = ' ';
 
-    readonly Dictionary<Point, char> cells = [];
     readonly Dictionary<char, Piece> pieces = [];
 
     public void Read(string notes) {
         string[] rows = notes.Split(Environment.NewLine);
         int width = rows[0].Length, height = rows.Length;
-        pieces.Add(FRAME, new Piece([]));
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < width; x++) {
                 var point = new Point(x, y);
                 char value = rows[y][x];
-                cells.Add(point, value);
-                if (!pieces.TryGetValue(value, out var piece)) {
-                    pieces.Add(value, piece = new Piece([]));
-                }
                 foreach (var direction in Point.Directions4) {
                     var neighborPoint = point + direction;
-                    if (cells.TryGetValue(neighborPoint, out char neighborValue) && value != neighborValue) {
-                        if (!piece.Bindings.TryGetValue(neighborValue, out var bindings)) {
-                            piece.Bindings.Add(neighborValue, bindings = []);
-                        }
-                        var neighborPiece = pieces[neighborValue];
-                        if (!neighborPiece.Bindings.TryGetValue(value, out var neighborBindings)) {
-                            neighborPiece.Bindings.Add(value, neighborBindings = []);
-                        }
-                        var binding = new Binding(point, neighborPoint);
-                        bindings.Add(binding);
-                        neighborBindings.Add(binding);
-                    } else if (!neighborPoint.InBounds(width, height)) {
-                        if (!piece.Bindings.TryGetValue(FRAME, out var bindings)) {
-                            piece.Bindings.Add(FRAME, bindings = []);
-                        }
-                        var neighborPiece = pieces[FRAME];
-                        if (!neighborPiece.Bindings.TryGetValue(value, out var neighborBindings)) {
-                            neighborPiece.Bindings.Add(value, neighborBindings = []);
-                        }
-                        var binding = new Binding(point, neighborPoint);
-                        bindings.Add(binding);
-                        neighborBindings.Add(binding);
+                    char neighborValue = neighborPoint.InBounds(width, height)
+                            ? rows[neighborPoint.Y][neighborPoint.X]
+                            : FRAME;
+                    if (neighborValue == value) {
+                        continue;
                     }
+                    var binding = new Binding(point, neighborPoint);
+                    Bindings(value).Add(binding);
+                    Bindings(neighborValue).Add(binding);
                 }
             }
         }
+    }
+
+    HashSet<Binding> Bindings(char pieceValue) {
+        if (!pieces.TryGetValue(pieceValue, out var piece)) {
+            pieces.Add(pieceValue, piece = new Piece([]));
+        }
+        if (!piece.Bindings.TryGetValue(pieceValue, out var bindings)) {
+            piece.Bindings.Add(pieceValue, bindings = []);
+        }
+        return bindings;
     }
 
     public int Repair() {
