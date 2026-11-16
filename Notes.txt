@@ -1,499 +1,240 @@
-﻿hands 10:10:10
-direction CW:CW:CW
-current 9:0:5
-move 5400:0:0
-
-hands 6:6:6
-direction CW:CW:CW
-current 1:1:1
-move 6240:6240:6240
-
-hands 7:5:28
-direction CW:CW:CCW
-current 5:4:24
-move 7363:7621:7228
-
-hands 8:8:24
-direction CCW:CCW:CW
-current 4:1:3
-move 8853:9148:8796
-
-hands 8:10:22
-direction CW:CCW:CW
-current 7:5:19
-move 10368:10518:10575
-
-hands 5:10:25
-direction CCW:CCW:CW
-current 1:9:18
-move 12993:12472:12715
-
-hands 9:5:26
-direction CW:CCW:CCW
-current 3:3:15
-move 16029:15763:16119
-
-hands 9:11:20
-direction CW:CW:CCW
-current 4:4:13
-move 19180:17948:18563
-
-hands 9:7:24
-direction CW:CW:CW
-current 2:2:19
-move 23213:22719:21539
-
-hands 6:6:28
-direction CW:CW:CW
-current 3:1:22
-move 27440:26270:26725
-
-hands 6:8:12
-direction CW:CCW:CW
-current 1:2:2
-move 30958:32196:33434
-
-hands 6:5:29
-direction CW:CCW:CW
-current 2:1:28
-move 37890:39423:39078
-
-hands 5:4:31
-direction CW:CW:CCW
-current 4:1:29
-move 44657:45344:47691
-
-hands 8:5:27
-direction CCW:CCW:CCW
-current 7:3:25
-move 54174:57218:54310
-
-hands 7:5:28
-direction CCW:CW:CW
-current 2:4:21
-move 67753:68152:67407
-
-hands 9:11:20
-direction CW:CW:CCW
-current 4:6:1
-move 77097:78205:81195
-
-hands 5:10:25
-direction CW:CCW:CCW
-current 2:1:7
-move 96821:93078:97442
-
-hands 6:14:20
-direction CW:CCW:CCW
-current 3:7:13
-move 117076:115927:115856
-
-hands 5:11:24
-direction CCW:CW:CW
-current 3:6:19
-move 138750:142664:134549
-
-hands 5:11:24
-direction CCW:CCW:CW
-current 4:5:20
-move 162053:164304:172085
-
-hands 5:7:4
-direction CW:CW:CW
-current 4:6:3
-move 191687:199354:207021
-
-hands 7:12:21
-direction CCW:CCW:CW
-current 6:9:7
-move 239095:235446:232432
-
-hands 9:7:24
-direction CW:CCW:CCW
-current 5:2:6
-move 281857:280364:293766
-
-hands 9:11:20
-direction CW:CCW:CCW
-current 2:3:17
-move 339914:339943:351726
-
-hands 5:7:28
-direction CCW:CW:CCW
-current 0:4:20
-move 401707:422953:417707
-
-hands 4:4:32
-direction CCW:CW:CW
-current 0:2:30
-move 497267:494451:511587
-
-hands 9:14:17
-direction CCW:CW:CW
-current 6:5:13
-move 612932:573235:576472
-
-hands 4:11:25
-direction CW:CW:CW
-current 2:4:7
-move 705046:731821:728850
-
-hands 6:4:30
-direction CW:CCW:CW
-current 3:2:6
-move 880820:845273:848798
-
-hands 8:7:25
-direction CW:CCW:CCW
-current 3:4:8
-move 1001139:1000730:1014230
-
-hands 4:5:7
-direction CCW:CCW:CCW
-current 0:0:0
-move 1186881:1234356:1281831
-
-hands 6:8:26
-direction CW:CCW:CW
-current 5:1:4
-move 1463005:1469583:1513232
-
-hands 4:9:27
-direction CW:CW:CCW
-current 2:8:9
-move 1719631:1727534:1754557
-
-hands 4:4:32
-direction CCW:CW:CW
-current 2:2:12
-move 2178491:2150729:2097795
-
-hands 9:12:19
-direction CCW:CCW:CW
-current 4:3:18
-move 2581643:2559028:2477422
-
-hands 6:5:29
-direction CW:CW:CW
-current 3:4:5
-move 3063249:3127749:3161705
-
-hands 4:10:26
-direction CCW:CW:CW
-current 0:8:18
-move 3725928:3598602:3754865
-
-hands 4:11:25
-direction CCW:CW:CCW
-current 1:0:24
-move 4402204:4410132:4296032
-
-hands 6:9:25
-direction CW:CCW:CW
-current 0:7:7
-move 5479056:5127862:5478937
-
-hands 4:12:24
-direction CCW:CW:CCW
-current 2:5:0
-move 6167286:6162920:6361420
-
-hands 5:7:9
-direction CW:CCW:CW
-current 0:0:0
-move 7348857:7642811:7936765
-
-hands 6:14:20
-direction CW:CW:CCW
-current 4:11:11
-move 8868542:9347006:9343237
-
-hands 8:13:19
-direction CCW:CCW:CCW
-current 5:3:6
-move 10967079:10923733:10860850
-
-hands 7:14:19
-direction CW:CCW:CCW
-current 5:1:3
-move 13229477:13637603:13148331
-
-hands 5:7:28
-direction CW:CCW:CCW
-current 0:5:18
-move 16091410:15365486:15951002
-
-hands 9:11:20
-direction CW:CCW:CCW
-current 7:10:11
-move 18506715:18382066:19137680
-
-hands 8:6:26
-direction CCW:CW:CW
-current 0:2:10
-move 23355960:22022064:21978639
-
-hands 7:14:19
-direction CCW:CW:CCW
-current 6:5:7
-move 28347891:28236854:26722035
-
-hands 5:8:27
-direction CW:CW:CCW
-current 4:0:11
-move 32686789:32921829:33387521
-
-hands 8:4:28
-direction CCW:CW:CCW
-current 0:1:1
-move 38598756:39278104:38930427
-
-hands 8:8:8
-direction CW:CCW:CW
-current 0:2:4
-move 45502190:47322277:49142365
-
-hands 6:14:20
-direction CW:CW:CCW
-current 4:4:18
-move 57307934:58879697:56864276
-
-hands 9:12:19
-direction CCW:CCW:CW
-current 5:8:15
-move 67429717:69705739:66960425
-
-hands 4:5:31
-direction CW:CCW:CCW
-current 1:1:29
-move 80459467:81759035:84361954
-
-hands 8:11:21
-direction CW:CCW:CW
-current 2:10:18
-move 101855287:101209516:96411760
-
-hands 7:5:28
-direction CW:CW:CCW
-current 0:0:27
-move 113659173:116100704:114375493
-
-hands 7:11:22
-direction CW:CW:CCW
-current 1:8:14
-move 146234252:137553170:145207762
-
-hands 4:11:25
-direction CW:CCW:CCW
-current 2:0:18
-move 165722991:164853582:163417309
-
-hands 5:10:25
-direction CCW:CW:CCW
-current 4:3:20
-move 210182082:195882212:198943406
-
-hands 7:8:25
-direction CCW:CW:CW
-current 2:6:19
-move 236660792:240463214:237073587
-
-hands 9:9:22
-direction CW:CW:CCW
-current 5:5:17
-move 281737571:304276576:293007073
-
-hands 4:12:24
-direction CCW:CW:CCW
-current 2:8:13
-move 364778521:343022847:358274173
-
-hands 9:4:27
-direction CW:CCW:CW
-current 6:1:22
-move 424338217:422754509:427867738
-
-hands 9:14:17
-direction CCW:CW:CCW
-current 3:11:2
-move 524806122:508147578:508189193
-
-hands 7:9:24
-direction CW:CW:CCW
-current 6:3:19
-move 611119475:622223919:613960697
-
-hands 8:9:23
-direction CCW:CCW:CW
-current 2:6:5
-move 706250295:712900782:741816852
-
-hands 4:10:26
-direction CCW:CW:CCW
-current 2:9:21
-move 891947244:862836640:850152408
-
-hands 5:14:21
-direction CCW:CW:CW
-current 3:10:11
-move 1010341595:1077586655:1058985465
-
-hands 4:9:27
-direction CW:CW:CCW
-current 3:5:25
-move 1235753613:1228753576:1277293867
-
-hands 5:6:29
-direction CCW:CW:CW
-current 1:0:7
-move 1526955550:1495855624:1563111800
-
-hands 6:10:24
-direction CW:CCW:CW
-current 5:8:7
-move 1868083272:1842469067:1760300502
-
-hands 9:13:18
-direction CCW:CW:CCW
-current 7:5:8
-move 2167306097:2215332219:2156487993
-
-hands 7:9:24
-direction CW:CCW:CCW
-current 1:0:10
-move 2656637385:2638697235:2675626798
-
-hands 4:8:28
-direction CCW:CCW:CCW
-current 1:6:1
-move 3077814842:3061418713:3097709798
-
-hands 7:12:21
-direction CW:CW:CCW
-current 3:0:11
-move 3756465129:3850773513:3781291099
-
-hands 6:13:21
-direction CW:CW:CW
-current 5:6:0
-move 4502844067:4599167807:4417653393
-
-hands 5:7:28
-direction CCW:CW:CCW
-current 4:0:21
-move 5336013278:5411311190:5340910845
-
-hands 6:8:26
-direction CCW:CCW:CCW
-current 1:7:7
-move 6617883998:6645623842:6747691465
-
-hands 8:6:26
-direction CCW:CCW:CW
-current 6:2:11
-move 8079991855:7675372076:7560285882
-
-hands 5:5:30
-direction CW:CW:CW
-current 3:2:23
-move 9380101280:9664927392:9498551064
-
-hands 10:10:10
-direction CW:CCW:CW
-current 9:1:5
-move 10801142310:11233188002:11665233694
-
-hands 5:5:30
-direction CW:CW:CCW
-current 4:2:9
-move 13768543926:13276221308:13496001853
-
-hands 9:13:18
-direction CW:CCW:CCW
-current 1:11:3
-move 16251560158:15975815903:16216424778
-
-hands 9:7:24
-direction CW:CW:CW
-current 3:6:10
-move 20106638280:19992533622:18997112824
-
-hands 9:5:26
-direction CW:CW:CW
-current 4:4:9
-move 23141798942:23444569422:22505078867
-
-hands 4:14:22
-direction CCW:CCW:CW
-current 3:2:17
-move 28492380376:27193570886:27807813778
-
-hands 8:12:20
-direction CW:CCW:CW
-current 2:5:19
-move 34044838730:33040178809:33684010268
-
-hands 4:9:27
-direction CW:CCW:CCW
-current 1:7:25
-move 38894153357:38811236069:39328878287
-
-hands 7:6:27
-direction CCW:CCW:CW
-current 3:5:22
-move 48911565331:49350276261:49425872496
-
-hands 6:5:29
-direction CW:CCW:CW
-current 4:2:12
-move 57123521381:58958792413:56425027103
-
-hands 4:11:25
-direction CCW:CCW:CW
-current 1:10:23
-move 70187970582:68822518207:67228099119
-
-hands 4:11:25
-direction CCW:CW:CCW
-current 2:6:7
-move 82492734118:80788884658:83355633156
-
-hands 8:14:18
-direction CW:CW:CCW
-current 6:4:9
-move 102746823066:97385726586:101928319547
-
-hands 5:13:22
-direction CCW:CW:CW
-current 1:4:19
-move 115739919741:119713644762:118457301530
-
-hands 8:13:19
-direction CCW:CW:CCW
-current 3:2:7
-move 147730027607:140359020523:145491721854
-
-hands 4:7:29
-direction CCW:CW:CCW
-current 1:4:22
-move 175361876869:171723421970:174744167385
-
-hands 9:11:20
-direction CW:CCW:CW
-current 3:7:15
-move 202058830479:199997256461:210609343418
-
-hands 4:10:26
-direction CCW:CCW:CCW
-current 0:8:25
-move 249254726011:242515882261:243557965819
-
-hands 8:5:27
-direction CCW:CW:CCW
-current 2:0:20
-move 289845386184:292266500456:299179820711
-
-hands 4:8:12
-direction CW:CCW:CW
-current 1:2:3
-move 345074893841:358877889594:372680885348
+﻿ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;999999999999999999999999999999========================================================================yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy444444444444444444444444444444444444
+ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;999999999999999999999999999999========================================================================yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy444444444444444444444444444444444444
+ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;999999999999999999999999999999========================================================================yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy444444444444444444444444444444444444
+ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;999999999999999999999999999999========================================================================yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy444444444444444444444444444444444444
+ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;999999999999999999999999999999========================================================================yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy444444444444444444444444444444444444
+ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;999999999999999999999999999999========================================================================yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy444444444444444444444444444444444444
+ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;999999999999999999999999999999999999999999999999========================================================================yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyxxxxxxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy444444444444444444444444444444444444
+ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;999999999999999999999999999999999999999999999999========================================================================yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyxxxxxxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy444444444444444444444444444444444444
+ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;999999999999999999999999999999999999999999999999========================================================================yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyxxxxxxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy444444444444444444444444444444444444
+ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;999999999999999999999999999999999999999999999999========================================================================yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyxxxxxxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy444444444444444444444444444444444444
+ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;999999999999999999999999999999999999999999999999========================================================================yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyxxxxxxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy444444444444444444444444444444444444
+ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;999999999999999999999999999999999999999999999999========================================================================yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyxxxxxxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy444444444444444444444444444444444444
+ssssssssssssssssssssssssssssssssssssAAAAAAssssssssssssssssssAAAAAAssssssssssssBBBBBBBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC;;;;;;DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEZZZZZZFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF======GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGyyyyyyHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHkkkkkkyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444444444444444444444444444
+ssssssssssssssssssssssssssssssssssssAAAAAAssssssssssssssssssAAAAAAssssssssssssBBBBBBBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC;;;;;;DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEZZZZZZFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF======GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGyyyyyyHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHkkkkkkyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444444444444444444444444444
+ssssssssssssssssssssssssssssssssssssAAAAAAssssssssssssssssssAAAAAAssssssssssssBBBBBBBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC;;;;;;DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEZZZZZZFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF======GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGyyyyyyHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHkkkkkkyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444444444444444444444444444
+ssssssssssssssssssssssssssssssssssssAAAAAAssssssssssssssssssAAAAAAssssssssssssBBBBBBBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC;;;;;;DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEZZZZZZFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF======GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGyyyyyyHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHkkkkkkyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444444444444444444444444444
+ssssssssssssssssssssssssssssssssssssAAAAAAssssssssssssssssssAAAAAAssssssssssssBBBBBBBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC;;;;;;DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEZZZZZZFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF======GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGyyyyyyHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHkkkkkkyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444444444444444444444444444
+ssssssssssssssssssssssssssssssssssssAAAAAAssssssssssssssssssAAAAAAssssssssssssBBBBBBBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC;;;;;;DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEZZZZZZFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF======GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGyyyyyyHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHkkkkkkyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444444444444444444444444444
+ssssssssssssssssssssssssssssssssssssAAAAAAAAAAAAssssssssssssAAAAAAssssssBBBBBBBBBBBBttttttBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;DDDDDDbbbbbbbbbbbbbbbbbbDDDDDD999999EEEEEEZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))yyyyyyyyyyyyHHHHHHccccccccccccccccccHHHHHHkkkkkkyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444444444
+ssssssssssssssssssssssssssssssssssssAAAAAAAAAAAAssssssssssssAAAAAAssssssBBBBBBBBBBBBttttttBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;DDDDDDbbbbbbbbbbbbbbbbbbDDDDDD999999EEEEEEZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))yyyyyyyyyyyyHHHHHHccccccccccccccccccHHHHHHkkkkkkyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444444444
+ssssssssssssssssssssssssssssssssssssAAAAAAAAAAAAssssssssssssAAAAAAssssssBBBBBBBBBBBBttttttBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;DDDDDDbbbbbbbbbbbbbbbbbbDDDDDD999999EEEEEEZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))yyyyyyyyyyyyHHHHHHccccccccccccccccccHHHHHHkkkkkkyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444444444
+ssssssssssssssssssssssssssssssssssssAAAAAAAAAAAAssssssssssssAAAAAAssssssBBBBBBBBBBBBttttttBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;DDDDDDbbbbbbbbbbbbbbbbbbDDDDDD999999EEEEEEZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))yyyyyyyyyyyyHHHHHHccccccccccccccccccHHHHHHkkkkkkyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444444444
+ssssssssssssssssssssssssssssssssssssAAAAAAAAAAAAssssssssssssAAAAAAssssssBBBBBBBBBBBBttttttBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;DDDDDDbbbbbbbbbbbbbbbbbbDDDDDD999999EEEEEEZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))yyyyyyyyyyyyHHHHHHccccccccccccccccccHHHHHHkkkkkkyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444444444
+ssssssssssssssssssssssssssssssssssssAAAAAAAAAAAAssssssssssssAAAAAAssssssBBBBBBBBBBBBttttttBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;DDDDDDbbbbbbbbbbbbbbbbbbDDDDDD999999EEEEEEZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))yyyyyyyyyyyyHHHHHHccccccccccccccccccHHHHHHkkkkkkyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444444444
+ssssssssssssssssssssssssssssssssssssAAAAAAAAAAAAAAAAAAssssssAAAAAAssssssBBBBBBttttttttttttttttttBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;DDDDDDbbbbbbbbbbbbbbbbbbDDDDDD999999EEEEEEZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))))))))))))))HHHHHHccccccccccccccccccHHHHHHkkkkkkyyyyyykkkkkkkkkkkkyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444
+ssssssssssssssssssssssssssssssssssssAAAAAAAAAAAAAAAAAAssssssAAAAAAssssssBBBBBBttttttttttttttttttBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;DDDDDDbbbbbbbbbbbbbbbbbbDDDDDD999999EEEEEEZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))))))))))))))HHHHHHccccccccccccccccccHHHHHHkkkkkkyyyyyykkkkkkkkkkkkyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444
+ssssssssssssssssssssssssssssssssssssAAAAAAAAAAAAAAAAAAssssssAAAAAAssssssBBBBBBttttttttttttttttttBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;DDDDDDbbbbbbbbbbbbbbbbbbDDDDDD999999EEEEEEZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))))))))))))))HHHHHHccccccccccccccccccHHHHHHkkkkkkyyyyyykkkkkkkkkkkkyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444
+ssssssssssssssssssssssssssssssssssssAAAAAAAAAAAAAAAAAAssssssAAAAAAssssssBBBBBBttttttttttttttttttBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;DDDDDDbbbbbbbbbbbbbbbbbbDDDDDD999999EEEEEEZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))))))))))))))HHHHHHccccccccccccccccccHHHHHHkkkkkkyyyyyykkkkkkkkkkkkyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444
+ssssssssssssssssssssssssssssssssssssAAAAAAAAAAAAAAAAAAssssssAAAAAAssssssBBBBBBttttttttttttttttttBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;DDDDDDbbbbbbbbbbbbbbbbbbDDDDDD999999EEEEEEZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))))))))))))))HHHHHHccccccccccccccccccHHHHHHkkkkkkyyyyyykkkkkkkkkkkkyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444
+ssssssssssssssssssssssssssssssssssssAAAAAAAAAAAAAAAAAAssssssAAAAAAssssssBBBBBBttttttttttttttttttBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;DDDDDDbbbbbbbbbbbbbbbbbbDDDDDD999999EEEEEEZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))))))))))))))HHHHHHccccccccccccccccccHHHHHHkkkkkkyyyyyykkkkkkkkkkkkyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444
+ssssssssssssssssssssssssssssssssssssAAAAAA]]]]]]AAAAAAAAAAAAAAAAAAssssssBBBBBBttttttttttttttttttBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCCCCCCCCCCCCCCCCCCCC999999999999DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGGGGGGGGGGGGGGGGGGGG))))))))))))HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIddddddIIIIIIddddddIIIIIIIIIIIIIIIIIIIIIIII444444
+ssssssssssssssssssssssssssssssssssssAAAAAA]]]]]]AAAAAAAAAAAAAAAAAAssssssBBBBBBttttttttttttttttttBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCCCCCCCCCCCCCCCCCCCC999999999999DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGGGGGGGGGGGGGGGGGGGG))))))))))))HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIddddddIIIIIIddddddIIIIIIIIIIIIIIIIIIIIIIII444444
+ssssssssssssssssssssssssssssssssssssAAAAAA]]]]]]AAAAAAAAAAAAAAAAAAssssssBBBBBBttttttttttttttttttBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCCCCCCCCCCCCCCCCCCCC999999999999DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGGGGGGGGGGGGGGGGGGGG))))))))))))HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIddddddIIIIIIddddddIIIIIIIIIIIIIIIIIIIIIIII444444
+ssssssssssssssssssssssssssssssssssssAAAAAA]]]]]]AAAAAAAAAAAAAAAAAAssssssBBBBBBttttttttttttttttttBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCCCCCCCCCCCCCCCCCCCC999999999999DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGGGGGGGGGGGGGGGGGGGG))))))))))))HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIddddddIIIIIIddddddIIIIIIIIIIIIIIIIIIIIIIII444444
+ssssssssssssssssssssssssssssssssssssAAAAAA]]]]]]AAAAAAAAAAAAAAAAAAssssssBBBBBBttttttttttttttttttBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCCCCCCCCCCCCCCCCCCCC999999999999DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGGGGGGGGGGGGGGGGGGGG))))))))))))HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIddddddIIIIIIddddddIIIIIIIIIIIIIIIIIIIIIIII444444
+ssssssssssssssssssssssssssssssssssssAAAAAA]]]]]]AAAAAAAAAAAAAAAAAAssssssBBBBBBttttttttttttttttttBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCCCCCCCCCCCCCCCCCCCC999999999999DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGGGGGGGGGGGGGGGGGGGG))))))))))))HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJyyyyyyyyyyyyyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIddddddIIIIIIddddddIIIIIIIIIIIIIIIIIIIIIIII444444
+ssssssssssssssssssssssssssssssssssssAAAAAA]]]]]]]]]]]]AAAAAAAAAAAAssssssBBBBBBttttttttttttttttttBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC999999999999999999999999999999DDDDDD999999999999999999DDDDDD999999999999999999999999999999EEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))))))))))))))HHHHHH))))))HHHHHHHHHHHHkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIddddddddddddddddddIIIIIIIIIIIIIIIIIIIIIIII444444
+ssssssssssssssssssssssssssssssssssssAAAAAA]]]]]]]]]]]]AAAAAAAAAAAAssssssBBBBBBttttttttttttttttttBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC999999999999999999999999999999DDDDDD999999999999999999DDDDDD999999999999999999999999999999EEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))))))))))))))HHHHHH))))))HHHHHHHHHHHHkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIddddddddddddddddddIIIIIIIIIIIIIIIIIIIIIIII444444
+ssssssssssssssssssssssssssssssssssssAAAAAA]]]]]]]]]]]]AAAAAAAAAAAAssssssBBBBBBttttttttttttttttttBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC999999999999999999999999999999DDDDDD999999999999999999DDDDDD999999999999999999999999999999EEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))))))))))))))HHHHHH))))))HHHHHHHHHHHHkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIddddddddddddddddddIIIIIIIIIIIIIIIIIIIIIIII444444
+ssssssssssssssssssssssssssssssssssssAAAAAA]]]]]]]]]]]]AAAAAAAAAAAAssssssBBBBBBttttttttttttttttttBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC999999999999999999999999999999DDDDDD999999999999999999DDDDDD999999999999999999999999999999EEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))))))))))))))HHHHHH))))))HHHHHHHHHHHHkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIddddddddddddddddddIIIIIIIIIIIIIIIIIIIIIIII444444
+ssssssssssssssssssssssssssssssssssssAAAAAA]]]]]]]]]]]]AAAAAAAAAAAAssssssBBBBBBttttttttttttttttttBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC999999999999999999999999999999DDDDDD999999999999999999DDDDDD999999999999999999999999999999EEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))))))))))))))HHHHHH))))))HHHHHHHHHHHHkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIddddddddddddddddddIIIIIIIIIIIIIIIIIIIIIIII444444
+ssssssssssssssssssssssssssssssssssssAAAAAA]]]]]]]]]]]]AAAAAAAAAAAAssssssBBBBBBttttttttttttttttttBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC999999999999999999999999999999DDDDDD999999999999999999DDDDDD999999999999999999999999999999EEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))))))))))))))HHHHHH))))))HHHHHHHHHHHHkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJyyyyyyyyyyyyIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIddddddddddddddddddIIIIIIIIIIIIIIIIIIIIIIII444444
+ssssssssssssssssss]]]]]]]]]]]]]]]]]]AAAAAA]]]]]]]]]]]]]]]]]]AAAAAAssssssBBBBBBBBBBBBaaaaaaBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC999999999999999999999999999999DDDDDD999999999999999999DDDDDD999999999999999999999999999999EEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))))))))))))))HHHHHH))))))))))))HHHHHHHHHHHHkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJ::::::::::::::::::IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444
+ssssssssssssssssss]]]]]]]]]]]]]]]]]]AAAAAA]]]]]]]]]]]]]]]]]]AAAAAAssssssBBBBBBBBBBBBaaaaaaBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC999999999999999999999999999999DDDDDD999999999999999999DDDDDD999999999999999999999999999999EEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))))))))))))))HHHHHH))))))))))))HHHHHHHHHHHHkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJ::::::::::::::::::IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444
+ssssssssssssssssss]]]]]]]]]]]]]]]]]]AAAAAA]]]]]]]]]]]]]]]]]]AAAAAAssssssBBBBBBBBBBBBaaaaaaBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC999999999999999999999999999999DDDDDD999999999999999999DDDDDD999999999999999999999999999999EEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))))))))))))))HHHHHH))))))))))))HHHHHHHHHHHHkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJ::::::::::::::::::IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444
+ssssssssssssssssss]]]]]]]]]]]]]]]]]]AAAAAA]]]]]]]]]]]]]]]]]]AAAAAAssssssBBBBBBBBBBBBaaaaaaBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC999999999999999999999999999999DDDDDD999999999999999999DDDDDD999999999999999999999999999999EEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))))))))))))))HHHHHH))))))))))))HHHHHHHHHHHHkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJ::::::::::::::::::IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444
+ssssssssssssssssss]]]]]]]]]]]]]]]]]]AAAAAA]]]]]]]]]]]]]]]]]]AAAAAAssssssBBBBBBBBBBBBaaaaaaBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC999999999999999999999999999999DDDDDD999999999999999999DDDDDD999999999999999999999999999999EEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))))))))))))))HHHHHH))))))))))))HHHHHHHHHHHHkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJ::::::::::::::::::IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444
+ssssssssssssssssss]]]]]]]]]]]]]]]]]]AAAAAA]]]]]]]]]]]]]]]]]]AAAAAAssssssBBBBBBBBBBBBaaaaaaBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;CCCCCC999999999999999999999999999999DDDDDD999999999999999999DDDDDD999999999999999999999999999999EEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGG))))))))))))))))))))))))))))))HHHHHH))))))))))))HHHHHHHHHHHHkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJ::::::::::::::::::IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]AAAAAA]]]]]]]]]]]]]]]]]]AAAAAAssssssssssssBBBBBBBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC999999DDDDDD999999999999999999DDDDDD999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG))))))HHHHHH))))))))))))))))))HHHHHHkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJ::::::::::::IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]AAAAAA]]]]]]]]]]]]]]]]]]AAAAAAssssssssssssBBBBBBBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC999999DDDDDD999999999999999999DDDDDD999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG))))))HHHHHH))))))))))))))))))HHHHHHkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJ::::::::::::IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]AAAAAA]]]]]]]]]]]]]]]]]]AAAAAAssssssssssssBBBBBBBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC999999DDDDDD999999999999999999DDDDDD999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG))))))HHHHHH))))))))))))))))))HHHHHHkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJ::::::::::::IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]AAAAAA]]]]]]]]]]]]]]]]]]AAAAAAssssssssssssBBBBBBBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC999999DDDDDD999999999999999999DDDDDD999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG))))))HHHHHH))))))))))))))))))HHHHHHkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJ::::::::::::IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]AAAAAA]]]]]]]]]]]]]]]]]]AAAAAAssssssssssssBBBBBBBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC999999DDDDDD999999999999999999DDDDDD999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG))))))HHHHHH))))))))))))))))))HHHHHHkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJ::::::::::::IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]AAAAAA]]]]]]]]]]]]]]]]]]AAAAAAssssssssssssBBBBBBBBBBBBBBBBBB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC999999DDDDDD999999999999999999DDDDDD999999EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEZZZZZZZZZZZZZZZZZZFFFFFF==================GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG))))))HHHHHH))))))))))))))))))HHHHHHkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkJJJJJJJJJJJJJJJJJJJJJJJJ::::::::::::IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]ssssssssssssssssssssssss;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;111111111111111111111111999999999999999999999999999999999999999999999999999999999999999999999999ZZZZZZZZZZZZZZZZZZ================================================))))))))))))))))))))))))))))))))))))))))))kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]ssssssssssssssssssssssss;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;111111111111111111111111999999999999999999999999999999999999999999999999999999999999999999999999ZZZZZZZZZZZZZZZZZZ================================================))))))))))))))))))))))))))))))))))))))))))kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]ssssssssssssssssssssssss;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;111111111111111111111111999999999999999999999999999999999999999999999999999999999999999999999999ZZZZZZZZZZZZZZZZZZ================================================))))))))))))))))))))))))))))))))))))))))))kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]ssssssssssssssssssssssss;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;111111111111111111111111999999999999999999999999999999999999999999999999999999999999999999999999ZZZZZZZZZZZZZZZZZZ================================================))))))))))))))))))))))))))))))))))))))))))kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]ssssssssssssssssssssssss;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;111111111111111111111111999999999999999999999999999999999999999999999999999999999999999999999999ZZZZZZZZZZZZZZZZZZ================================================))))))))))))))))))))))))))))))))))))))))))kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]ssssssssssssssssssssssss;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;111111111111111111111111999999999999999999999999999999999999999999999999999999999999999999999999ZZZZZZZZZZZZZZZZZZ================================================))))))))))))))))))))))))))))))))))))))))))kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]ssssss&&&&&&&&&&&&111111111111111111;;;;;;;;;;;;;;;;;;111111111111111111111111999999999999}}}}}}999999999999999999999999999999999999999999999999999999ZZZZZZZZZZZZZZZZZZ============================================================))))))))))))))))))))))))))))))kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::000000000000IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]ssssss&&&&&&&&&&&&111111111111111111;;;;;;;;;;;;;;;;;;111111111111111111111111999999999999}}}}}}999999999999999999999999999999999999999999999999999999ZZZZZZZZZZZZZZZZZZ============================================================))))))))))))))))))))))))))))))kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::000000000000IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]ssssss&&&&&&&&&&&&111111111111111111;;;;;;;;;;;;;;;;;;111111111111111111111111999999999999}}}}}}999999999999999999999999999999999999999999999999999999ZZZZZZZZZZZZZZZZZZ============================================================))))))))))))))))))))))))))))))kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::000000000000IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]ssssss&&&&&&&&&&&&111111111111111111;;;;;;;;;;;;;;;;;;111111111111111111111111999999999999}}}}}}999999999999999999999999999999999999999999999999999999ZZZZZZZZZZZZZZZZZZ============================================================))))))))))))))))))))))))))))))kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::000000000000IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]ssssss&&&&&&&&&&&&111111111111111111;;;;;;;;;;;;;;;;;;111111111111111111111111999999999999}}}}}}999999999999999999999999999999999999999999999999999999ZZZZZZZZZZZZZZZZZZ============================================================))))))))))))))))))))))))))))))kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::000000000000IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]ssssss&&&&&&&&&&&&111111111111111111;;;;;;;;;;;;;;;;;;111111111111111111111111999999999999}}}}}}999999999999999999999999999999999999999999999999999999ZZZZZZZZZZZZZZZZZZ============================================================))))))))))))))))))))))))))))))kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::000000000000IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII444444444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]&&&&&&&&&&&&111111111111111111;;;;;;;;;;;;;;;;;;111111111111111111111111999999}}}}}}}}}}}}}}}}}}999999999999999999999999999999999999999999999999ZZZZZZZZZZZZZZZZZZZZZZZZ================================================)))))))))))))))))))))))))))))))))))))))))){{{{{{{{{{{{kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::000000000000000000000000000000000000000000000000444444444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]&&&&&&&&&&&&111111111111111111;;;;;;;;;;;;;;;;;;111111111111111111111111999999}}}}}}}}}}}}}}}}}}999999999999999999999999999999999999999999999999ZZZZZZZZZZZZZZZZZZZZZZZZ================================================)))))))))))))))))))))))))))))))))))))))))){{{{{{{{{{{{kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::000000000000000000000000000000000000000000000000444444444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]&&&&&&&&&&&&111111111111111111;;;;;;;;;;;;;;;;;;111111111111111111111111999999}}}}}}}}}}}}}}}}}}999999999999999999999999999999999999999999999999ZZZZZZZZZZZZZZZZZZZZZZZZ================================================)))))))))))))))))))))))))))))))))))))))))){{{{{{{{{{{{kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::000000000000000000000000000000000000000000000000444444444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]&&&&&&&&&&&&111111111111111111;;;;;;;;;;;;;;;;;;111111111111111111111111999999}}}}}}}}}}}}}}}}}}999999999999999999999999999999999999999999999999ZZZZZZZZZZZZZZZZZZZZZZZZ================================================)))))))))))))))))))))))))))))))))))))))))){{{{{{{{{{{{kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::000000000000000000000000000000000000000000000000444444444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]&&&&&&&&&&&&111111111111111111;;;;;;;;;;;;;;;;;;111111111111111111111111999999}}}}}}}}}}}}}}}}}}999999999999999999999999999999999999999999999999ZZZZZZZZZZZZZZZZZZZZZZZZ================================================)))))))))))))))))))))))))))))))))))))))))){{{{{{{{{{{{kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::000000000000000000000000000000000000000000000000444444444444
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]&&&&&&&&&&&&111111111111111111;;;;;;;;;;;;;;;;;;111111111111111111111111999999}}}}}}}}}}}}}}}}}}999999999999999999999999999999999999999999999999ZZZZZZZZZZZZZZZZZZZZZZZZ================================================)))))))))))))))))))))))))))))))))))))))))){{{{{{{{{{{{kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::000000000000000000000000000000000000000000000000444444444444
+]]]]]]]]]]]]>>>>>>]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]&&&&&&&&&&&&&&&&&&&&&&&&111111111111111111111111111111111111111111111111111111111111111111}}}}}}999999999999999999}}}}}}}}}}}}999999999999999999ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ================================================)))))))))))))))))))))))))))))))))))))))))){{{{{{kkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::::::::::::::::::::000000000000000000000000000000000000000000000000000000
+]]]]]]]]]]]]>>>>>>]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]&&&&&&&&&&&&&&&&&&&&&&&&111111111111111111111111111111111111111111111111111111111111111111}}}}}}999999999999999999}}}}}}}}}}}}999999999999999999ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ================================================)))))))))))))))))))))))))))))))))))))))))){{{{{{kkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::::::::::::::::::::000000000000000000000000000000000000000000000000000000
+]]]]]]]]]]]]>>>>>>]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]&&&&&&&&&&&&&&&&&&&&&&&&111111111111111111111111111111111111111111111111111111111111111111}}}}}}999999999999999999}}}}}}}}}}}}999999999999999999ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ================================================)))))))))))))))))))))))))))))))))))))))))){{{{{{kkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::::::::::::::::::::000000000000000000000000000000000000000000000000000000
+]]]]]]]]]]]]>>>>>>]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]&&&&&&&&&&&&&&&&&&&&&&&&111111111111111111111111111111111111111111111111111111111111111111}}}}}}999999999999999999}}}}}}}}}}}}999999999999999999ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ================================================)))))))))))))))))))))))))))))))))))))))))){{{{{{kkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::::::::::::::::::::000000000000000000000000000000000000000000000000000000
+]]]]]]]]]]]]>>>>>>]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]&&&&&&&&&&&&&&&&&&&&&&&&111111111111111111111111111111111111111111111111111111111111111111}}}}}}999999999999999999}}}}}}}}}}}}999999999999999999ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ================================================)))))))))))))))))))))))))))))))))))))))))){{{{{{kkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::::::::::::::::::::000000000000000000000000000000000000000000000000000000
+]]]]]]]]]]]]>>>>>>]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]&&&&&&&&&&&&&&&&&&&&&&&&111111111111111111111111111111111111111111111111111111111111111111}}}}}}999999999999999999}}}}}}}}}}}}999999999999999999ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ================================================)))))))))))))))))))))))))))))))))))))))))){{{{{{kkkkkkkkkkkkkkkkkkkkkkkkkkkkkk::::::::::::::::::::::::::::::::::::::::::::::::000000000000000000000000000000000000000000000000000000
+>>>>>>]]]]]]>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&111111111111111111111111111111111111111111111111111111111111111111111111}}}}}}}}}}}}}}}}}}999999}}}}}}}}}}}}}}}}}}999999ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ==========================================)))))))))))))))))))))))))))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{kkkkkk::::::::::::::::::::::::::::::::::::::::::::::::::::::000000000000000000000000000000000000pppppp000000
+>>>>>>]]]]]]>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&111111111111111111111111111111111111111111111111111111111111111111111111}}}}}}}}}}}}}}}}}}999999}}}}}}}}}}}}}}}}}}999999ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ==========================================)))))))))))))))))))))))))))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{kkkkkk::::::::::::::::::::::::::::::::::::::::::::::::::::::000000000000000000000000000000000000pppppp000000
+>>>>>>]]]]]]>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&111111111111111111111111111111111111111111111111111111111111111111111111}}}}}}}}}}}}}}}}}}999999}}}}}}}}}}}}}}}}}}999999ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ==========================================)))))))))))))))))))))))))))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{kkkkkk::::::::::::::::::::::::::::::::::::::::::::::::::::::000000000000000000000000000000000000pppppp000000
+>>>>>>]]]]]]>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&111111111111111111111111111111111111111111111111111111111111111111111111}}}}}}}}}}}}}}}}}}999999}}}}}}}}}}}}}}}}}}999999ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ==========================================)))))))))))))))))))))))))))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{kkkkkk::::::::::::::::::::::::::::::::::::::::::::::::::::::000000000000000000000000000000000000pppppp000000
+>>>>>>]]]]]]>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&111111111111111111111111111111111111111111111111111111111111111111111111}}}}}}}}}}}}}}}}}}999999}}}}}}}}}}}}}}}}}}999999ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ==========================================)))))))))))))))))))))))))))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{kkkkkk::::::::::::::::::::::::::::::::::::::::::::::::::::::000000000000000000000000000000000000pppppp000000
+>>>>>>]]]]]]>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&111111111111111111111111111111111111111111111111111111111111111111111111}}}}}}}}}}}}}}}}}}999999}}}}}}}}}}}}}}}}}}999999ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ==========================================)))))))))))))))))))))))))))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{kkkkkk::::::::::::::::::::::::::::::::::::::::::::::::::::::000000000000000000000000000000000000pppppp000000
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&111111111111111111111111111111111111111111111111111111111111111111111111111111}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ==============================)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{::::::::::::::::::::::::::::::::::::::::::::::::::::::000000000000pppppppppppp000000pppppppppppppppppp
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&111111111111111111111111111111111111111111111111111111111111111111111111111111}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ==============================)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{::::::::::::::::::::::::::::::::::::::::::::::::::::::000000000000pppppppppppp000000pppppppppppppppppp
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&111111111111111111111111111111111111111111111111111111111111111111111111111111}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ==============================)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{::::::::::::::::::::::::::::::::::::::::::::::::::::::000000000000pppppppppppp000000pppppppppppppppppp
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&111111111111111111111111111111111111111111111111111111111111111111111111111111}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ==============================)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{::::::::::::::::::::::::::::::::::::::::::::::::::::::000000000000pppppppppppp000000pppppppppppppppppp
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&111111111111111111111111111111111111111111111111111111111111111111111111111111}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ==============================)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{::::::::::::::::::::::::::::::::::::::::::::::::::::::000000000000pppppppppppp000000pppppppppppppppppp
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&111111111111111111111111111111111111111111111111111111111111111111111111111111}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ==============================)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{::::::::::::::::::::::::::::::::::::::::::::::::::::::000000000000pppppppppppp000000pppppppppppppppppp
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK111111LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL111111MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNZZZZZZZZZZZZOOOOOOOOOOOOOOOOOOwwwwwwwwwwwwPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP)))))))))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{::::::::::::::::::::::::::::::pppppppppppppppppp000000pppppppppppppppppppppppppppppppppppp
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK111111LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL111111MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNZZZZZZZZZZZZOOOOOOOOOOOOOOOOOOwwwwwwwwwwwwPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP)))))))))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{::::::::::::::::::::::::::::::pppppppppppppppppp000000pppppppppppppppppppppppppppppppppppp
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK111111LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL111111MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNZZZZZZZZZZZZOOOOOOOOOOOOOOOOOOwwwwwwwwwwwwPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP)))))))))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{::::::::::::::::::::::::::::::pppppppppppppppppp000000pppppppppppppppppppppppppppppppppppp
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK111111LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL111111MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNZZZZZZZZZZZZOOOOOOOOOOOOOOOOOOwwwwwwwwwwwwPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP)))))))))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{::::::::::::::::::::::::::::::pppppppppppppppppp000000pppppppppppppppppppppppppppppppppppp
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK111111LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL111111MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNZZZZZZZZZZZZOOOOOOOOOOOOOOOOOOwwwwwwwwwwwwPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP)))))))))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{::::::::::::::::::::::::::::::pppppppppppppppppp000000pppppppppppppppppppppppppppppppppppp
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK111111LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL111111MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNZZZZZZZZZZZZOOOOOOOOOOOOOOOOOOwwwwwwwwwwwwPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP)))))))))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{::::::::::::::::::::::::::::::pppppppppppppppppp000000pppppppppppppppppppppppppppppppppppp
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%111111LLLLLL111111111111111111LLLLLL111111MMMMMM}}}}}}}}}}}}}}}}}}MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOOOOOOOO333333OOOOOOOOOOOOwwwwwwPPPPPPffffffffffffffffffPPPPPP)))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{uuuuuuuuuuuuuuuuuu::::::uuuuuu::::::pppppppppppppppppppppppppppppppppppppppppppppppppppppp____________
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%111111LLLLLL111111111111111111LLLLLL111111MMMMMM}}}}}}}}}}}}}}}}}}MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOOOOOOOO333333OOOOOOOOOOOOwwwwwwPPPPPPffffffffffffffffffPPPPPP)))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{uuuuuuuuuuuuuuuuuu::::::uuuuuu::::::pppppppppppppppppppppppppppppppppppppppppppppppppppppp____________
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%111111LLLLLL111111111111111111LLLLLL111111MMMMMM}}}}}}}}}}}}}}}}}}MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOOOOOOOO333333OOOOOOOOOOOOwwwwwwPPPPPPffffffffffffffffffPPPPPP)))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{uuuuuuuuuuuuuuuuuu::::::uuuuuu::::::pppppppppppppppppppppppppppppppppppppppppppppppppppppp____________
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%111111LLLLLL111111111111111111LLLLLL111111MMMMMM}}}}}}}}}}}}}}}}}}MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOOOOOOOO333333OOOOOOOOOOOOwwwwwwPPPPPPffffffffffffffffffPPPPPP)))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{uuuuuuuuuuuuuuuuuu::::::uuuuuu::::::pppppppppppppppppppppppppppppppppppppppppppppppppppppp____________
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%111111LLLLLL111111111111111111LLLLLL111111MMMMMM}}}}}}}}}}}}}}}}}}MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOOOOOOOO333333OOOOOOOOOOOOwwwwwwPPPPPPffffffffffffffffffPPPPPP)))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{uuuuuuuuuuuuuuuuuu::::::uuuuuu::::::pppppppppppppppppppppppppppppppppppppppppppppppppppppp____________
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%111111LLLLLL111111111111111111LLLLLL111111MMMMMM}}}}}}}}}}}}}}}}}}MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOOOOOOOO333333OOOOOOOOOOOOwwwwwwPPPPPPffffffffffffffffffPPPPPP)))))))))))))))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{uuuuuuuuuuuuuuuuuu::::::uuuuuu::::::pppppppppppppppppppppppppppppppppppppppppppppppppppppp____________
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%111111LLLLLL111111111111111111111111111111MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOO333333333333333333OOOOOOwwwwwwPPPPPPffffffffffffffffffPPPPPP)))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{uuuuuuuuuuuuuuuuuuuuuuuuuuuuuupppppppppppppppppppppppppppppp____________pppppp________________________
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%111111LLLLLL111111111111111111111111111111MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOO333333333333333333OOOOOOwwwwwwPPPPPPffffffffffffffffffPPPPPP)))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{uuuuuuuuuuuuuuuuuuuuuuuuuuuuuupppppppppppppppppppppppppppppp____________pppppp________________________
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%111111LLLLLL111111111111111111111111111111MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOO333333333333333333OOOOOOwwwwwwPPPPPPffffffffffffffffffPPPPPP)))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{uuuuuuuuuuuuuuuuuuuuuuuuuuuuuupppppppppppppppppppppppppppppp____________pppppp________________________
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%111111LLLLLL111111111111111111111111111111MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOO333333333333333333OOOOOOwwwwwwPPPPPPffffffffffffffffffPPPPPP)))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{uuuuuuuuuuuuuuuuuuuuuuuuuuuuuupppppppppppppppppppppppppppppp____________pppppp________________________
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%111111LLLLLL111111111111111111111111111111MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOO333333333333333333OOOOOOwwwwwwPPPPPPffffffffffffffffffPPPPPP)))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{uuuuuuuuuuuuuuuuuuuuuuuuuuuuuupppppppppppppppppppppppppppppp____________pppppp________________________
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%111111LLLLLL111111111111111111111111111111MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOO333333333333333333OOOOOOwwwwwwPPPPPPffffffffffffffffffPPPPPP)))))))))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{uuuuuuuuuuuuuuuuuuuuuuuuuuuuuupppppppppppppppppppppppppppppp____________pppppp________________________
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKKKKKKKKKKKKKKKKKKKK%%%%%%%%%%%%LLLLLL111111LLLLLLLLLLLLLLLLLL111111MMMMMM}}}}}}MMMMMMMMMMMMMMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNNNNNNNNNNNNNNNNNNNZZZZZZZZZZZZOOOOOO333333333333333333OOOOOOwwwwwwPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP)))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu______________________________________________________
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKKKKKKKKKKKKKKKKKKKK%%%%%%%%%%%%LLLLLL111111LLLLLLLLLLLLLLLLLL111111MMMMMM}}}}}}MMMMMMMMMMMMMMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNNNNNNNNNNNNNNNNNNNZZZZZZZZZZZZOOOOOO333333333333333333OOOOOOwwwwwwPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP)))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu______________________________________________________
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKKKKKKKKKKKKKKKKKKKK%%%%%%%%%%%%LLLLLL111111LLLLLLLLLLLLLLLLLL111111MMMMMM}}}}}}MMMMMMMMMMMMMMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNNNNNNNNNNNNNNNNNNNZZZZZZZZZZZZOOOOOO333333333333333333OOOOOOwwwwwwPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP)))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu______________________________________________________
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKKKKKKKKKKKKKKKKKKKK%%%%%%%%%%%%LLLLLL111111LLLLLLLLLLLLLLLLLL111111MMMMMM}}}}}}MMMMMMMMMMMMMMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNNNNNNNNNNNNNNNNNNNZZZZZZZZZZZZOOOOOO333333333333333333OOOOOOwwwwwwPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP)))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu______________________________________________________
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKKKKKKKKKKKKKKKKKKKK%%%%%%%%%%%%LLLLLL111111LLLLLLLLLLLLLLLLLL111111MMMMMM}}}}}}MMMMMMMMMMMMMMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNNNNNNNNNNNNNNNNNNNZZZZZZZZZZZZOOOOOO333333333333333333OOOOOOwwwwwwPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP)))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu______________________________________________________
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKKKKKKKKKKKKKKKKKKKK%%%%%%%%%%%%LLLLLL111111LLLLLLLLLLLLLLLLLL111111MMMMMM}}}}}}MMMMMMMMMMMMMMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNNNNNNNNNNNNNNNNNNNZZZZZZZZZZZZOOOOOO333333333333333333OOOOOOwwwwwwPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP)))))))))))){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu______________________________________________________
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLLLLL111111111111111111LLLLLL111111MMMMMM}}}}}}}}}}}}}}}}}}MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOO333333333333333333OOOOOOwwwwwwPPPPPPnnnnnnPPPPPPPPPPPP555555555555555555555555{{{{{{555555??????{{{{{{??????{{{{{{??????{{{{{{{{{{{{uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu______uuuuuu________________________!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLLLLL111111111111111111LLLLLL111111MMMMMM}}}}}}}}}}}}}}}}}}MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOO333333333333333333OOOOOOwwwwwwPPPPPPnnnnnnPPPPPPPPPPPP555555555555555555555555{{{{{{555555??????{{{{{{??????{{{{{{??????{{{{{{{{{{{{uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu______uuuuuu________________________!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLLLLL111111111111111111LLLLLL111111MMMMMM}}}}}}}}}}}}}}}}}}MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOO333333333333333333OOOOOOwwwwwwPPPPPPnnnnnnPPPPPPPPPPPP555555555555555555555555{{{{{{555555??????{{{{{{??????{{{{{{??????{{{{{{{{{{{{uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu______uuuuuu________________________!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLLLLL111111111111111111LLLLLL111111MMMMMM}}}}}}}}}}}}}}}}}}MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOO333333333333333333OOOOOOwwwwwwPPPPPPnnnnnnPPPPPPPPPPPP555555555555555555555555{{{{{{555555??????{{{{{{??????{{{{{{??????{{{{{{{{{{{{uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu______uuuuuu________________________!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLLLLL111111111111111111LLLLLL111111MMMMMM}}}}}}}}}}}}}}}}}}MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOO333333333333333333OOOOOOwwwwwwPPPPPPnnnnnnPPPPPPPPPPPP555555555555555555555555{{{{{{555555??????{{{{{{??????{{{{{{??????{{{{{{{{{{{{uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu______uuuuuu________________________!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLLLLL111111111111111111LLLLLL111111MMMMMM}}}}}}}}}}}}}}}}}}MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOO333333333333333333OOOOOOwwwwwwPPPPPPnnnnnnPPPPPPPPPPPP555555555555555555555555{{{{{{555555??????{{{{{{??????{{{{{{??????{{{{{{{{{{{{uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu______uuuuuu________________________!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLLLLL111111111111111111LLLLLL111111MMMMMM}}}}}}}}}}}}}}}}}}MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZrrrrrrrrrrrrOOOOOOOOOOOOeeeeeeOOOOOOOOOOOOwwwwwwPPPPPPnnnnnnnnnnnnPPPPPPPPPPPP555555555555555555555555555555??????????????????????????????????????????????????????uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLLLLL111111111111111111LLLLLL111111MMMMMM}}}}}}}}}}}}}}}}}}MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZrrrrrrrrrrrrOOOOOOOOOOOOeeeeeeOOOOOOOOOOOOwwwwwwPPPPPPnnnnnnnnnnnnPPPPPPPPPPPP555555555555555555555555555555??????????????????????????????????????????????????????uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLLLLL111111111111111111LLLLLL111111MMMMMM}}}}}}}}}}}}}}}}}}MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZrrrrrrrrrrrrOOOOOOOOOOOOeeeeeeOOOOOOOOOOOOwwwwwwPPPPPPnnnnnnnnnnnnPPPPPPPPPPPP555555555555555555555555555555??????????????????????????????????????????????????????uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLLLLL111111111111111111LLLLLL111111MMMMMM}}}}}}}}}}}}}}}}}}MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZrrrrrrrrrrrrOOOOOOOOOOOOeeeeeeOOOOOOOOOOOOwwwwwwPPPPPPnnnnnnnnnnnnPPPPPPPPPPPP555555555555555555555555555555??????????????????????????????????????????????????????uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLLLLL111111111111111111LLLLLL111111MMMMMM}}}}}}}}}}}}}}}}}}MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZrrrrrrrrrrrrOOOOOOOOOOOOeeeeeeOOOOOOOOOOOOwwwwwwPPPPPPnnnnnnnnnnnnPPPPPPPPPPPP555555555555555555555555555555??????????????????????????????????????????????????????uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&KKKKKK%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLLLLL111111111111111111LLLLLL111111MMMMMM}}}}}}}}}}}}}}}}}}MMMMMM}}}}}}}}}}}}}}}}}}}}}}}}NNNNNNZZZZZZZZZZZZZZZZZZrrrrrrrrrrrrOOOOOOOOOOOOeeeeeeOOOOOOOOOOOOwwwwwwPPPPPPnnnnnnnnnnnnPPPPPPPPPPPP555555555555555555555555555555??????????????????????????????????????????????????????uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>jjjjjjjjjjjjjjjjjj&&&&&&&&&&&&[[[[[[[[[[[[[[[[[[&&&&&&&&&&&&KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK%%%%%%LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL^^^^^^MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM######}}}}}}}}}}}}######NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZrrrrrrrrrrrrOOOOOOOOOOOOOOOOOOwwwwwwwwwwwwPPPPPPnnnnnnnnnnnnnnnnnnPPPPPP555555555555555555555555555555555555????????????????????????????????????????????????uuuuuuuuuuuu888888888888uuuuuuuuuuuuuuuuuu!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>jjjjjjjjjjjjjjjjjj&&&&&&&&&&&&[[[[[[[[[[[[[[[[[[&&&&&&&&&&&&KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK%%%%%%LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL^^^^^^MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM######}}}}}}}}}}}}######NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZrrrrrrrrrrrrOOOOOOOOOOOOOOOOOOwwwwwwwwwwwwPPPPPPnnnnnnnnnnnnnnnnnnPPPPPP555555555555555555555555555555555555????????????????????????????????????????????????uuuuuuuuuuuu888888888888uuuuuuuuuuuuuuuuuu!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>jjjjjjjjjjjjjjjjjj&&&&&&&&&&&&[[[[[[[[[[[[[[[[[[&&&&&&&&&&&&KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK%%%%%%LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL^^^^^^MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM######}}}}}}}}}}}}######NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZrrrrrrrrrrrrOOOOOOOOOOOOOOOOOOwwwwwwwwwwwwPPPPPPnnnnnnnnnnnnnnnnnnPPPPPP555555555555555555555555555555555555????????????????????????????????????????????????uuuuuuuuuuuu888888888888uuuuuuuuuuuuuuuuuu!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>jjjjjjjjjjjjjjjjjj&&&&&&&&&&&&[[[[[[[[[[[[[[[[[[&&&&&&&&&&&&KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK%%%%%%LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL^^^^^^MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM######}}}}}}}}}}}}######NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZrrrrrrrrrrrrOOOOOOOOOOOOOOOOOOwwwwwwwwwwwwPPPPPPnnnnnnnnnnnnnnnnnnPPPPPP555555555555555555555555555555555555????????????????????????????????????????????????uuuuuuuuuuuu888888888888uuuuuuuuuuuuuuuuuu!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>jjjjjjjjjjjjjjjjjj&&&&&&&&&&&&[[[[[[[[[[[[[[[[[[&&&&&&&&&&&&KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK%%%%%%LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL^^^^^^MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM######}}}}}}}}}}}}######NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZrrrrrrrrrrrrOOOOOOOOOOOOOOOOOOwwwwwwwwwwwwPPPPPPnnnnnnnnnnnnnnnnnnPPPPPP555555555555555555555555555555555555????????????????????????????????????????????????uuuuuuuuuuuu888888888888uuuuuuuuuuuuuuuuuu!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>jjjjjjjjjjjjjjjjjj&&&&&&&&&&&&[[[[[[[[[[[[[[[[[[&&&&&&&&&&&&KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK%%%%%%LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL^^^^^^MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM######}}}}}}}}}}}}######NNNNNNZZZZZZZZZZZZZZZZZZZZZZZZrrrrrrrrrrrrOOOOOOOOOOOOOOOOOOwwwwwwwwwwwwPPPPPPnnnnnnnnnnnnnnnnnnPPPPPP555555555555555555555555555555555555????????????????????????????????????????????????uuuuuuuuuuuu888888888888uuuuuuuuuuuuuuuuuu!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>jjjjjjjjjjjjjjjjjjjjjjjj&&&&&&[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^############################################################ZZZZZZZZZZZZrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrwwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555555555555555555555555555????????????????????????????????????888888888888888888888888888888888888uuuuuuuuuuuuuuuuuuuuuuuu!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>jjjjjjjjjjjjjjjjjjjjjjjj&&&&&&[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^############################################################ZZZZZZZZZZZZrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrwwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555555555555555555555555555????????????????????????????????????888888888888888888888888888888888888uuuuuuuuuuuuuuuuuuuuuuuu!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>jjjjjjjjjjjjjjjjjjjjjjjj&&&&&&[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^############################################################ZZZZZZZZZZZZrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrwwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555555555555555555555555555????????????????????????????????????888888888888888888888888888888888888uuuuuuuuuuuuuuuuuuuuuuuu!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>jjjjjjjjjjjjjjjjjjjjjjjj&&&&&&[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^############################################################ZZZZZZZZZZZZrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrwwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555555555555555555555555555????????????????????????????????????888888888888888888888888888888888888uuuuuuuuuuuuuuuuuuuuuuuu!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>jjjjjjjjjjjjjjjjjjjjjjjj&&&&&&[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^############################################################ZZZZZZZZZZZZrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrwwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555555555555555555555555555????????????????????????????????????888888888888888888888888888888888888uuuuuuuuuuuuuuuuuuuuuuuu!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>jjjjjjjjjjjjjjjjjjjjjjjj&&&&&&[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^############################################################ZZZZZZZZZZZZrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrwwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555555555555555555555555555????????????????????????????????????888888888888888888888888888888888888uuuuuuuuuuuuuuuuuuuuuuuu!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^######^^^^^^##############################ZZZZZZZZZZZZZZZZZZ<<<<<<<<<<<<<<<<<<<<<<<<rrrrrr<<<<<<wwwwwwwwwwwwwwwwwwnnnnnnnnnnnnnnnnnn555555555555555555555555555555555555555555555555555555????????????????????????????????????888888888888888888888888888888888888888888888888!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^######^^^^^^##############################ZZZZZZZZZZZZZZZZZZ<<<<<<<<<<<<<<<<<<<<<<<<rrrrrr<<<<<<wwwwwwwwwwwwwwwwwwnnnnnnnnnnnnnnnnnn555555555555555555555555555555555555555555555555555555????????????????????????????????????888888888888888888888888888888888888888888888888!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^######^^^^^^##############################ZZZZZZZZZZZZZZZZZZ<<<<<<<<<<<<<<<<<<<<<<<<rrrrrr<<<<<<wwwwwwwwwwwwwwwwwwnnnnnnnnnnnnnnnnnn555555555555555555555555555555555555555555555555555555????????????????????????????????????888888888888888888888888888888888888888888888888!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^######^^^^^^##############################ZZZZZZZZZZZZZZZZZZ<<<<<<<<<<<<<<<<<<<<<<<<rrrrrr<<<<<<wwwwwwwwwwwwwwwwwwnnnnnnnnnnnnnnnnnn555555555555555555555555555555555555555555555555555555????????????????????????????????????888888888888888888888888888888888888888888888888!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^######^^^^^^##############################ZZZZZZZZZZZZZZZZZZ<<<<<<<<<<<<<<<<<<<<<<<<rrrrrr<<<<<<wwwwwwwwwwwwwwwwwwnnnnnnnnnnnnnnnnnn555555555555555555555555555555555555555555555555555555????????????????????????????????????888888888888888888888888888888888888888888888888!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^######^^^^^^##############################ZZZZZZZZZZZZZZZZZZ<<<<<<<<<<<<<<<<<<<<<<<<rrrrrr<<<<<<wwwwwwwwwwwwwwwwwwnnnnnnnnnnnnnnnnnn555555555555555555555555555555555555555555555555555555????????????????????????????????????888888888888888888888888888888888888888888888888!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^####################################ZZZZZZZZZZZZZZZZZZ<<<<<<<<<<<<<<<<<<rrrrrr<<<<<<<<<<<<wwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555555555555555555555555555??????????????????888888888888888888888888888888888888777777777777777777666666666666666666!!!!!!666666666666!!!!!!!!!!!!
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^####################################ZZZZZZZZZZZZZZZZZZ<<<<<<<<<<<<<<<<<<rrrrrr<<<<<<<<<<<<wwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555555555555555555555555555??????????????????888888888888888888888888888888888888777777777777777777666666666666666666!!!!!!666666666666!!!!!!!!!!!!
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^####################################ZZZZZZZZZZZZZZZZZZ<<<<<<<<<<<<<<<<<<rrrrrr<<<<<<<<<<<<wwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555555555555555555555555555??????????????????888888888888888888888888888888888888777777777777777777666666666666666666!!!!!!666666666666!!!!!!!!!!!!
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^####################################ZZZZZZZZZZZZZZZZZZ<<<<<<<<<<<<<<<<<<rrrrrr<<<<<<<<<<<<wwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555555555555555555555555555??????????????????888888888888888888888888888888888888777777777777777777666666666666666666!!!!!!666666666666!!!!!!!!!!!!
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^####################################ZZZZZZZZZZZZZZZZZZ<<<<<<<<<<<<<<<<<<rrrrrr<<<<<<<<<<<<wwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555555555555555555555555555??????????????????888888888888888888888888888888888888777777777777777777666666666666666666!!!!!!666666666666!!!!!!!!!!!!
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^####################################ZZZZZZZZZZZZZZZZZZ<<<<<<<<<<<<<<<<<<rrrrrr<<<<<<<<<<<<wwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555555555555555555555555555??????????????????888888888888888888888888888888888888777777777777777777666666666666666666!!!!!!666666666666!!!!!!!!!!!!
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^####################################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555555555oooooo555555555555oooooo??????????????????888888888888777777777777888888777777777777777777777777666666666666666666666666666666666666!!!!!!
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^####################################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555555555oooooo555555555555oooooo??????????????????888888888888777777777777888888777777777777777777777777666666666666666666666666666666666666!!!!!!
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^####################################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555555555oooooo555555555555oooooo??????????????????888888888888777777777777888888777777777777777777777777666666666666666666666666666666666666!!!!!!
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^####################################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555555555oooooo555555555555oooooo??????????????????888888888888777777777777888888777777777777777777777777666666666666666666666666666666666666!!!!!!
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^####################################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555555555oooooo555555555555oooooo??????????????????888888888888777777777777888888777777777777777777777777666666666666666666666666666666666666!!!!!!
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^####################################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555555555oooooo555555555555oooooo??????????????????888888888888777777777777888888777777777777777777777777666666666666666666666666666666666666!!!!!!
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^##########################################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wwwwwwwwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555oooooooooooooooooooooooo????????????777777777777777777777777777777777777777777777777777777666666666666666666666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^##########################################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wwwwwwwwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555oooooooooooooooooooooooo????????????777777777777777777777777777777777777777777777777777777666666666666666666666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^##########################################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wwwwwwwwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555oooooooooooooooooooooooo????????????777777777777777777777777777777777777777777777777777777666666666666666666666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^##########################################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wwwwwwwwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555oooooooooooooooooooooooo????????????777777777777777777777777777777777777777777777777777777666666666666666666666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^##########################################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wwwwwwwwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555oooooooooooooooooooooooo????????????777777777777777777777777777777777777777777777777777777666666666666666666666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^##########################################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wwwwwwwwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555555555555555oooooooooooooooooooooooo????????????777777777777777777777777777777777777777777777777777777666666666666666666666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^##########################################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wwwwwwwwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555oooooooooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777666666666666666666666666666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^##########################################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wwwwwwwwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555oooooooooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777666666666666666666666666666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^##########################################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wwwwwwwwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555oooooooooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777666666666666666666666666666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^##########################################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wwwwwwwwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555oooooooooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777666666666666666666666666666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^##########################################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wwwwwwwwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555oooooooooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777666666666666666666666666666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^##########################################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<wwwwwwwwwwwwwwwwwwnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn555555oooooooooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777666666666666666666666666666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ[[[[[[RRRRRR[[[[[[[[[[[[[[[[[[RRRRRR%%%%%%SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS@@@@@@TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUUUUUUUUUUUUUUUUUUUUUUUUU<<<<<<VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVwwwwwwWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWnnnnnnYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYoooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777777777666666666666666666666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ[[[[[[RRRRRR[[[[[[[[[[[[[[[[[[RRRRRR%%%%%%SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS@@@@@@TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUUUUUUUUUUUUUUUUUUUUUUUUU<<<<<<VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVwwwwwwWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWnnnnnnYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYoooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777777777666666666666666666666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ[[[[[[RRRRRR[[[[[[[[[[[[[[[[[[RRRRRR%%%%%%SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS@@@@@@TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUUUUUUUUUUUUUUUUUUUUUUUUU<<<<<<VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVwwwwwwWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWnnnnnnYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYoooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777777777666666666666666666666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ[[[[[[RRRRRR[[[[[[[[[[[[[[[[[[RRRRRR%%%%%%SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS@@@@@@TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUUUUUUUUUUUUUUUUUUUUUUUUU<<<<<<VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVwwwwwwWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWnnnnnnYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYoooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777777777666666666666666666666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ[[[[[[RRRRRR[[[[[[[[[[[[[[[[[[RRRRRR%%%%%%SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS@@@@@@TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUUUUUUUUUUUUUUUUUUUUUUUUU<<<<<<VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVwwwwwwWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWnnnnnnYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYoooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777777777666666666666666666666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ[[[[[[RRRRRR[[[[[[[[[[[[[[[[[[RRRRRR%%%%%%SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS@@@@@@TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUUUUUUUUUUUUUUUUUUUUUUUUU<<<<<<VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVwwwwwwWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWnnnnnnYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYoooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777777777666666666666666666666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjQQQQQQ************[[[[[[RRRRRR[[[[[[[[[[[[[[[[[[RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUggggggggggggggggggUUUUUU<<<<<<VVVVVVhhhhhhhhhhhhhhhhhhVVVVVVwwwwwwWWWWWWiiiiiiiiiiiiiiiiiiWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||oooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777777777777777777777777777666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjQQQQQQ************[[[[[[RRRRRR[[[[[[[[[[[[[[[[[[RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUggggggggggggggggggUUUUUU<<<<<<VVVVVVhhhhhhhhhhhhhhhhhhVVVVVVwwwwwwWWWWWWiiiiiiiiiiiiiiiiiiWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||oooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777777777777777777777777777666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjQQQQQQ************[[[[[[RRRRRR[[[[[[[[[[[[[[[[[[RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUggggggggggggggggggUUUUUU<<<<<<VVVVVVhhhhhhhhhhhhhhhhhhVVVVVVwwwwwwWWWWWWiiiiiiiiiiiiiiiiiiWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||oooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777777777777777777777777777666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjQQQQQQ************[[[[[[RRRRRR[[[[[[[[[[[[[[[[[[RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUggggggggggggggggggUUUUUU<<<<<<VVVVVVhhhhhhhhhhhhhhhhhhVVVVVVwwwwwwWWWWWWiiiiiiiiiiiiiiiiiiWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||oooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777777777777777777777777777666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjQQQQQQ************[[[[[[RRRRRR[[[[[[[[[[[[[[[[[[RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUggggggggggggggggggUUUUUU<<<<<<VVVVVVhhhhhhhhhhhhhhhhhhVVVVVVwwwwwwWWWWWWiiiiiiiiiiiiiiiiiiWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||oooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777777777777777777777777777666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjQQQQQQ************[[[[[[RRRRRR[[[[[[[[[[[[[[[[[[RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUggggggggggggggggggUUUUUU<<<<<<VVVVVVhhhhhhhhhhhhhhhhhhVVVVVVwwwwwwWWWWWWiiiiiiiiiiiiiiiiiiWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||oooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777777777777777777777777777666666666666666666666666666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjQQQQQQ******************RRRRRR[[[[[[[[[[[[[[[[[[RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUggggggggggggggggggUUUUUU<<<<<<VVVVVVhhhhhhhhhhhhhhhhhhVVVVVVwwwwwwWWWWWWiiiiiiiiiiiiiiiiiiWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||oooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777777777777777666666666666666666666666666666++++++666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjQQQQQQ******************RRRRRR[[[[[[[[[[[[[[[[[[RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUggggggggggggggggggUUUUUU<<<<<<VVVVVVhhhhhhhhhhhhhhhhhhVVVVVVwwwwwwWWWWWWiiiiiiiiiiiiiiiiiiWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||oooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777777777777777666666666666666666666666666666++++++666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjQQQQQQ******************RRRRRR[[[[[[[[[[[[[[[[[[RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUggggggggggggggggggUUUUUU<<<<<<VVVVVVhhhhhhhhhhhhhhhhhhVVVVVVwwwwwwWWWWWWiiiiiiiiiiiiiiiiiiWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||oooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777777777777777666666666666666666666666666666++++++666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjQQQQQQ******************RRRRRR[[[[[[[[[[[[[[[[[[RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUggggggggggggggggggUUUUUU<<<<<<VVVVVVhhhhhhhhhhhhhhhhhhVVVVVVwwwwwwWWWWWWiiiiiiiiiiiiiiiiiiWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||oooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777777777777777666666666666666666666666666666++++++666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjQQQQQQ******************RRRRRR[[[[[[[[[[[[[[[[[[RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUggggggggggggggggggUUUUUU<<<<<<VVVVVVhhhhhhhhhhhhhhhhhhVVVVVVwwwwwwWWWWWWiiiiiiiiiiiiiiiiiiWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||oooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777777777777777666666666666666666666666666666++++++666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjQQQQQQ******************RRRRRR[[[[[[[[[[[[[[[[[[RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUggggggggggggggggggUUUUUU<<<<<<VVVVVVhhhhhhhhhhhhhhhhhhVVVVVVwwwwwwWWWWWWiiiiiiiiiiiiiiiiiiWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||oooooooooooooooooooooooooooooooooooooooooo777777777777777777777777777777777777777777777777777777777777666666666666666666666666666666++++++666666
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj******************QQQQQQ******************RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUUUUUUUUUUUUUUUUUUUUUUUUU<<<<<<VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVwwwwwwWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||||||||||||||oooooooooooooooooooooooo||||||777777777777777777||||||||||||777777777777777777777777777777666666vvvvvv++++++++++++++++++++++++++++++
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj******************QQQQQQ******************RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUUUUUUUUUUUUUUUUUUUUUUUUU<<<<<<VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVwwwwwwWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||||||||||||||oooooooooooooooooooooooo||||||777777777777777777||||||||||||777777777777777777777777777777666666vvvvvv++++++++++++++++++++++++++++++
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj******************QQQQQQ******************RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUUUUUUUUUUUUUUUUUUUUUUUUU<<<<<<VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVwwwwwwWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||||||||||||||oooooooooooooooooooooooo||||||777777777777777777||||||||||||777777777777777777777777777777666666vvvvvv++++++++++++++++++++++++++++++
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj******************QQQQQQ******************RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUUUUUUUUUUUUUUUUUUUUUUUUU<<<<<<VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVwwwwwwWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||||||||||||||oooooooooooooooooooooooo||||||777777777777777777||||||||||||777777777777777777777777777777666666vvvvvv++++++++++++++++++++++++++++++
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj******************QQQQQQ******************RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUUUUUUUUUUUUUUUUUUUUUUUUU<<<<<<VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVwwwwwwWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||||||||||||||oooooooooooooooooooooooo||||||777777777777777777||||||||||||777777777777777777777777777777666666vvvvvv++++++++++++++++++++++++++++++
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj******************QQQQQQ******************RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUUUUUUUUUUUUUUUUUUUUUUUUUU<<<<<<VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVwwwwwwWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||||||||||||||oooooooooooooooooooooooo||||||777777777777777777||||||||||||777777777777777777777777777777666666vvvvvv++++++++++++++++++++++++++++++
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj******************QQQQQQ******************RRRRRR------------------RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUU<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<VVVVVVmmmmmmmmmmmmmmmmmmVVVVVVwwwwwwWWWWWWwwwwwwWWWWWWWWWWWWnnnnnnnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||||||||||||||||||||||||||oooooooooooo||||||||||||||||||||||||||||||777777777777vvvvvvvvvvvvvvvvvv666666666666vvvvvv++++++++++++++++++++++++++++++
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj******************QQQQQQ******************RRRRRR------------------RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUU<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<VVVVVVmmmmmmmmmmmmmmmmmmVVVVVVwwwwwwWWWWWWwwwwwwWWWWWWWWWWWWnnnnnnnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||||||||||||||||||||||||||oooooooooooo||||||||||||||||||||||||||||||777777777777vvvvvvvvvvvvvvvvvv666666666666vvvvvv++++++++++++++++++++++++++++++
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj******************QQQQQQ******************RRRRRR------------------RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUU<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<VVVVVVmmmmmmmmmmmmmmmmmmVVVVVVwwwwwwWWWWWWwwwwwwWWWWWWWWWWWWnnnnnnnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||||||||||||||||||||||||||oooooooooooo||||||||||||||||||||||||||||||777777777777vvvvvvvvvvvvvvvvvv666666666666vvvvvv++++++++++++++++++++++++++++++
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj******************QQQQQQ******************RRRRRR------------------RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUU<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<VVVVVVmmmmmmmmmmmmmmmmmmVVVVVVwwwwwwWWWWWWwwwwwwWWWWWWWWWWWWnnnnnnnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||||||||||||||||||||||||||oooooooooooo||||||||||||||||||||||||||||||777777777777vvvvvvvvvvvvvvvvvv666666666666vvvvvv++++++++++++++++++++++++++++++
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj******************QQQQQQ******************RRRRRR------------------RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUU<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<VVVVVVmmmmmmmmmmmmmmmmmmVVVVVVwwwwwwWWWWWWwwwwwwWWWWWWWWWWWWnnnnnnnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||||||||||||||||||||||||||oooooooooooo||||||||||||||||||||||||||||||777777777777vvvvvvvvvvvvvvvvvv666666666666vvvvvv++++++++++++++++++++++++++++++
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj******************QQQQQQ******************RRRRRR------------------RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUU<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<VVVVVVmmmmmmmmmmmmmmmmmmVVVVVVwwwwwwWWWWWWwwwwwwWWWWWWWWWWWWnnnnnnnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||||||||||||||||||||||||||oooooooooooo||||||||||||||||||||||||||||||777777777777vvvvvvvvvvvvvvvvvv666666666666vvvvvv++++++++++++++++++++++++++++++
+jjjjjjjjjjjjzzzzzzzzzzzzzzzzzzzzzzzz************QQQQQQ******************RRRRRR------------------RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUU<<<<<<<<<<<<mmmmmm<<<<<<mmmmmmVVVVVVmmmmmmwwwwwwwwwwwwVVVVVVwwwwwwWWWWWWwwwwwwwwwwwwWWWWWWWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||777777777777777777vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++++++++
+jjjjjjjjjjjjzzzzzzzzzzzzzzzzzzzzzzzz************QQQQQQ******************RRRRRR------------------RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUU<<<<<<<<<<<<mmmmmm<<<<<<mmmmmmVVVVVVmmmmmmwwwwwwwwwwwwVVVVVVwwwwwwWWWWWWwwwwwwwwwwwwWWWWWWWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||777777777777777777vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++++++++
+jjjjjjjjjjjjzzzzzzzzzzzzzzzzzzzzzzzz************QQQQQQ******************RRRRRR------------------RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUU<<<<<<<<<<<<mmmmmm<<<<<<mmmmmmVVVVVVmmmmmmwwwwwwwwwwwwVVVVVVwwwwwwWWWWWWwwwwwwwwwwwwWWWWWWWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||777777777777777777vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++++++++
+jjjjjjjjjjjjzzzzzzzzzzzzzzzzzzzzzzzz************QQQQQQ******************RRRRRR------------------RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUU<<<<<<<<<<<<mmmmmm<<<<<<mmmmmmVVVVVVmmmmmmwwwwwwwwwwwwVVVVVVwwwwwwWWWWWWwwwwwwwwwwwwWWWWWWWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||777777777777777777vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++++++++
+jjjjjjjjjjjjzzzzzzzzzzzzzzzzzzzzzzzz************QQQQQQ******************RRRRRR------------------RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUU<<<<<<<<<<<<mmmmmm<<<<<<mmmmmmVVVVVVmmmmmmwwwwwwwwwwwwVVVVVVwwwwwwWWWWWWwwwwwwwwwwwwWWWWWWWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||777777777777777777vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++++++++
+jjjjjjjjjjjjzzzzzzzzzzzzzzzzzzzzzzzz************QQQQQQ******************RRRRRR------------------RRRRRR%%%%%%%%%%%%%%%%%%SSSSSS@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@TTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUU<<<<<<<<<<<<mmmmmm<<<<<<mmmmmmVVVVVVmmmmmmwwwwwwwwwwwwVVVVVVwwwwwwWWWWWWwwwwwwwwwwwwWWWWWWWWWWWWnnnnnnnnnnnnnnnnnnYYYYYY||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||777777777777777777vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++++++++
+jjjjjjjjjjjjzzzzzzzzzzzzzzzzzz******************QQQQQQ******************RRRRRR------------------RRRRRR%%%%%%SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS@@@@@@TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUU<<<<<<mmmmmmmmmmmm<<<<<<mmmmmmVVVVVVmmmmmmwwwwwwwwwwwwVVVVVVwwwwwwWWWWWWwwwwwwwwwwww222222WWWWWW222222222222222222YYYYYY||||||||||||222222||||||llllllllllll||||||||||||llllll||||||||||||777777777777777777777777vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++++++++++++++
+jjjjjjjjjjjjzzzzzzzzzzzzzzzzzz******************QQQQQQ******************RRRRRR------------------RRRRRR%%%%%%SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS@@@@@@TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUU<<<<<<mmmmmmmmmmmm<<<<<<mmmmmmVVVVVVmmmmmmwwwwwwwwwwwwVVVVVVwwwwwwWWWWWWwwwwwwwwwwww222222WWWWWW222222222222222222YYYYYY||||||||||||222222||||||llllllllllll||||||||||||llllll||||||||||||777777777777777777777777vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++++++++++++++
+jjjjjjjjjjjjzzzzzzzzzzzzzzzzzz******************QQQQQQ******************RRRRRR------------------RRRRRR%%%%%%SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS@@@@@@TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUU<<<<<<mmmmmmmmmmmm<<<<<<mmmmmmVVVVVVmmmmmmwwwwwwwwwwwwVVVVVVwwwwwwWWWWWWwwwwwwwwwwww222222WWWWWW222222222222222222YYYYYY||||||||||||222222||||||llllllllllll||||||||||||llllll||||||||||||777777777777777777777777vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++++++++++++++
+jjjjjjjjjjjjzzzzzzzzzzzzzzzzzz******************QQQQQQ******************RRRRRR------------------RRRRRR%%%%%%SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS@@@@@@TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUU<<<<<<mmmmmmmmmmmm<<<<<<mmmmmmVVVVVVmmmmmmwwwwwwwwwwwwVVVVVVwwwwwwWWWWWWwwwwwwwwwwww222222WWWWWW222222222222222222YYYYYY||||||||||||222222||||||llllllllllll||||||||||||llllll||||||||||||777777777777777777777777vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++++++++++++++
+jjjjjjjjjjjjzzzzzzzzzzzzzzzzzz******************QQQQQQ******************RRRRRR------------------RRRRRR%%%%%%SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS@@@@@@TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUU<<<<<<mmmmmmmmmmmm<<<<<<mmmmmmVVVVVVmmmmmmwwwwwwwwwwwwVVVVVVwwwwwwWWWWWWwwwwwwwwwwww222222WWWWWW222222222222222222YYYYYY||||||||||||222222||||||llllllllllll||||||||||||llllll||||||||||||777777777777777777777777vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++++++++++++++
+jjjjjjjjjjjjzzzzzzzzzzzzzzzzzz******************QQQQQQ******************RRRRRR------------------RRRRRR%%%%%%SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS@@@@@@TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT$$$$$$$$$$$$$$$$$$$$$$$$UUUUUU<<<<<<mmmmmmmmmmmm<<<<<<mmmmmmVVVVVVmmmmmmwwwwwwwwwwwwVVVVVVwwwwwwWWWWWWwwwwwwwwwwww222222WWWWWW222222222222222222YYYYYY||||||||||||222222||||||llllllllllll||||||||||||llllll||||||||||||777777777777777777777777vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++++++++++++++
+jjjjjjzzzzzzzzzzzz************************************************************------------------%%%%%%%%%%%%%%%%%%((((((((((((((((((((((((@@@@@@(((((((((((((((((((((((($$$$$$$$$$$$$$$$$$$$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmwwwwwwwwwwwwwwwwwwwwwwwwwwwwww222222222222222222222222222222222222222222222222222222222222222222llllllllllll||||||||||||llllll||||||vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+jjjjjjzzzzzzzzzzzz************************************************************------------------%%%%%%%%%%%%%%%%%%((((((((((((((((((((((((@@@@@@(((((((((((((((((((((((($$$$$$$$$$$$$$$$$$$$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmwwwwwwwwwwwwwwwwwwwwwwwwwwwwww222222222222222222222222222222222222222222222222222222222222222222llllllllllll||||||||||||llllll||||||vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+jjjjjjzzzzzzzzzzzz************************************************************------------------%%%%%%%%%%%%%%%%%%((((((((((((((((((((((((@@@@@@(((((((((((((((((((((((($$$$$$$$$$$$$$$$$$$$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmwwwwwwwwwwwwwwwwwwwwwwwwwwwwww222222222222222222222222222222222222222222222222222222222222222222llllllllllll||||||||||||llllll||||||vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+jjjjjjzzzzzzzzzzzz************************************************************------------------%%%%%%%%%%%%%%%%%%((((((((((((((((((((((((@@@@@@(((((((((((((((((((((((($$$$$$$$$$$$$$$$$$$$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmwwwwwwwwwwwwwwwwwwwwwwwwwwwwww222222222222222222222222222222222222222222222222222222222222222222llllllllllll||||||||||||llllll||||||vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+jjjjjjzzzzzzzzzzzz************************************************************------------------%%%%%%%%%%%%%%%%%%((((((((((((((((((((((((@@@@@@(((((((((((((((((((((((($$$$$$$$$$$$$$$$$$$$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmwwwwwwwwwwwwwwwwwwwwwwwwwwwwww222222222222222222222222222222222222222222222222222222222222222222llllllllllll||||||||||||llllll||||||vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+jjjjjjzzzzzzzzzzzz************************************************************------------------%%%%%%%%%%%%%%%%%%((((((((((((((((((((((((@@@@@@(((((((((((((((((((((((($$$$$$$$$$$$$$$$$$$$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmwwwwwwwwwwwwwwwwwwwwwwwwwwwwww222222222222222222222222222222222222222222222222222222222222222222llllllllllll||||||||||||llllll||||||vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+zzzzzzzzzzzzzzzzzzzzzzzz******************************************************------------------------%%%%%%(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((($$$$$$$$$$$$$$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmwwwwww222222222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+zzzzzzzzzzzzzzzzzzzzzzzz******************************************************------------------------%%%%%%(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((($$$$$$$$$$$$$$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmwwwwww222222222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+zzzzzzzzzzzzzzzzzzzzzzzz******************************************************------------------------%%%%%%(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((($$$$$$$$$$$$$$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmwwwwww222222222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+zzzzzzzzzzzzzzzzzzzzzzzz******************************************************------------------------%%%%%%(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((($$$$$$$$$$$$$$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmwwwwww222222222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+zzzzzzzzzzzzzzzzzzzzzzzz******************************************************------------------------%%%%%%(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((($$$$$$$$$$$$$$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmwwwwww222222222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+zzzzzzzzzzzzzzzzzzzzzzzz******************************************************------------------------%%%%%%(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((($$$$$$$$$$$$$$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmwwwwww222222222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+zzzzzzqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq************************************------------------------------((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((XXXXXX(((((($$$$$$$$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+zzzzzzqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq************************************------------------------------((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((XXXXXX(((((($$$$$$$$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+zzzzzzqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq************************************------------------------------((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((XXXXXX(((((($$$$$$$$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+zzzzzzqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq************************************------------------------------((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((XXXXXX(((((($$$$$$$$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+zzzzzzqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq************************************------------------------------((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((XXXXXX(((((($$$$$$$$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+zzzzzzqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq************************************------------------------------((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((XXXXXX(((((($$$$$$$$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq************************------------------------------------------------------(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((($$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllvvvvvvllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq************************------------------------------------------------------(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((($$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllvvvvvvllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq************************------------------------------------------------------(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((($$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllvvvvvvllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq************************------------------------------------------------------(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((($$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllvvvvvvllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq************************------------------------------------------------------(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((($$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllvvvvvvllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq************************------------------------------------------------------(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((($$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllvvvvvvllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq******************------------------------------------------------(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((($$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq******************------------------------------------------------(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((($$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq******************------------------------------------------------(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((($$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq******************------------------------------------------------(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((($$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq******************------------------------------------------------(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((($$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq******************------------------------------------------------(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((($$$$$$$$$$$$mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm222222222222222222222222222222222222222222222222222222222222llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv++++++++++++++++++++++++
