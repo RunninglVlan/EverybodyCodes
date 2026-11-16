@@ -4,7 +4,10 @@
 Test.Run((notes, part, expected) => {
     var portal = new PortalGrid();
     portal.Read(notes);
-    int bindings = portal.Repair();
+    int bindings = part switch {
+        1 => portal.Repair(),
+        _ => portal.RepairOptimally()
+    };
     Assert.ActualEqualsExpected(bindings, expected);
 });
 
@@ -48,6 +51,23 @@ class PortalGrid {
 
     public int Repair() {
         return pieces.Values.SelectMany(piece => piece.Bindings.Values.SelectMany(it => it)).ToHashSet().Count;
+    }
+
+    public int RepairOptimally() {
+        // todo: keep only char to
+        PriorityQueue<(char from, char to), int> queue = new();
+        Dictionary<char, int> connected = [];
+        queue.Enqueue((FRAME, FRAME), 0);
+        while (queue.TryDequeue(out var current, out int currentBindings)) {
+            if (!connected.TryAdd(current.to, currentBindings)) {
+                continue;
+            }
+            Test.Log($"connected {current.from}-{current.to}: {currentBindings}");
+            foreach ((char next, var bindings) in pieces[current.to].Bindings) {
+                queue.Enqueue((current.to, next), bindings.Count);
+            }
+        }
+        return connected.Values.Sum();
     }
 }
 
