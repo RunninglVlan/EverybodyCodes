@@ -31,10 +31,12 @@ class PortalGrid {
                 var nextPoint = current.point + direction;
                 if (cells.TryGetValue(nextPoint, out char nextValue) && visited.Add(nextPoint)) {
                     queue.Enqueue((nextPoint, nextValue));
+                    if (current.value != nextValue) {
+                        bindings.Add(new Pair(current.point, nextPoint));
+                    }
                 }
             }
         }
-        Test.Log(visited.Count);
         return bindings.Count;
     }
 }
