@@ -6,8 +6,8 @@ Test.Run((notes, part, expected) => {
     portal.Read(notes);
     int bindings = part switch {
         1 => portal.Repair(),
-        2 => portal.RepairOptimally(),
-        _ => portal.AddChargesAndRepairOptimally()
+        2 => portal.RepairOptimally(false),
+        _ => portal.RepairOptimally(true)
     };
     Assert.ActualEqualsExpected(bindings, expected);
 });
@@ -54,63 +54,44 @@ class PortalGrid {
         return pieces.Values.SelectMany(piece => piece.Bindings.Values.SelectMany(it => it)).ToHashSet().Count;
     }
 
-    public int RepairOptimally() {
-        // todo: keep only char to
-        PriorityQueue<(char from, char to), int> queue = new();
+    public int RepairOptimally(bool useCharges) {
+        if (!useCharges) {
+            return RepairOptimally(new PriorityQueue<char, int>());
+        }
+        var minBindings = int.MaxValue;
+        PriorityQueue<char, int> queue = new();
+        char[] pieceValues = [.. pieces.Keys.Where(it => it != FRAME)];
+        for (var i = 0; i < pieceValues.Length; i++) {
+            for (int j = i + 1; j < pieceValues.Length; j++) {
+                queue.Clear();
+                Add(pieceValues[i]);
+                Add(pieceValues[j]);
+                int bindings = RepairOptimally(queue);
+                minBindings = Math.Min(bindings, minBindings);
+            }
+        }
+        return minBindings;
+
+        void Add(char value) {
+            queue.Enqueue(value, 0);
+            foreach (char neighbor in pieces[value].Bindings.Keys) {
+                queue.Enqueue(neighbor, 0);
+            }
+        }
+    }
+
+    int RepairOptimally(PriorityQueue<char, int> queue) {
         Dictionary<char, int> connected = [];
-        queue.Enqueue((FRAME, FRAME), 0);
-        while (queue.TryDequeue(out var current, out int currentBindings)) {
-            if (!connected.TryAdd(current.to, currentBindings)) {
+        queue.Enqueue(FRAME, 0);
+        while (queue.TryDequeue(out char current, out int currentBindings)) {
+            if (!connected.TryAdd(current, currentBindings)) {
                 continue;
             }
-            // Test.Log($"connected {current.from}-{current.to}: {currentBindings}");
-            foreach ((char next, var bindings) in pieces[current.to].Bindings) {
-                queue.Enqueue((current.to, next), bindings.Count);
+            foreach ((char next, var bindings) in pieces[current].Bindings) {
+                queue.Enqueue(next, bindings.Count);
             }
         }
         return connected.Values.Sum();
-    }
-
-    public int AddChargesAndRepairOptimally() {
-        var minConnected = int.MaxValue;
-        PriorityQueue<(char from, char to), int> queue = new();
-        Dictionary<char, int> connected = [];
-        char[] pieceValues = [.. pieces.Keys.Where(it => it != FRAME)];
-        List<(char first, char second, int count)> pairs = [];
-        for (var i = 0; i < pieceValues.Length; i++) {
-            char piece1Value = pieceValues[i];
-            var piece1 = pieces[piece1Value];
-            for (int j = i + 1; j < pieceValues.Length; j++) {
-                char piece2Value = pieceValues[j];
-                var piece2 = pieces[piece2Value];
-                int count = piece1.Bindings.Keys.Union(piece2.Bindings.Keys).Count();
-                pairs.Add((piece1Value, piece2Value, count));
-            }
-        }
-        foreach (var pair in pairs) {
-            queue.Clear();
-            connected.Clear();
-            // Test.Log(pair);
-            queue.Enqueue((FRAME, pair.first), 0);
-            foreach (char value in pieces[pair.first].Bindings.Keys) {
-                queue.Enqueue((FRAME, value), 0);
-            }
-            queue.Enqueue((FRAME, pair.second), 0);
-            foreach (char value in pieces[pair.second].Bindings.Keys) {
-                queue.Enqueue((FRAME, value), 0);
-            }
-            while (queue.TryDequeue(out var current, out int currentBindings)) {
-                if (!connected.TryAdd(current.to, currentBindings)) {
-                    continue;
-                }
-                // Test.Log($"connected {current.from}-{current.to}: {currentBindings}");
-                foreach ((char next, var bindings) in pieces[current.to].Bindings) {
-                    queue.Enqueue((current.to, next), bindings.Count);
-                }
-            }
-            minConnected = Math.Min(connected.Values.Sum(), minConnected);
-        }
-        return minConnected;
     }
 }
 
