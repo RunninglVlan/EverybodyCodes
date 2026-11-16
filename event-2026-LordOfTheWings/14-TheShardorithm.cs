@@ -25,9 +25,9 @@ class PortalGrid {
         HashSet<Pair> bindings = [];
         foreach ((var point, char value) in cells) {
             foreach (var direction in Point.Directions4) {
-                var nextPoint = point + direction;
-                if (!cells.TryGetValue(nextPoint, out char nextValue) || value != nextValue) {
-                    bindings.Add(new Pair(point, nextPoint));
+                var neighborPoint = point + direction;
+                if (!cells.TryGetValue(neighborPoint, out char neighborValue) || value != neighborValue) {
+                    bindings.Add(new Pair(point, neighborPoint));
                 }
             }
         }
