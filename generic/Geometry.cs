@@ -4,10 +4,16 @@
     static readonly Point LEFT = new(-1, 0);
     static readonly Point RIGHT = new(1, 0);
 
+    public static Point[] Directions4 { get; } = [RIGHT, LEFT, UP, DOWN];
+
     public static Point[] Directions8 { get; } = [
         RIGHT, LEFT, UP, DOWN,
         new(1, 1), new(-1, 1), new(1, -1), new(-1, -1)
     ];
+
+    public bool InBounds(int width, int? height = null) {
+        return X >= 0 && X < width && Y >= 0 && Y < (height ?? width);
+    }
 
     public static Point operator +(Point a, Point b) => new(a.X + b.X, a.Y + b.Y);
     public static Point operator -(Point a, Point b) => new(a.X - b.X, a.Y - b.Y);
