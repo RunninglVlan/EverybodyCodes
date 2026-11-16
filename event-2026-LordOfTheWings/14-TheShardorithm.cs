@@ -80,6 +80,7 @@ class PortalGrid {
         }
     }
 
+    /// Prim's algorithm
     int RepairOptimally(PriorityQueue<char, int> queue) {
         Dictionary<char, int> connected = [];
         queue.Enqueue(FRAME, 0);
