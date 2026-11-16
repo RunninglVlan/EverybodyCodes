@@ -29,19 +29,19 @@ class PortalGrid {
                         continue;
                     }
                     var binding = new Binding(point, neighborPoint);
-                    Bindings(value).Add(binding);
-                    Bindings(neighborValue).Add(binding);
+                    Bindings(value, neighborValue).Add(binding);
+                    Bindings(neighborValue, value).Add(binding);
                 }
             }
         }
     }
 
-    HashSet<Binding> Bindings(char pieceValue) {
+    HashSet<Binding> Bindings(char pieceValue, char neighborValue) {
         if (!pieces.TryGetValue(pieceValue, out var piece)) {
             pieces.Add(pieceValue, piece = new Piece([]));
         }
-        if (!piece.Bindings.TryGetValue(pieceValue, out var bindings)) {
-            piece.Bindings.Add(pieceValue, bindings = []);
+        if (!piece.Bindings.TryGetValue(neighborValue, out var bindings)) {
+            piece.Bindings.Add(neighborValue, bindings = []);
         }
         return bindings;
     }
