@@ -2,8 +2,59 @@
 
 // https://everybody.codes/event/2026/quests/14
 Test.Run((notes, part, expected) => {
-    Assert.ActualEqualsExpected(0, expected);
+    var portal = new PortalGrid();
+    portal.Read(notes);
+    int bindings = portal.Repair();
+    Assert.ActualEqualsExpected(bindings, expected);
 });
+
+class PortalGrid {
+    readonly Dictionary<Point, char> cells = [];
+
+    public void Read(string notes) {
+        string[] rows = notes.Split(Environment.NewLine);
+        int width = rows[0].Length, height = rows.Length;
+        for (var y = 0; y < height; y++) {
+            for (var x = 0; x < width; x++) {
+                cells.Add(new Point(x, y), rows[y][x]);
+            }
+        }
+    }
+
+    public int Repair() {
+        HashSet<Pair> bindings = [];
+        var queue = new Queue<(Point point, char value)>();
+        queue.Enqueue((Point.ZERO, cells[Point.ZERO]));
+        HashSet<Point> visited = [Point.ZERO];
+        while (queue.TryDequeue(out var current)) {
+            foreach (var direction in Point.Directions4) {
+                var nextPoint = current.point + direction;
+                if (cells.TryGetValue(nextPoint, out char nextValue) && visited.Add(nextPoint)) {
+                    queue.Enqueue((nextPoint, nextValue));
+                }
+            }
+        }
+        Test.Log(visited.Count);
+        return bindings.Count;
+    }
+}
+
+readonly record struct Pair(Point A, Point B) {
+    public bool Equals(Pair other) => A == other.A && B == other.B || A == other.B && B == other.A;
+    public override int GetHashCode() => A.GetHashCode() ^ B.GetHashCode();
+}
+
+readonly record struct Point(int X, int Y) {
+    public static readonly Point ZERO = new(0, 0);
+    static readonly Point UP = new(0, 1);
+    static readonly Point DOWN = new(0, -1);
+    static readonly Point LEFT = new(-1, 0);
+    static readonly Point RIGHT = new(1, 0);
+
+    public static Point[] Directions4 { get; } = [RIGHT, LEFT, UP, DOWN];
+
+    public static Point operator +(Point a, Point b) => new(a.X + b.X, a.Y + b.Y);
+}
 
 static class Test {
     const string CASE_FILE = "../Test.Cases.txt";
