@@ -88,16 +88,16 @@ class Grid : IGame<PathState> {
         foreach (var path in endState.Paths) {
             for (var i = 1; i < path.Count; i++) {
                 var movement = path[i];
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.CursorLeft = movement.Point.X;
-                Console.CursorTop = movement.Point.Y;
-                Console.Write(Point.ToChar(movement.Direction));
+                // Console.ForegroundColor = ConsoleColor.Red;
+                // Console.CursorLeft = movement.Point.X;
+                // Console.CursorTop = movement.Point.Y;
+                // Console.Write(Point.ToChar(movement.Direction));
                 bool reachedTarget = movement.Point == endTargets.First();
                 endMoves++;
                 if (i + 1 < path.Count && path[i + 1].Point != movement.Point + movement.Direction || reachedTarget) {
-                    Console.CursorLeft = column;
-                    Console.CursorTop = row++;
-                    Test.Log($"{moves}, {endMoves}");
+                    // Console.CursorLeft = column;
+                    // Console.CursorTop = row++;
+                    // Test.Log($"{moves}, {endMoves}");
                     moves = 0;
                     if (reachedTarget) {
                         endMoves = 0;
@@ -107,7 +107,7 @@ class Grid : IGame<PathState> {
                     }
                 }
                 moves++;
-                Test.Step();
+                // Test.Step();
             }
         }
         return endState.Seconds;
@@ -145,23 +145,37 @@ class Grid : IGame<PathState> {
     [SuppressMessage("ReSharper", "InvertIf")]
     IEnumerable<PathState> IGame<PathState>.Next(PathState current) {
         Func<Movement, IEnumerable<Movement>> nextMovement = it => NextMovement(current, it);
+        var logEnabled = false;
+        Action<Movement> log = it => {
+            if (!logEnabled) {
+                return;
+            }
+            // Console.CursorLeft = it.Point.X;
+            // Console.CursorTop = it.Point.Y;
+            // Console.Write(Point.ToChar(it.Direction));
+            // Test.Step();
+        };
         var sulphurCollected = true;
         var endTarget = current.EndTargets.First();
+        Console.ForegroundColor = ConsoleColor.Red;
         for (var i = 0; i < sulphurCells.Count; i++) {
             var sulphur = sulphurCells[i];
             if (sulphur.X > endTarget.X || current.SulphurCollected(i)) {
                 continue;
             }
-            var path = Pathfinding<Movement>.Shortest(current.Movement, new Movement(sulphur), nextMovement);
-            if (path == null) {
+            logEnabled = current.Movement.Point == new Point(12, 7) && sulphur == new Point(28, 5);
+            var paths = Pathfinding<Movement>.Shortest(current.Movement, new Movement(sulphur), nextMovement, log);
+            if (paths.Count == 0) {
                 continue;
             }
-            yield return current.From(sulphur, path, i);
+            foreach (var path in paths) {
+                yield return current.From(sulphur, path, i);
+            }
             sulphurCollected = false;
         }
         if (sulphurCollected) {
-            var path = Pathfinding<Movement>.Shortest(current.Movement, new Movement(endTarget), nextMovement)!;
-            var next = current.From(endTarget, path, sulphurCells.Count);
+            var paths = Pathfinding<Movement>.Shortest(current.Movement, new Movement(endTarget), nextMovement);
+            var next = current.From(endTarget, paths.First(), sulphurCells.Count);
             next.EndTargets.RemoveAt(0);
             yield return next;
         }
@@ -231,25 +245,31 @@ readonly record struct Point(int X, int Y) {
 
 static class Pathfinding<T> where T : IEquatable<T> {
     /// BFS
-    public static List<T>? Shortest(T start, T end, Func<T, IEnumerable<T>> getNext) {
+    public static List<List<T>> Shortest(T start, T end, Func<T, IEnumerable<T>> getNext, Action<T>? onVisit = null) {
+        List<List<T>> paths = [];
         Dictionary<T, T> parents = [];
         Queue<T> queue = [];
         HashSet<T> visited = [];
         queue.Enqueue(start);
         visited.Add(start);
         while (queue.TryDequeue(out var current)) {
+            onVisit?.Invoke(current);
             if (current.Equals(end)) {
-                return Reconstruct(parents, start, current);
+                paths.Add(Reconstruct(parents, start, current));
+                if (paths.Count == 2) {
+                    return paths;
+                }
+                continue;
             }
             foreach (var next in getNext(current)) {
-                if (!visited.Add(next)) {
+                if (!visited.Add(next) && !next.Equals(end)) {
                     continue;
                 }
                 queue.Enqueue(next);
                 parents[next] = current;
             }
         }
-        return null;
+        return paths;
     }
 
     static List<T> Reconstruct(Dictionary<T, T> parents, T start, T end) {
