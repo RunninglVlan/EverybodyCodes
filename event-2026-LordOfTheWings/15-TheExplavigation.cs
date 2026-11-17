@@ -7,7 +7,10 @@ Test.Until = "Part II";
 Test.Run((notes, part, expected) => {
     var grid = new Grid();
     grid.Read(notes);
-    int seconds = grid.CollectSulphurAndReachEnd();
+    int seconds = part switch {
+        1 => grid.CollectSulphurAndReachEnd(),
+        _ => grid.CollectEnoughSulphurAndReachEnd()
+    };
     Assert.ActualEqualsExpected(seconds, expected);
 });
 
@@ -50,6 +53,7 @@ class Grid : IGame<PathState> {
     readonly Dictionary<Point, bool> walkableCells = [];
     readonly List<Point> sulphurCells = [];
     readonly List<Point> endTargets = [];
+    readonly List<(HashSet<Point> path, int sulphur)> cyclesWithSulphur = [];
 
     public Grid() {
         stateSearch = new StateSearch<PathState>(this, 100);
@@ -170,6 +174,56 @@ class Grid : IGame<PathState> {
     }
 
     bool IGame<PathState>.HasReachedEnd(PathState state) => state.ReachedEnd;
+
+    public int CollectEnoughSulphurAndReachEnd() {
+        const int required = 2026;
+        FindCycles();
+        var cycle = cyclesWithSulphur.MaxBy(it => it.sulphur / (float)it.path.Count);
+        var cyclesToCollect = (int)Math.Ceiling(required / (float)cycle.sulphur);
+        int seconds = cyclesToCollect * cycle.path.Count;
+        // reach cycle
+        var startMovement = new Movement(start, Point.RIGHT);
+        var end = new Movement(cycle.path.First());
+        var pathToCycle = Pathfinding<Movement>.Shortest(startMovement, end, NextMovement).First();
+        // remove overlapping cells
+        for (var i = 0; i < pathToCycle.Count; i++) {
+            var movement = pathToCycle[i];
+            if (cycle.path.Contains(movement.Point)) {
+                pathToCycle.RemoveAt(i);
+            }
+        }
+        // todo: reach end from the cycle using state search
+        startMovement = end with { Direction = Point.RIGHT };
+        end = new Movement(endTargets.Last());
+        var pathToEnd = Pathfinding<Movement>.Shortest(startMovement, end, NextMovement).First();
+        // remove overlapping cells
+        for (var i = 0; i < pathToEnd.Count; i++) {
+            var movement = pathToEnd[i];
+            if (cycle.path.Contains(movement.Point)) {
+                pathToEnd.RemoveAt(i);
+            }
+        }
+        return pathToCycle.Count + seconds + pathToEnd.Count;
+    }
+
+    void FindCycles() {
+        foreach (var cell in sulphurCells.Where(cell => !cyclesWithSulphur.Any(it => it.path.Contains(cell)))) {
+            foreach (var direction in Point.Directions4) {
+                var next = cell + direction;
+                if (!walkableCells[next]) {
+                    continue;
+                }
+                var startMovement = new Movement(next, direction);
+                var path = Pathfinding<Movement>.Shortest(startMovement, new Movement(cell), NextMovement).First();
+                cyclesWithSulphur.Add((
+                        [.. path.Select(it => it.Point)], path.Count(it => sulphurCells.Contains(it.Point))
+                ));
+                break;
+            }
+        }
+    }
+
+    IEnumerable<Movement> NextMovement(Movement current) => NextMovement(current, width - 1);
 }
 
 readonly record struct Movement(Point Point, Point Direction = default) {
@@ -189,6 +243,8 @@ readonly record struct Point(int X, int Y) {
     static readonly Point DOWN = new(0, -1);
     static readonly Point LEFT = new(-1, 0);
     public static readonly Point RIGHT = new(1, 0);
+
+    public static Point[] Directions4 { get; } = [RIGHT, LEFT, UP, DOWN];
 
     public static char ToChar(Point direction) => direction switch {
         _ when direction == UP => 'v',
