@@ -18,7 +18,6 @@ record PathState(Movement Movement, int[] TargetsReached) : IState<PathState> {
 
     [SuppressMessage("ReSharper", "UseObjectOrCollectionInitializer")]
     public PathState From(Point point, List<Movement> path, int i) {
-        Test.Step();
         var next = new PathState(new Movement(point, path[^1].Point - path[^2].Point), [.. TargetsReached]);
         next.TargetsReached[i] = path.Count;
         return next;
@@ -51,12 +50,17 @@ class Grid : IGame<PathState> {
     }
 
     public void Read(string notes) {
+        // Console.Clear();
         string[] rows = notes.Split(Environment.NewLine);
         int width = rows[0].Length, height = rows.Length;
         for (var y = 0; y < height; y++) {
+            // Console.WriteLine(rows[y]);
             for (var x = 0; x < width; x++) {
                 var point = new Point(x, y);
                 char cell = rows[y][x];
+                if (cell != Cells.WALL) {
+                    walkableCells.Add(point);
+                }
                 switch (cell) {
                     case Cells.START:
                         start = point;
@@ -67,12 +71,6 @@ class Grid : IGame<PathState> {
                     case Cells.SULPHUR:
                         sulphurCells.Add(point);
                         break;
-                    default: {
-                        if (cell != Cells.WALL) {
-                            walkableCells.Add(point);
-                        }
-                        break;
-                    }
                 }
             }
         }
@@ -91,6 +89,7 @@ class Grid : IGame<PathState> {
                 continue;
             }
             var sulphur = sulphurCells[i];
+            // Console.ForegroundColor = ConsoleColor.Red;
             var path = Pathfinding<Movement>.Shortest(current.Movement, new Movement(sulphur), NextMovement)!;
             var next = current.From(sulphur, path, i);
             yield return next;
@@ -104,9 +103,18 @@ class Grid : IGame<PathState> {
     }
 
     IEnumerable<Movement> NextMovement(Movement current) {
-        return new[] { current.Direction, Point.TurnLeft(current.Direction), Point.TurnRight(current.Direction) }
+        var nextMovements = new[]
+                        { current.Direction, Point.TurnLeft(current.Direction), Point.TurnRight(current.Direction) }
                 .Select(it => new Movement(current.Point + it, it))
-                .Where(it => walkableCells.Contains(it.Point));
+                .Where(it => walkableCells.Contains(it.Point))
+                .ToArray();
+        foreach (var next in nextMovements) {
+            // Console.CursorLeft = next.Point.X;
+            // Console.CursorTop = next.Point.Y;
+            // Console.Write(Point.ToChar(next.Direction));
+            // Test.Step();
+        }
+        return nextMovements;
     }
 
     bool IGame<PathState>.HasReachedEnd(PathState state) => state.ReachedEnd;
@@ -129,6 +137,14 @@ readonly record struct Point(int X, int Y) {
     static readonly Point DOWN = new(0, -1);
     static readonly Point LEFT = new(-1, 0);
     public static readonly Point RIGHT = new(1, 0);
+
+    public static char ToChar(Point direction) => direction switch {
+        _ when direction == UP => 'v',
+        _ when direction == DOWN => '^',
+        _ when direction == LEFT => '<',
+        _ when direction == RIGHT => '>',
+        _ => throw new ArgumentException($"Unsupported direction: {direction}")
+    };
 
     public static Point TurnLeft(Point direction) => new(-direction.Y, direction.X);
     public static Point TurnRight(Point direction) => new(direction.Y, -direction.X);
