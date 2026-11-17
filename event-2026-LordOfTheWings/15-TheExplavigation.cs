@@ -13,6 +13,7 @@ Test.Run((notes, part, expected) => {
 record PathState(Movement Movement, int[] TargetsReached, List<Point> EndTargets) : IState<PathState> {
     public int Seconds => TargetsReached.Sum();
     public bool ReachedEnd => EndTargets.Count == 0 && TargetsReached.Last() != 0;
+    public List<List<Movement>> Paths { get; private set; } = [];
 
     public bool SulphurCollected(int i) => TargetsReached[i] != 0;
 
@@ -20,6 +21,7 @@ record PathState(Movement Movement, int[] TargetsReached, List<Point> EndTargets
     public PathState From(Point point, List<Movement> path, int i) {
         var movement = new Movement(point, path[^1].Point - path[^2].Point);
         var next = new PathState(movement, [.. TargetsReached], [.. EndTargets]);
+        next.Paths = [.. Paths, path];
         next.TargetsReached[i] = path.Count;
         return next;
     }
@@ -52,12 +54,12 @@ class Grid : IGame<PathState> {
     }
 
     public void Read(string notes) {
-        // Console.Clear();
+        Console.Clear();
         string[] rows = notes.Split(Environment.NewLine);
         width = rows[0].Length;
         height = rows.Length;
         for (var y = 0; y < height; y++) {
-            // Console.WriteLine(rows[y]);
+            Console.WriteLine(rows[y]);
             for (var x = 0; x < width; x++) {
                 var point = new Point(x, y);
                 char cell = rows[y][x];
@@ -75,9 +77,24 @@ class Grid : IGame<PathState> {
     }
 
     public int CollectSulphurAndReachEnd() {
-        var movement = new Movement(start, Point.RIGHT);
-        var startState = new PathState(movement, new int[sulphurCells.Count + 1], FindEndTargets());
-        return stateSearch.FindBest(startState)!.Seconds;
+        var startMovement = new Movement(start, Point.RIGHT);
+        var startState = new PathState(startMovement, new int[sulphurCells.Count + 1], FindEndTargets());
+        var endState = stateSearch.FindBest(startState)!;
+        Console.ForegroundColor = ConsoleColor.Red;
+        var moves = 0;
+        foreach (var it in endState.Paths) {
+            for (var i = 1; i < it.Count; i++) {
+                var movement = it[i];
+                Console.CursorLeft = movement.Point.X;
+                Console.CursorTop = movement.Point.Y;
+                Console.Write(Point.ToChar(movement.Direction));
+                Test.Step();
+                moves++;
+            }
+        }
+        Test.Log(moves);
+        Test.Step();
+        return endState.Seconds;
     }
 
     List<Point> FindEndTargets() {
@@ -119,18 +136,15 @@ class Grid : IGame<PathState> {
             if (sulphur.X > endTarget.X || current.SulphurCollected(i)) {
                 continue;
             }
-            // Console.ForegroundColor = ConsoleColor.Red;
             var path = Pathfinding<Movement>.Shortest(current.Movement, new Movement(sulphur), nextMovement);
             if (path == null) {
                 continue;
             }
-            // Test.Log($"{current.Movement.Point} -> {sulphur}, {path}");
             yield return current.From(sulphur, path, i);
             sulphurCollected = false;
         }
         if (sulphurCollected) {
             var path = Pathfinding<Movement>.Shortest(current.Movement, new Movement(endTarget), nextMovement)!;
-            // Test.Log($"{current.Movement.Point} -> {end}, {path}");
             var next = current.From(endTarget, path, sulphurCells.Count);
             next.EndTargets.RemoveAt(0);
             yield return next;
@@ -178,6 +192,14 @@ readonly record struct Point(int X, int Y) {
     static readonly Point DOWN = new(0, -1);
     static readonly Point LEFT = new(-1, 0);
     public static readonly Point RIGHT = new(1, 0);
+
+    public static char ToChar(Point direction) => direction switch {
+        _ when direction == UP => 'v',
+        _ when direction == DOWN => '^',
+        _ when direction == LEFT => '<',
+        _ when direction == RIGHT => '>',
+        _ => throw new ArgumentException($"Unsupported direction: {direction}")
+    };
 
     public static Point TurnLeft(Point direction) => new(-direction.Y, direction.X);
     public static Point TurnRight(Point direction) => new(direction.Y, -direction.X);
