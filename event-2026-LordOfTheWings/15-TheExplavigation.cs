@@ -54,12 +54,10 @@ class Grid : IGame<PathState> {
     }
 
     public void Read(string notes) {
-        Console.Clear();
         string[] rows = notes.Split(Environment.NewLine);
         width = rows[0].Length;
         height = rows.Length;
         for (var y = 0; y < height; y++) {
-            Console.WriteLine(rows[y]);
             for (var x = 0; x < width; x++) {
                 var point = new Point(x, y);
                 char cell = rows[y][x];
@@ -81,35 +79,6 @@ class Grid : IGame<PathState> {
         var endTargets = EndTargets();
         var startState = new PathState(startMovement, new int[sulphurCells.Count + 1], endTargets);
         var endState = stateSearch.FindBest(startState)!;
-        var moves = 1;
-        var endMoves = 0;
-        int row = height;
-        var column = 0;
-        foreach (var path in endState.Paths) {
-            for (var i = 1; i < path.Count; i++) {
-                var movement = path[i];
-                // Console.ForegroundColor = ConsoleColor.Red;
-                // Console.CursorLeft = movement.Point.X;
-                // Console.CursorTop = movement.Point.Y;
-                // Console.Write(Point.ToChar(movement.Direction));
-                bool reachedTarget = movement.Point == endTargets.First();
-                endMoves++;
-                if (i + 1 < path.Count && path[i + 1].Point != movement.Point + movement.Direction || reachedTarget) {
-                    // Console.CursorLeft = column;
-                    // Console.CursorTop = row++;
-                    // Test.Log($"{moves}, {endMoves}");
-                    moves = 0;
-                    if (reachedTarget) {
-                        endMoves = 0;
-                        endTargets.RemoveAt(0);
-                        row = height;
-                        column += 10;
-                    }
-                }
-                moves++;
-                // Test.Step();
-            }
-        }
         return endState.Seconds;
     }
 
@@ -145,26 +114,14 @@ class Grid : IGame<PathState> {
     [SuppressMessage("ReSharper", "InvertIf")]
     IEnumerable<PathState> IGame<PathState>.Next(PathState current) {
         Func<Movement, IEnumerable<Movement>> nextMovement = it => NextMovement(current, it);
-        var logEnabled = false;
-        Action<Movement> log = it => {
-            if (!logEnabled) {
-                return;
-            }
-            // Console.CursorLeft = it.Point.X;
-            // Console.CursorTop = it.Point.Y;
-            // Console.Write(Point.ToChar(it.Direction));
-            // Test.Step();
-        };
         var sulphurCollected = true;
         var endTarget = current.EndTargets.First();
-        Console.ForegroundColor = ConsoleColor.Red;
         for (var i = 0; i < sulphurCells.Count; i++) {
             var sulphur = sulphurCells[i];
             if (sulphur.X > endTarget.X || current.SulphurCollected(i)) {
                 continue;
             }
-            logEnabled = current.Movement.Point == new Point(12, 7) && sulphur == new Point(28, 5);
-            var paths = Pathfinding<Movement>.Shortest(current.Movement, new Movement(sulphur), nextMovement, log);
+            var paths = Pathfinding<Movement>.Shortest(current.Movement, new Movement(sulphur), nextMovement);
             if (paths.Count == 0) {
                 continue;
             }
@@ -245,7 +202,7 @@ readonly record struct Point(int X, int Y) {
 
 static class Pathfinding<T> where T : IEquatable<T> {
     /// BFS
-    public static List<List<T>> Shortest(T start, T end, Func<T, IEnumerable<T>> getNext, Action<T>? onVisit = null) {
+    public static List<List<T>> Shortest(T start, T end, Func<T, IEnumerable<T>> getNext) {
         List<List<T>> paths = [];
         Dictionary<T, T> parents = [];
         Queue<T> queue = [];
@@ -253,7 +210,6 @@ static class Pathfinding<T> where T : IEquatable<T> {
         queue.Enqueue(start);
         visited.Add(start);
         while (queue.TryDequeue(out var current)) {
-            onVisit?.Invoke(current);
             if (current.Equals(end)) {
                 paths.Add(Reconstruct(parents, start, current));
                 if (paths.Count == 2) {
