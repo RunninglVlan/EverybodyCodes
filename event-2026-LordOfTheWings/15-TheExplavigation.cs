@@ -125,7 +125,7 @@ class Grid : IGame<PathState> {
             if (sulphur.X > endTarget.X || current.SulphurCollected(i)) {
                 continue;
             }
-            var paths = Pathfinding<Movement>.Shortest(current.Movement, new Movement(sulphur), nextMovement);
+            var paths = Pathfinding<Movement>.Shortest(current.Movement, new Movement(sulphur), nextMovement, 2);
             if (paths.Count == 0) {
                 continue;
             }
@@ -135,8 +135,8 @@ class Grid : IGame<PathState> {
             sulphurCollected = false;
         }
         if (sulphurCollected) {
-            var paths = Pathfinding<Movement>.Shortest(current.Movement, new Movement(endTarget), nextMovement);
-            var next = current.From(endTarget, paths.First(), sulphurCells.Count + endTargetIndex);
+            var path = Pathfinding<Movement>.Shortest(current.Movement, new Movement(endTarget), nextMovement).First();
+            var next = current.From(endTarget, path, sulphurCells.Count + endTargetIndex);
             next.EndTargets--;
             yield return next;
         }
@@ -206,7 +206,7 @@ readonly record struct Point(int X, int Y) {
 
 static class Pathfinding<T> where T : IEquatable<T> {
     /// BFS
-    public static List<List<T>> Shortest(T start, T end, Func<T, IEnumerable<T>> getNext) {
+    public static List<List<T>> Shortest(T start, T end, Func<T, IEnumerable<T>> getNext, int max = 1) {
         List<List<T>> paths = [];
         Dictionary<T, T> parents = [];
         Queue<T> queue = [];
@@ -216,7 +216,7 @@ static class Pathfinding<T> where T : IEquatable<T> {
         while (queue.TryDequeue(out var current)) {
             if (current.Equals(end)) {
                 paths.Add(Reconstruct(parents, start, current));
-                if (paths.Count == 2) {
+                if (paths.Count == max) {
                     return paths;
                 }
                 continue;
