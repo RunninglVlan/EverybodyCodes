@@ -10,9 +10,10 @@ Test.Run((notes, part, expected) => {
     Assert.ActualEqualsExpected(seconds, expected);
 });
 
-record PathState(Movement Movement, int[] TargetsReached, List<Point> EndTargets) : IState<PathState> {
+record PathState(Movement Movement, int[] TargetsReached) : IState<PathState> {
+    public int EndTargets { get; set; }
     public int Seconds => Paths.Sum(it => it.Count - 1);
-    public bool ReachedEnd => EndTargets.Count == 0 && TargetsReached.Last() != 0;
+    public bool ReachedEnd => EndTargets == 0 && TargetsReached.Last() != 0;
     List<List<Movement>> Paths { get; set; } = [];
 
     public bool SulphurCollected(int i) => TargetsReached[i] != 0;
@@ -20,9 +21,10 @@ record PathState(Movement Movement, int[] TargetsReached, List<Point> EndTargets
     [SuppressMessage("ReSharper", "UseObjectOrCollectionInitializer")]
     public PathState From(Point point, List<Movement> path, int i) {
         var direction = path[^1].Point - path[^2].Point;
-        var next = new PathState(new Movement(point, direction), [.. TargetsReached], [.. EndTargets]);
+        var next = new PathState(new Movement(point, direction), [.. TargetsReached]);
         next.Paths = [.. Paths, path];
         next.TargetsReached[i] = path.Count;
+        next.EndTargets = EndTargets;
         return next;
     }
 
@@ -48,6 +50,7 @@ class Grid : IGame<PathState> {
     Point start;
     readonly Dictionary<Point, bool> walkableCells = [];
     readonly List<Point> sulphurCells = [];
+    readonly List<Point> endTargets = [];
 
     public Grid() {
         stateSearch = new StateSearch<PathState>(this, 100);
@@ -72,28 +75,20 @@ class Grid : IGame<PathState> {
                 }
             }
         }
+        FindEndTargets();
     }
 
-    public int CollectSulphurAndReachEnd() {
-        var startMovement = new Movement(start, Point.RIGHT);
-        var endTargets = EndTargets();
-        var startState = new PathState(startMovement, new int[sulphurCells.Count + 1], endTargets);
-        var endState = stateSearch.FindBest(startState)!;
-        return endState.Seconds;
-    }
-
-    List<Point> EndTargets() {
-        List<Point> targets = [];
+    void FindEndTargets() {
         for (var x = 1; x < width; x++) {
             if (!TryFindPass(x, out var pass)) {
                 continue;
             }
-            if (targets.Count > 0 && targets.Last().X == pass.X - 1) {
-                targets.RemoveAt(targets.Count - 1);
+            if (endTargets.Count > 0 && endTargets.Last().X == pass.X - 1) {
+                endTargets.RemoveAt(endTargets.Count - 1);
             }
-            targets.Add(pass);
+            endTargets.Add(pass);
         }
-        return targets;
+        return;
 
         bool TryFindPass(int x, out Point pass) {
             pass = default;
@@ -111,11 +106,20 @@ class Grid : IGame<PathState> {
         }
     }
 
+    public int CollectSulphurAndReachEnd() {
+        var startMovement = new Movement(start, Point.RIGHT);
+        var startState = new PathState(startMovement, new int[sulphurCells.Count + 1]) {
+            EndTargets = endTargets.Count
+        };
+        var endState = stateSearch.FindBest(startState)!;
+        return endState.Seconds;
+    }
+
     [SuppressMessage("ReSharper", "InvertIf")]
     IEnumerable<PathState> IGame<PathState>.Next(PathState current) {
         Func<Movement, IEnumerable<Movement>> nextMovement = it => NextMovement(current, it);
         var sulphurCollected = true;
-        var endTarget = current.EndTargets.First();
+        var endTarget = endTargets[^current.EndTargets];
         for (var i = 0; i < sulphurCells.Count; i++) {
             var sulphur = sulphurCells[i];
             if (sulphur.X > endTarget.X || current.SulphurCollected(i)) {
@@ -133,7 +137,7 @@ class Grid : IGame<PathState> {
         if (sulphurCollected) {
             var paths = Pathfinding<Movement>.Shortest(current.Movement, new Movement(endTarget), nextMovement);
             var next = current.From(endTarget, paths.First(), sulphurCells.Count);
-            next.EndTargets.RemoveAt(0);
+            next.EndTargets--;
             yield return next;
         }
     }
@@ -143,7 +147,7 @@ class Grid : IGame<PathState> {
         if (remainingSulphurCells.Contains(current.Point)) {
             yield break;
         }
-        var endTarget = state.EndTargets.First();
+        var endTarget = endTargets[^state.EndTargets];
         var directions = new[] {
             current.Direction, Point.TurnLeft(current.Direction), Point.TurnRight(current.Direction)
         };
