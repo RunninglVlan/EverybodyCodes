@@ -12,9 +12,8 @@ Test.Run((notes, part, expected) => {
 
 record PathState(Movement Movement, int[] TargetsReached) : IState<PathState> {
     public int EndTargets { get; set; }
-    public int Seconds => Paths.Sum(it => it.Count - 1);
+    public int Seconds => TargetsReached.Sum();
     public bool ReachedEnd => EndTargets == 0 && TargetsReached.Last() != 0;
-    List<List<Movement>> Paths { get; set; } = [];
 
     public bool SulphurCollected(int i) => TargetsReached[i] != 0;
 
@@ -22,8 +21,7 @@ record PathState(Movement Movement, int[] TargetsReached) : IState<PathState> {
     public PathState From(Point point, List<Movement> path, int i) {
         var direction = path[^1].Point - path[^2].Point;
         var next = new PathState(new Movement(point, direction), [.. TargetsReached]);
-        next.Paths = [.. Paths, path];
-        next.TargetsReached[i] = path.Count;
+        next.TargetsReached[i] = path.Count - 1;
         next.EndTargets = EndTargets;
         return next;
     }
@@ -108,7 +106,7 @@ class Grid : IGame<PathState> {
 
     public int CollectSulphurAndReachEnd() {
         var startMovement = new Movement(start, Point.RIGHT);
-        var startState = new PathState(startMovement, new int[sulphurCells.Count + 1]) {
+        var startState = new PathState(startMovement, new int[sulphurCells.Count + endTargets.Count]) {
             EndTargets = endTargets.Count
         };
         var endState = stateSearch.FindBest(startState)!;
@@ -119,7 +117,8 @@ class Grid : IGame<PathState> {
     IEnumerable<PathState> IGame<PathState>.Next(PathState current) {
         Func<Movement, IEnumerable<Movement>> nextMovement = it => NextMovement(current, it);
         var sulphurCollected = true;
-        var endTarget = endTargets[^current.EndTargets];
+        int endTargetIndex = endTargets.Count - current.EndTargets;
+        var endTarget = endTargets[endTargetIndex];
         for (var i = 0; i < sulphurCells.Count; i++) {
             var sulphur = sulphurCells[i];
             if (sulphur.X > endTarget.X || current.SulphurCollected(i)) {
@@ -136,7 +135,7 @@ class Grid : IGame<PathState> {
         }
         if (sulphurCollected) {
             var paths = Pathfinding<Movement>.Shortest(current.Movement, new Movement(endTarget), nextMovement);
-            var next = current.From(endTarget, paths.First(), sulphurCells.Count);
+            var next = current.From(endTarget, paths.First(), sulphurCells.Count + endTargetIndex);
             next.EndTargets--;
             yield return next;
         }
