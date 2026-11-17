@@ -11,7 +11,7 @@ Test.Run((notes, part, expected) => {
 });
 
 record PathState(Movement Movement, int[] TargetsReached, List<Point> EndTargets) : IState<PathState> {
-    public int Seconds => TargetsReached.Sum();
+    public int Seconds => Paths.Sum(it => it.Count - 1);
     public bool ReachedEnd => EndTargets.Count == 0 && TargetsReached.Last() != 0;
     public List<List<Movement>> Paths { get; private set; } = [];
 
@@ -78,26 +78,42 @@ class Grid : IGame<PathState> {
 
     public int CollectSulphurAndReachEnd() {
         var startMovement = new Movement(start, Point.RIGHT);
-        var startState = new PathState(startMovement, new int[sulphurCells.Count + 1], FindEndTargets());
+        var endTargets = EndTargets();
+        var startState = new PathState(startMovement, new int[sulphurCells.Count + 1], endTargets);
         var endState = stateSearch.FindBest(startState)!;
-        Console.ForegroundColor = ConsoleColor.Red;
-        var moves = 0;
-        foreach (var it in endState.Paths) {
-            for (var i = 1; i < it.Count; i++) {
-                var movement = it[i];
+        var moves = 1;
+        var endMoves = 0;
+        int row = height;
+        var column = 0;
+        foreach (var path in endState.Paths) {
+            for (var i = 1; i < path.Count; i++) {
+                var movement = path[i];
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.CursorLeft = movement.Point.X;
                 Console.CursorTop = movement.Point.Y;
                 Console.Write(Point.ToChar(movement.Direction));
-                Test.Step();
+                bool reachedTarget = movement.Point == endTargets.First();
+                endMoves++;
+                if (i + 1 < path.Count && path[i + 1].Point != movement.Point + movement.Direction || reachedTarget) {
+                    Console.CursorLeft = column;
+                    Console.CursorTop = row++;
+                    Test.Log($"{moves}, {endMoves}");
+                    moves = 0;
+                    if (reachedTarget) {
+                        endMoves = 0;
+                        endTargets.RemoveAt(0);
+                        row = height;
+                        column += 10;
+                    }
+                }
                 moves++;
+                Test.Step();
             }
         }
-        Test.Log(moves);
-        Test.Step();
         return endState.Seconds;
     }
 
-    List<Point> FindEndTargets() {
+    List<Point> EndTargets() {
         List<Point> targets = [];
         for (var x = 1; x < width; x++) {
             if (!TryFindPass(x, out var pass)) {
