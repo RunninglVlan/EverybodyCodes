@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 
+Test.Until = "Part I";
 // https://everybody.codes/event/2026/quests/15
 Test.Run((notes, part, expected) => {
     Assert.ActualEqualsExpected(0, expected);
