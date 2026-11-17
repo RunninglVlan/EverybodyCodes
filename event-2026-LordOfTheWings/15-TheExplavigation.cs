@@ -148,12 +148,18 @@ class Grid : IGame<PathState> {
             yield break;
         }
         var endTarget = endTargets[^state.EndTargets];
+        foreach (var movement in NextMovement(current, endTarget.X)) {
+            yield return movement;
+        }
+    }
+
+    IEnumerable<Movement> NextMovement(Movement current, int xMax) {
         var directions = new[] {
             current.Direction, Point.TurnLeft(current.Direction), Point.TurnRight(current.Direction)
         };
         foreach (var direction in directions) {
             var nextPoint = current.Point + direction;
-            if (nextPoint.X < 0 || nextPoint.X > endTarget.X) {
+            if (nextPoint.X < 0 || nextPoint.X > xMax) {
                 continue;
             }
             var next = new Movement(nextPoint, direction);
