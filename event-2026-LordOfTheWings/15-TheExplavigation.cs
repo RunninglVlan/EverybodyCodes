@@ -13,14 +13,14 @@ Test.Run((notes, part, expected) => {
 record PathState(Movement Movement, int[] TargetsReached, List<Point> EndTargets) : IState<PathState> {
     public int Seconds => Paths.Sum(it => it.Count - 1);
     public bool ReachedEnd => EndTargets.Count == 0 && TargetsReached.Last() != 0;
-    public List<List<Movement>> Paths { get; private set; } = [];
+    List<List<Movement>> Paths { get; set; } = [];
 
     public bool SulphurCollected(int i) => TargetsReached[i] != 0;
 
     [SuppressMessage("ReSharper", "UseObjectOrCollectionInitializer")]
     public PathState From(Point point, List<Movement> path, int i) {
-        var movement = new Movement(point, path[^1].Point - path[^2].Point);
-        var next = new PathState(movement, [.. TargetsReached], [.. EndTargets]);
+        var direction = path[^1].Point - path[^2].Point;
+        var next = new PathState(new Movement(point, direction), [.. TargetsReached], [.. EndTargets]);
         next.Paths = [.. Paths, path];
         next.TargetsReached[i] = path.Count;
         return next;
