@@ -3,8 +3,78 @@
 Test.Until = "Part I";
 // https://everybody.codes/event/2026/quests/15
 Test.Run((notes, part, expected) => {
-    Assert.ActualEqualsExpected(0, expected);
+    var grid = new Grid();
+    grid.Read(notes);
+    int seconds = grid.CollectSulphurAndReachEnd();
+    Assert.ActualEqualsExpected(seconds, expected);
 });
+
+class Grid {
+    Point start, end;
+    readonly HashSet<Point> walkableCells = [];
+    readonly List<Point> sulphurCells = [];
+
+    public void Read(string notes) {
+        string[] rows = notes.Split(Environment.NewLine);
+        int width = rows[0].Length, height = rows.Length;
+        for (var y = 0; y < height; y++) {
+            for (var x = 0; x < width; x++) {
+                var point = new Point(x, y);
+                char cell = rows[y][x];
+                switch (cell) {
+                    case Cells.START:
+                        start = point;
+                        break;
+                    case Cells.END:
+                        end = point;
+                        break;
+                    case Cells.SULPHUR:
+                        sulphurCells.Add(point);
+                        break;
+                    default: {
+                        if (cell != Cells.WALL) {
+                            walkableCells.Add(point);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    public int CollectSulphurAndReachEnd() {
+        // todo: start search and reach all sulphur cells and then end
+        return 0;
+    }
+}
+
+static class Cells {
+    public const char START = 'S';
+    public const char END = 'E';
+    public const char WALL = '#';
+    public const char SULPHUR = '@';
+}
+
+readonly record struct Point(int X, int Y) {
+    static readonly Point UP = new(0, 1);
+    static readonly Point DOWN = new(0, -1);
+    static readonly Point LEFT = new(-1, 0);
+    static readonly Point RIGHT = new(1, 0);
+
+    public static Point[] Directions4 { get; } = [RIGHT, LEFT, UP, DOWN];
+
+    public bool InBounds(int width, int? height = null) {
+        return X >= 0 && X < width && Y >= 0 && Y < (height ?? width);
+    }
+
+    public static Point operator +(Point a, Point b) => new(a.X + b.X, a.Y + b.Y);
+    public static Point operator -(Point a, Point b) => new(a.X - b.X, a.Y - b.Y);
+    public static Point operator +(Point a, int value) => new(a.X + value, a.Y + value);
+    public static Point operator -(Point a, int value) => new(a.X - value, a.Y - value);
+    public static Point operator -(Point value) => new(-value.X, -value.Y);
+
+    public override string ToString() => $"({X}, {Y})";
+}
 
 static class Test {
     const string CASE_FILE = "../Test.Cases.txt";
