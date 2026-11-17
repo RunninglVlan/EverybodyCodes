@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
+Test.From = "Part II Example";
+Test.Until = "Part II";
 // https://everybody.codes/event/2026/quests/15
 Test.Run((notes, part, expected) => {
     var grid = new Grid();
