@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 Test.Until = "Part I";
 // https://everybody.codes/event/2026/quests/15
@@ -9,10 +10,45 @@ Test.Run((notes, part, expected) => {
     Assert.ActualEqualsExpected(seconds, expected);
 });
 
-class Grid {
+record PathState(Movement Movement, int[] TargetsReached) : IState<PathState> {
+    public int Seconds => TargetsReached.Sum();
+    public bool ReachedEnd => TargetsReached.Last() != 0;
+
+    public bool SulphurCollected(int i) => TargetsReached[i] != 0;
+
+    [SuppressMessage("ReSharper", "UseObjectOrCollectionInitializer")]
+    public PathState From(Point point, List<Movement> path, int i) {
+        Test.Step();
+        var next = new PathState(new Movement(point, path[^1].Point - path[^2].Point), [.. TargetsReached]);
+        next.TargetsReached[i] = path.Count;
+        return next;
+    }
+
+    public bool IsBetterThan(PathState other) => Seconds < other.Seconds;
+
+    public virtual bool Equals(PathState? other) {
+        return other is not null && TargetsReached.SequenceEqual(other.TargetsReached);
+    }
+
+    public override int GetHashCode() {
+        var hash = new HashCode();
+        foreach (int item in TargetsReached) {
+            hash.Add(item);
+        }
+        return hash.ToHashCode();
+    }
+}
+
+class Grid : IGame<PathState> {
+    readonly StateSearch<PathState> stateSearch;
+
     Point start, end;
     readonly HashSet<Point> walkableCells = [];
     readonly List<Point> sulphurCells = [];
+
+    public Grid() {
+        stateSearch = new StateSearch<PathState>(this, 100);
+    }
 
     public void Read(string notes) {
         string[] rows = notes.Split(Environment.NewLine);
@@ -43,9 +79,42 @@ class Grid {
     }
 
     public int CollectSulphurAndReachEnd() {
-        // todo: start search and reach all sulphur cells and then end
-        return 0;
+        var startState = new PathState(new Movement(start, Point.RIGHT), new int[sulphurCells.Count + 1]);
+        return stateSearch.FindBest(startState)!.Seconds;
     }
+
+    [SuppressMessage("ReSharper", "InvertIf")]
+    IEnumerable<PathState> IGame<PathState>.Next(PathState current) {
+        var sulphurCollected = true;
+        for (var i = 0; i < sulphurCells.Count; i++) {
+            if (current.SulphurCollected(i)) {
+                continue;
+            }
+            var sulphur = sulphurCells[i];
+            var path = Pathfinding<Movement>.Shortest(current.Movement, new Movement(sulphur), NextMovement)!;
+            var next = current.From(sulphur, path, i);
+            yield return next;
+            sulphurCollected = false;
+        }
+        if (sulphurCollected) {
+            var path = Pathfinding<Movement>.Shortest(current.Movement, new Movement(end), NextMovement)!;
+            var next = current.From(end, path, sulphurCells.Count);
+            yield return next;
+        }
+    }
+
+    IEnumerable<Movement> NextMovement(Movement current) {
+        return new[] { current.Direction, Point.TurnLeft(current.Direction), Point.TurnRight(current.Direction) }
+                .Select(it => new Movement(current.Point + it, it))
+                .Where(it => walkableCells.Contains(it.Point));
+    }
+
+    bool IGame<PathState>.HasReachedEnd(PathState state) => state.ReachedEnd;
+}
+
+readonly record struct Movement(Point Point, Point Direction = default) {
+    public bool Equals(Movement other) => Point == other.Point;
+    public override int GetHashCode() => Point.GetHashCode();
 }
 
 static class Cells {
@@ -59,13 +128,10 @@ readonly record struct Point(int X, int Y) {
     static readonly Point UP = new(0, 1);
     static readonly Point DOWN = new(0, -1);
     static readonly Point LEFT = new(-1, 0);
-    static readonly Point RIGHT = new(1, 0);
+    public static readonly Point RIGHT = new(1, 0);
 
-    public static Point[] Directions4 { get; } = [RIGHT, LEFT, UP, DOWN];
-
-    public bool InBounds(int width, int? height = null) {
-        return X >= 0 && X < width && Y >= 0 && Y < (height ?? width);
-    }
+    public static Point TurnLeft(Point direction) => new(-direction.Y, direction.X);
+    public static Point TurnRight(Point direction) => new(direction.Y, -direction.X);
 
     public static Point operator +(Point a, Point b) => new(a.X + b.X, a.Y + b.Y);
     public static Point operator -(Point a, Point b) => new(a.X - b.X, a.Y - b.Y);
@@ -74,6 +140,85 @@ readonly record struct Point(int X, int Y) {
     public static Point operator -(Point value) => new(-value.X, -value.Y);
 
     public override string ToString() => $"({X}, {Y})";
+}
+
+static class Pathfinding<T> where T : IEquatable<T> {
+    /// BFS
+    public static List<T>? Shortest(T start, T end, Func<T, IEnumerable<T>> getNext) {
+        Dictionary<T, T> parents = [];
+        Queue<T> queue = [];
+        HashSet<T> visited = [];
+        queue.Enqueue(start);
+        visited.Add(start);
+        while (queue.TryDequeue(out var current)) {
+            if (current.Equals(end)) {
+                return Reconstruct(parents, start, current);
+            }
+            foreach (var next in getNext(current)) {
+                if (!visited.Add(next)) {
+                    continue;
+                }
+                queue.Enqueue(next);
+                parents[next] = current;
+            }
+        }
+        return null;
+    }
+
+    static List<T> Reconstruct(Dictionary<T, T> parents, T start, T end) {
+        var path = new List<T>();
+        var current = end;
+        while (!current.Equals(start)) {
+            path.Add(current);
+            current = parents[current];
+        }
+        path.Add(start);
+        path.Reverse();
+        return path;
+    }
+}
+
+class StateSearch<T>(IGame<T> game, int depthMax) where T : IState<T>, IEquatable<T> {
+    readonly HashSet<T> visited = [];
+
+    /// DFS/Backtracking
+    public T? FindBest(T start) {
+        visited.Clear();
+        visited.Add(start);
+        return FindBest(start, 0);
+    }
+
+    T? FindBest(T current, int depth) {
+        if (game.HasReachedEnd(current)) {
+            return current;
+        }
+        if (depth > depthMax) {
+            return default;
+        }
+        T? best = default;
+        foreach (var next in game.Next(current)) {
+            if (!visited.Add(next)) {
+                continue;
+            }
+            var nextBest = FindBest(next, depth + 1);
+            if (nextBest == null) {
+                continue;
+            }
+            if (best == null || nextBest.IsBetterThan(best)) {
+                best = nextBest;
+            }
+        }
+        return best;
+    }
+}
+
+interface IGame<TState> {
+    IEnumerable<TState> Next(TState current);
+    bool HasReachedEnd(TState state);
+}
+
+interface IState<in T> where T : IState<T> {
+    bool IsBetterThan(T other);
 }
 
 static class Test {
