@@ -83,6 +83,7 @@ class Grid : IGame<PathState> {
 
     [SuppressMessage("ReSharper", "InvertIf")]
     IEnumerable<PathState> IGame<PathState>.Next(PathState current) {
+        Func<Movement, IEnumerable<Movement>> nextMovement = it => NextMovement(current, it);
         var sulphurCollected = true;
         for (var i = 0; i < sulphurCells.Count; i++) {
             if (current.SulphurCollected(i)) {
@@ -90,31 +91,37 @@ class Grid : IGame<PathState> {
             }
             var sulphur = sulphurCells[i];
             // Console.ForegroundColor = ConsoleColor.Red;
-            var path = Pathfinding<Movement>.Shortest(current.Movement, new Movement(sulphur), NextMovement)!;
+            var path = Pathfinding<Movement>.Shortest(current.Movement, new Movement(sulphur), nextMovement);
+            if (path == null) {
+                continue;
+            }
+            // Test.Log($"{current.Movement.Point} -> {sulphur}, {path}");
             var next = current.From(sulphur, path, i);
             yield return next;
             sulphurCollected = false;
         }
         if (sulphurCollected) {
-            var path = Pathfinding<Movement>.Shortest(current.Movement, new Movement(end), NextMovement)!;
+            var path = Pathfinding<Movement>.Shortest(current.Movement, new Movement(end), nextMovement)!;
+            // Test.Log($"{current.Movement.Point} -> {end}, {path}");
             var next = current.From(end, path, sulphurCells.Count);
             yield return next;
         }
     }
 
-    IEnumerable<Movement> NextMovement(Movement current) {
-        var nextMovements = new[]
-                        { current.Direction, Point.TurnLeft(current.Direction), Point.TurnRight(current.Direction) }
-                .Select(it => new Movement(current.Point + it, it))
-                .Where(it => walkableCells.Contains(it.Point))
-                .ToArray();
-        foreach (var next in nextMovements) {
-            // Console.CursorLeft = next.Point.X;
-            // Console.CursorTop = next.Point.Y;
-            // Console.Write(Point.ToChar(next.Direction));
-            // Test.Step();
+    IEnumerable<Movement> NextMovement(PathState state, Movement current) {
+        var remainingSulphurCells = sulphurCells.Where((_, i) => state.TargetsReached[i] == 0);
+        if (remainingSulphurCells.Contains(current.Point)) {
+            yield break;
         }
-        return nextMovements;
+        var directions = new[] {
+            current.Direction, Point.TurnLeft(current.Direction), Point.TurnRight(current.Direction)
+        };
+        foreach (var direction in directions) {
+            var next = new Movement(current.Point + direction, direction);
+            if (walkableCells.Contains(next.Point)) {
+                yield return next;
+            }
+        }
     }
 
     bool IGame<PathState>.HasReachedEnd(PathState state) => state.ReachedEnd;
@@ -137,14 +144,6 @@ readonly record struct Point(int X, int Y) {
     static readonly Point DOWN = new(0, -1);
     static readonly Point LEFT = new(-1, 0);
     public static readonly Point RIGHT = new(1, 0);
-
-    public static char ToChar(Point direction) => direction switch {
-        _ when direction == UP => 'v',
-        _ when direction == DOWN => '^',
-        _ when direction == LEFT => '<',
-        _ when direction == RIGHT => '>',
-        _ => throw new ArgumentException($"Unsupported direction: {direction}")
-    };
 
     public static Point TurnLeft(Point direction) => new(-direction.Y, direction.X);
     public static Point TurnRight(Point direction) => new(direction.Y, -direction.X);
