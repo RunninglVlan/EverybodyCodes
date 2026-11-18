@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-Test.From = "Part II Example";
 // https://everybody.codes/event/2026/quests/15
 Test.Run((notes, part, expected) => {
     Grid grid = part switch {
@@ -237,13 +236,18 @@ class Grid2 : Grid, IGame<PathState2> {
                 : throw new UnreachableException();
     }
 
+    [SuppressMessage("ReSharper", "InvertIf")]
     IEnumerable<(PathState2, int)> IGame<PathState2>.NextWithCost(PathState2 current) {
         if (current.SulphurCollected < REQUIRED) {
             foreach (var cycle in sulphurCycles) {
-                int distance = current.Distance(cycle, cycle.X.min);
-                yield return (current.From(cycle, cycle.X.min), distance);
-                distance = current.Distance(cycle, cycle.X.max);
-                yield return (current.From(cycle, cycle.X.max), distance);
+                if (cycle.X.min != current.X) {
+                    int distance = current.Distance(cycle, cycle.X.min);
+                    yield return (current.From(cycle, cycle.X.min), distance);
+                }
+                if (cycle.X.max != current.X) {
+                    int distance = current.Distance(cycle, cycle.X.max);
+                    yield return (current.From(cycle, cycle.X.max), distance);
+                }
             }
         } else {
             int end = endTargets.Last().X;
