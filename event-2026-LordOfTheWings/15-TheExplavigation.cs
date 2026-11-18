@@ -283,9 +283,9 @@ class Grid2 : Grid, IGame<PathState2> {
         int collected = mainCount * main.Deposits + remaining.Sum(it => it.Deposits);
         Test.Log($"collected: {collected}, remaining: {REQUIRED - collected}, seconds: {seconds}");
         var depth = 1;
-        Test.Log(main, depth++);
+        Test.Log($"{main}, {main.Seconds(mainCount)}", depth++);
         foreach (var cycle in remaining) {
-            Test.Log(cycle, depth++);
+            Test.Log($"{cycle}, {cycle.Seconds()}", depth++);
         }
     }
 
