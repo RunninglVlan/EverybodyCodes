@@ -18,8 +18,8 @@ abstract class Grid {
     int width, height;
     protected Point start;
     readonly Dictionary<Point, bool> walkableCells = [];
-    protected readonly List<Point> sulphurCells = [];
-    protected readonly List<(HashSet<Point> path, int sulphur)> cyclesWithSulphur = [];
+    protected readonly List<Point> sulphurDeposits = [];
+    protected readonly List<(HashSet<Point> path, int sulphur)> sulphurCycles = [];
     protected readonly List<Point> endTargets = [];
 
     public void Read(string notes) {
@@ -36,7 +36,7 @@ abstract class Grid {
                         start = point;
                         break;
                     case Cells.SULPHUR:
-                        sulphurCells.Add(point);
+                        sulphurDeposits.Add(point);
                         break;
                 }
             }
@@ -46,7 +46,7 @@ abstract class Grid {
     }
 
     void FindCycles() {
-        foreach (var cell in sulphurCells.Where(cell => !cyclesWithSulphur.Any(it => it.path.Contains(cell)))) {
+        foreach (var cell in sulphurDeposits.Where(cell => !sulphurCycles.Any(it => it.path.Contains(cell)))) {
             foreach (var direction in Point.Directions4) {
                 var next = cell + direction;
                 if (!walkableCells[next]) {
@@ -54,8 +54,8 @@ abstract class Grid {
                 }
                 var startMove = new Move(next, direction);
                 var path = Pathfinding<Move>.Shortest(startMove, new Move(cell), NextMove).First();
-                cyclesWithSulphur.Add((
-                        [.. path.Select(it => it.Point)], path.Count(it => sulphurCells.Contains(it.Point))
+                sulphurCycles.Add((
+                        [.. path.Select(it => it.Point)], path.Count(it => sulphurDeposits.Contains(it.Point))
                 ));
                 break;
             }
@@ -151,7 +151,7 @@ class Grid1 : Grid, IGame<PathState1> {
 
     public override int CollectSulphurAndReachEnd() {
         var startMove = new Move(start, Point.RIGHT);
-        var startState = new PathState1(startMove, new int[sulphurCells.Count + endTargets.Count]) {
+        var startState = new PathState1(startMove, new int[sulphurDeposits.Count + endTargets.Count]) {
             EndTargets = endTargets.Count
         };
         var endState = stateSearch.FindBest(startState)!;
@@ -164,8 +164,8 @@ class Grid1 : Grid, IGame<PathState1> {
         var sulphurCollected = true;
         int endTargetIndex = endTargets.Count - current.EndTargets;
         var endTarget = endTargets[endTargetIndex];
-        for (var i = 0; i < sulphurCells.Count; i++) {
-            var sulphur = sulphurCells[i];
+        for (var i = 0; i < sulphurDeposits.Count; i++) {
+            var sulphur = sulphurDeposits[i];
             if (sulphur.X > endTarget.X || current.SulphurCollected(i)) {
                 continue;
             }
@@ -180,15 +180,15 @@ class Grid1 : Grid, IGame<PathState1> {
         }
         if (sulphurCollected) {
             var path = Pathfinding<Move>.Shortest(current.Move, new Move(endTarget), nextMove).First();
-            var next = current.From(endTarget, path, sulphurCells.Count + endTargetIndex);
+            var next = current.From(endTarget, path, sulphurDeposits.Count + endTargetIndex);
             next.EndTargets--;
             yield return next;
         }
     }
 
     IEnumerable<Move> NextMove(PathState1 state, Move current) {
-        var remainingSulphurCells = sulphurCells.Where((_, i) => state.TargetsReached[i] == 0);
-        if (remainingSulphurCells.Contains(current.Point)) {
+        var remainingSulphur = sulphurDeposits.Where((_, i) => state.TargetsReached[i] == 0);
+        if (remainingSulphur.Contains(current.Point)) {
             yield break;
         }
         var endTarget = endTargets[^state.EndTargets];
@@ -240,10 +240,10 @@ class Grid2 : Grid, IGame<PathState2> {
 
     public override int CollectSulphurAndReachEnd() {
         const int required = 2026;
-        foreach ((var path, int sulphur) in cyclesWithSulphur) {
+        foreach ((var path, int sulphur) in sulphurCycles) {
             Test.Log((path.Count, sulphur, (float)path.Count / sulphur, sulphur / (float)path.Count));
         }
-        var cycle = cyclesWithSulphur.MaxBy(it => it.sulphur / (float)it.path.Count);
+        var cycle = sulphurCycles.MaxBy(it => it.sulphur / (float)it.path.Count);
         var cyclesToCollect = (int)Math.Ceiling(required / (float)cycle.sulphur);
         int seconds = cyclesToCollect * cycle.path.Count;
         Test.Log((cycle.path.Count, cycle.sulphur, cyclesToCollect, seconds));
