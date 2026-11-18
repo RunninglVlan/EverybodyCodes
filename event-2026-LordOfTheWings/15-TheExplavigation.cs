@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
+Test.From = "Part II Example";
 // https://everybody.codes/event/2026/quests/15
 Test.Run((notes, part, expected) => {
     Grid grid = part switch {
@@ -171,8 +172,9 @@ class Grid1 : Grid, IGame<PathState1> {
 
     public override int CollectSulphurAndReachEnd() {
         var startState = new PathState1(start.X, new bool[sulphurCycles.Count]);
-        var endState = stateSearch.FindBest(startState)!;
-        return endState.Seconds;
+        return stateSearch.TryFindBest(startState, out var endState)
+                ? endState.Seconds
+                : throw new UnreachableException();
     }
 
     IEnumerable<PathState1> IGame<PathState1>.Next(PathState1 current) {
@@ -209,35 +211,19 @@ class Grid1 : Grid, IGame<PathState1> {
     bool IGame<PathState1>.HasReachedEnd(PathState1 state) => state.X == endTargets.Last().X;
 }
 
-record PathState2(Move Move, int[] TargetsReached) : IState<PathState2> {
-    public int EndTargets { get; set; }
-    public int Seconds => TargetsReached.Sum();
-    public bool ReachedEnd => EndTargets == 0 && TargetsReached.Last() != 0;
-
-    public bool SulphurCollected(int i) => TargetsReached[i] != 0;
-
-    [SuppressMessage("ReSharper", "UseObjectOrCollectionInitializer")]
-    public PathState2 From(Point point, List<Move> path, int i) {
-        var direction = path[^1].Point - path[^2].Point;
-        var next = new PathState2(new Move(point, direction), [.. TargetsReached]);
-        next.TargetsReached[i] = path.Count - 1;
-        next.EndTargets = EndTargets;
-        return next;
+readonly record struct PathState2(int X, int SulphurCollected = 0, int Seconds = 0) : IState<PathState2> {
+    public PathState2 From(SulphurCycle cycle, int xStart) {
+        int nextX = cycle.X.min == xStart ? cycle.X.max : cycle.X.min;
+        int distance = Math.Abs(X - xStart) + cycle.Perimeter - cycle.Width;
+        return new PathState2(nextX, SulphurCollected + cycle.Deposits, Seconds + distance);
     }
 
     public bool IsBetterThan(PathState2 other) => Seconds < other.Seconds;
 
-    public virtual bool Equals(PathState2? other) {
-        return other is not null && TargetsReached.SequenceEqual(other.TargetsReached);
-    }
+    public bool Equals(PathState2 other) =>
+            X == other.X && SulphurCollected == other.SulphurCollected && Seconds == other.Seconds;
 
-    public override int GetHashCode() {
-        var hash = new HashCode();
-        foreach (int item in TargetsReached) {
-            hash.Add(item);
-        }
-        return hash.ToHashCode();
-    }
+    public override int GetHashCode() => HashCode.Combine(X, SulphurCollected, Seconds);
 }
 
 class Grid2 : Grid, IGame<PathState2> {
@@ -246,56 +232,29 @@ class Grid2 : Grid, IGame<PathState2> {
     readonly StateSearch<PathState2> stateSearch;
 
     public Grid2() {
-        stateSearch = new StateSearch<PathState2>(this, 100);
+        stateSearch = new StateSearch<PathState2>(this, 10_000);
     }
 
     public override int CollectSulphurAndReachEnd() {
-        int end = endTargets.Last().X;
-        var main = sulphurCycles.MaxBy(it => it.Deposits / (float)it.Perimeter);
-        var mainCount = (int)Math.Ceiling(REQUIRED / (float)main.Deposits);
-        int seconds = main.Seconds(mainCount) + end;
-        var leftCycles = sulphurCycles.Where(it => it.X.max < main.X.min).ToArray();
-        var rightCycles = sulphurCycles.Where(it => it.X.min > main.X.max).ToArray();
-        int maxLeft = leftCycles.Length > 0 ? leftCycles.Max(it => it.Deposits) : 0;
-        int maxRight = rightCycles.Length > 0 ? rightCycles.Max(it => it.Deposits) : 0;
-        Log(main, mainCount, seconds);
-        for (var i = 0; i <= (maxLeft + maxRight) / main.Deposits; i++) {
-            mainCount--;
-            int remaining = REQUIRED - mainCount * main.Deposits;
-            foreach (var right in rightCycles.Where(it => it.Deposits == remaining)) {
-                int newSeconds = main.Seconds(mainCount) + right.Seconds() + end;
-                seconds = Math.Min(newSeconds, seconds);
-                Log(main, mainCount, seconds, right);
-            }
-            foreach (var left in leftCycles.Where(it => it.Deposits <= remaining)) {
-                int newRemaining = remaining - left.Deposits;
-                foreach (var right in rightCycles.Where(it => it.Deposits == newRemaining)) {
-                    int newSeconds = left.Seconds() + main.Seconds(mainCount) + right.Seconds() + end;
-                    seconds = Math.Min(newSeconds, seconds);
-                    Log(main, mainCount, seconds, left, right);
-                }
-            }
-        }
-        return seconds;
+        return stateSearch.TryFindBest(new PathState2(start.X), out var endState)
+                ? endState.Seconds
+                : throw new UnreachableException();
     }
 
-    static void Log(SulphurCycle main, int mainCount, int seconds, params SulphurCycle[] remaining) {
-        int collected = mainCount * main.Deposits + remaining.Sum(it => it.Deposits);
-        Test.Log($"collected: {collected}, remaining: {REQUIRED - collected}, seconds: {seconds}");
-        var depth = 1;
-        Test.Log($"{main}, {main.Seconds(mainCount)}", depth++);
-        foreach (var cycle in remaining) {
-            Test.Log($"{cycle}, {cycle.Seconds()}", depth++);
+    IEnumerable<PathState2> IGame<PathState2>.Next(PathState2 current) {
+        if (current.SulphurCollected < REQUIRED) {
+            foreach (var cycle in sulphurCycles) {
+                yield return current.From(cycle, cycle.X.min);
+                yield return current.From(cycle, cycle.X.max);
+            }
+        } else {
+            int end = endTargets.Last().X;
+            int distance = end - current.X;
+            yield return current with { X = end, Seconds = current.Seconds + distance };
         }
     }
 
-    public IEnumerable<PathState2> Next(PathState2 current) {
-        throw new NotImplementedException();
-    }
-
-    public bool HasReachedEnd(PathState2 state) {
-        throw new NotImplementedException();
-    }
+    bool IGame<PathState2>.HasReachedEnd(PathState2 state) => state.X == endTargets.Last().X;
 }
 
 readonly record struct Move(Point Point, Point Direction = default) {
@@ -378,33 +337,36 @@ class StateSearch<T>(IGame<T> game, int depthMax) where T : IState<T>, IEquatabl
     readonly HashSet<T> visited = [];
 
     /// DFS/Backtracking
-    public T? FindBest(T start) {
+    public bool TryFindBest(T start, out T end) {
         visited.Clear();
         visited.Add(start);
-        return FindBest(start, 0);
+        return TryFindBest(start, 0, out end);
     }
 
-    T? FindBest(T current, int depth) {
+    [SuppressMessage("ReSharper", "InvertIf")]
+    bool TryFindBest(T current, int depth, out T end) {
+        end = default!;
         if (game.HasReachedEnd(current)) {
-            return current;
+            end = current;
+            return true;
         }
         if (depth > depthMax) {
-            return default;
+            return false;
         }
-        T? best = default;
+        var found = false;
         foreach (var next in game.Next(current)) {
             if (!visited.Add(next)) {
                 continue;
             }
-            var nextBest = FindBest(next, depth + 1);
-            if (nextBest == null) {
+            if (!TryFindBest(next, depth + 1, out var nextBest)) {
                 continue;
             }
-            if (best == null || nextBest.IsBetterThan(best)) {
-                best = nextBest;
+            if (!found || nextBest.IsBetterThan(end)) {
+                end = nextBest;
+                found = true;
             }
         }
-        return best;
+        return found;
     }
 }
 
