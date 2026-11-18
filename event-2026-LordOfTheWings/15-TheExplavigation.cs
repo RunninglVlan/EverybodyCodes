@@ -249,7 +249,7 @@ class Grid2 : Grid, IGame<PathState2> {
             cyclesToCollect--;
             int remaining = required - cyclesToCollect * cycle1.Deposits;
             int secondsAfterCycle1 = distanceTo1 + CycleSeconds(cycle1, cyclesToCollect);
-            foreach (var cycle2 in sulphurCycles.Where(it => it.Deposits == remaining)) {
+            foreach (var cycle2 in sulphurCycles.Where(it => it.Deposits == remaining && it.X.min > cycle1.X.max)) {
                 int distanceTo2 = cycle2.X.min - cycle1.X.max;
                 int newSeconds = secondsAfterCycle1 + distanceTo2 + CycleSeconds(cycle2) + end - cycle2.X.max;
                 seconds = Math.Min(newSeconds, seconds);
