@@ -75,7 +75,7 @@ abstract class Grid {
 
     public abstract int CollectSulphurAndReachEnd();
 
-    protected IEnumerable<Movement> NextMovement(Movement current, int xMax) {
+    protected IEnumerable<Move> NextMove(Move current, int xMax) {
         var directions = new[] {
             current.Direction, Point.TurnLeft(current.Direction), Point.TurnRight(current.Direction)
         };
@@ -84,7 +84,7 @@ abstract class Grid {
             if (nextPoint.X < 0 || nextPoint.X > xMax) {
                 continue;
             }
-            var next = new Movement(nextPoint, direction);
+            var next = new Move(nextPoint, direction);
             if (walkableCells[nextPoint]) {
                 yield return next;
             }
@@ -92,7 +92,7 @@ abstract class Grid {
     }
 }
 
-record PathState1(Movement Movement, int[] TargetsReached) : IState<PathState1> {
+record PathState1(Move Move, int[] TargetsReached) : IState<PathState1> {
     public int EndTargets { get; set; }
     public int Seconds => TargetsReached.Sum();
     public bool ReachedEnd => EndTargets == 0 && TargetsReached.Last() != 0;
@@ -100,9 +100,9 @@ record PathState1(Movement Movement, int[] TargetsReached) : IState<PathState1> 
     public bool SulphurCollected(int i) => TargetsReached[i] != 0;
 
     [SuppressMessage("ReSharper", "UseObjectOrCollectionInitializer")]
-    public PathState1 From(Point point, List<Movement> path, int i) {
+    public PathState1 From(Point point, List<Move> path, int i) {
         var direction = path[^1].Point - path[^2].Point;
-        var next = new PathState1(new Movement(point, direction), [.. TargetsReached]);
+        var next = new PathState1(new Move(point, direction), [.. TargetsReached]);
         next.TargetsReached[i] = path.Count - 1;
         next.EndTargets = EndTargets;
         return next;
@@ -131,8 +131,8 @@ class Grid1 : Grid, IGame<PathState1> {
     }
 
     public override int CollectSulphurAndReachEnd() {
-        var startMovement = new Movement(start, Point.RIGHT);
-        var startState = new PathState1(startMovement, new int[sulphurCells.Count + endTargets.Count]) {
+        var startMove = new Move(start, Point.RIGHT);
+        var startState = new PathState1(startMove, new int[sulphurCells.Count + endTargets.Count]) {
             EndTargets = endTargets.Count
         };
         var endState = stateSearch.FindBest(startState)!;
@@ -141,7 +141,7 @@ class Grid1 : Grid, IGame<PathState1> {
 
     [SuppressMessage("ReSharper", "InvertIf")]
     IEnumerable<PathState1> IGame<PathState1>.Next(PathState1 current) {
-        Func<Movement, IEnumerable<Movement>> nextMovement = it => NextMovement(current, it);
+        Func<Move, IEnumerable<Move>> nextMove = it => NextMove(current, it);
         var sulphurCollected = true;
         int endTargetIndex = endTargets.Count - current.EndTargets;
         var endTarget = endTargets[endTargetIndex];
@@ -150,7 +150,7 @@ class Grid1 : Grid, IGame<PathState1> {
             if (sulphur.X > endTarget.X || current.SulphurCollected(i)) {
                 continue;
             }
-            var paths = Pathfinding<Movement>.Shortest(current.Movement, new Movement(sulphur), nextMovement, 2);
+            var paths = Pathfinding<Move>.Shortest(current.Move, new Move(sulphur), nextMove, 2);
             if (paths.Count == 0) {
                 continue;
             }
@@ -160,28 +160,28 @@ class Grid1 : Grid, IGame<PathState1> {
             sulphurCollected = false;
         }
         if (sulphurCollected) {
-            var path = Pathfinding<Movement>.Shortest(current.Movement, new Movement(endTarget), nextMovement).First();
+            var path = Pathfinding<Move>.Shortest(current.Move, new Move(endTarget), nextMove).First();
             var next = current.From(endTarget, path, sulphurCells.Count + endTargetIndex);
             next.EndTargets--;
             yield return next;
         }
     }
 
-    IEnumerable<Movement> NextMovement(PathState1 state, Movement current) {
+    IEnumerable<Move> NextMove(PathState1 state, Move current) {
         var remainingSulphurCells = sulphurCells.Where((_, i) => state.TargetsReached[i] == 0);
         if (remainingSulphurCells.Contains(current.Point)) {
             yield break;
         }
         var endTarget = endTargets[^state.EndTargets];
-        foreach (var movement in NextMovement(current, endTarget.X)) {
-            yield return movement;
+        foreach (var move in NextMove(current, endTarget.X)) {
+            yield return move;
         }
     }
 
     bool IGame<PathState1>.HasReachedEnd(PathState1 state) => state.ReachedEnd;
 }
 
-record PathState2(Movement Movement, int[] TargetsReached) : IState<PathState2> {
+record PathState2(Move Move, int[] TargetsReached) : IState<PathState2> {
     public int EndTargets { get; set; }
     public int Seconds => TargetsReached.Sum();
     public bool ReachedEnd => EndTargets == 0 && TargetsReached.Last() != 0;
@@ -189,9 +189,9 @@ record PathState2(Movement Movement, int[] TargetsReached) : IState<PathState2> 
     public bool SulphurCollected(int i) => TargetsReached[i] != 0;
 
     [SuppressMessage("ReSharper", "UseObjectOrCollectionInitializer")]
-    public PathState2 From(Point point, List<Movement> path, int i) {
+    public PathState2 From(Point point, List<Move> path, int i) {
         var direction = path[^1].Point - path[^2].Point;
-        var next = new PathState2(new Movement(point, direction), [.. TargetsReached]);
+        var next = new PathState2(new Move(point, direction), [.. TargetsReached]);
         next.TargetsReached[i] = path.Count - 1;
         next.EndTargets = EndTargets;
         return next;
@@ -232,24 +232,24 @@ class Grid2 : Grid, IGame<PathState2> {
         int seconds = cyclesToCollect * cycle.path.Count;
         Test.Log((cycle.path.Count, cycle.sulphur, cyclesToCollect, seconds));
         // reach cycle
-        var startMovement = new Movement(start, Point.RIGHT);
-        var end = new Movement(cycle.path.First());
-        var pathToCycle = Pathfinding<Movement>.Shortest(startMovement, end, NextMovement).First();
+        var startMove = new Move(start, Point.RIGHT);
+        var end = new Move(cycle.path.First());
+        var pathToCycle = Pathfinding<Move>.Shortest(startMove, end, NextMove).First();
         // remove overlapping cells
         for (int i = pathToCycle.Count - 1; i >= 0; i--) {
-            var movement = pathToCycle[i];
-            if (cycle.path.Contains(movement.Point)) {
+            var move = pathToCycle[i];
+            if (cycle.path.Contains(move.Point)) {
                 pathToCycle.RemoveAt(i);
             }
         }
         // todo: reach end from the cycle using state search
-        startMovement = end with { Direction = Point.RIGHT };
-        end = new Movement(endTargets.Last());
-        var pathToEnd = Pathfinding<Movement>.Shortest(startMovement, end, NextMovement).First();
+        startMove = end with { Direction = Point.RIGHT };
+        end = new Move(endTargets.Last());
+        var pathToEnd = Pathfinding<Move>.Shortest(startMove, end, NextMove).First();
         // remove overlapping cells
         for (int i = pathToEnd.Count - 1; i >= 0; i--) {
-            var movement = pathToEnd[i];
-            if (cycle.path.Contains(movement.Point)) {
+            var move = pathToEnd[i];
+            if (cycle.path.Contains(move.Point)) {
                 pathToEnd.RemoveAt(i);
             }
         }
@@ -263,8 +263,8 @@ class Grid2 : Grid, IGame<PathState2> {
                 if (!walkableCells[next]) {
                     continue;
                 }
-                var startMovement = new Movement(next, direction);
-                var path = Pathfinding<Movement>.Shortest(startMovement, new Movement(cell), NextMovement).First();
+                var startMove = new Move(next, direction);
+                var path = Pathfinding<Move>.Shortest(startMove, new Move(cell), NextMove).First();
                 cyclesWithSulphur.Add((
                         [.. path.Select(it => it.Point)], path.Count(it => sulphurCells.Contains(it.Point))
                 ));
@@ -273,7 +273,7 @@ class Grid2 : Grid, IGame<PathState2> {
         }
     }
 
-    IEnumerable<Movement> NextMovement(Movement current) => NextMovement(current, width - 1);
+    IEnumerable<Move> NextMove(Move current) => NextMove(current, width - 1);
 
     public IEnumerable<PathState2> Next(PathState2 current) {
         throw new NotImplementedException();
@@ -284,8 +284,8 @@ class Grid2 : Grid, IGame<PathState2> {
     }
 }
 
-readonly record struct Movement(Point Point, Point Direction = default) {
-    public bool Equals(Movement other) => Point == other.Point;
+readonly record struct Move(Point Point, Point Direction = default) {
+    public bool Equals(Move other) => Point == other.Point;
     public override int GetHashCode() => Point.GetHashCode();
 }
 
