@@ -113,6 +113,8 @@ readonly record struct SulphurCycle(HashSet<Point> Path, int Deposits) {
     public (int min, int max) X { get; } = (Path.Min(it => it.X), Path.Max(it => it.X));
     public int Width => X.max - X.min;
     public int Perimeter => 2 * (Height + Width);
+
+    public int Seconds(int count = 1) => count * Perimeter - 2 * Width;
 }
 
 record PathState1(int X, bool[] CyclesVisited, int Seconds = 0) : IState<PathState1> {
@@ -228,6 +230,8 @@ record PathState2(Move Move, int[] TargetsReached) : IState<PathState2> {
 }
 
 class Grid2 : Grid, IGame<PathState2> {
+    const int REQUIRED = 2026;
+
     readonly StateSearch<PathState2> stateSearch;
 
     public Grid2() {
@@ -235,41 +239,38 @@ class Grid2 : Grid, IGame<PathState2> {
     }
 
     public override int CollectSulphurAndReachEnd() {
-        const int required = 2026;
         int end = endTargets.Last().X;
         var main = sulphurCycles.MaxBy(it => it.Deposits / (float)it.Perimeter);
-        var cyclesToCollect = (int)Math.Ceiling(required / (float)main.Deposits);
-        int seconds = Seconds(main, cyclesToCollect) + end;
+        var cyclesToCollect = (int)Math.Ceiling(REQUIRED / (float)main.Deposits);
+        int seconds = main.Seconds(cyclesToCollect) + end;
         var leftCycles = sulphurCycles.Where(it => it.X.max < main.X.min).ToArray();
         var rightCycles = sulphurCycles.Where(it => it.X.min > main.X.max).ToArray();
         int maxLeft = leftCycles.Length > 0 ? leftCycles.Max(it => it.Deposits) : 0;
         int maxRight = rightCycles.Length > 0 ? rightCycles.Max(it => it.Deposits) : 0;
-        Log();
+        Log(main, cyclesToCollect, seconds);
         for (var i = 0; i <= (maxLeft + maxRight) / main.Deposits; i++) {
             cyclesToCollect--;
-            int remaining = required - cyclesToCollect * main.Deposits;
+            int remaining = REQUIRED - cyclesToCollect * main.Deposits;
             foreach (var right in rightCycles.Where(it => it.Deposits == remaining)) {
-                int newSeconds = Seconds(main, cyclesToCollect) + Seconds(right) + end;
+                int newSeconds = main.Seconds(cyclesToCollect) + right.Seconds() + end;
                 seconds = Math.Min(newSeconds, seconds);
-                Log();
+                Log(main, cyclesToCollect, seconds, right);
             }
             foreach (var left in leftCycles.Where(it => it.Deposits <= remaining)) {
                 int newRemaining = remaining - left.Deposits;
                 foreach (var right in rightCycles.Where(it => it.Deposits == newRemaining)) {
-                    int newSeconds = Seconds(left) + Seconds(main, cyclesToCollect) + Seconds(right) + end;
+                    int newSeconds = left.Seconds() + main.Seconds(cyclesToCollect) + right.Seconds() + end;
                     seconds = Math.Min(newSeconds, seconds);
-                    Log();
+                    Log(main, cyclesToCollect, seconds, left, right);
                 }
             }
         }
         return seconds;
+    }
 
-        int Seconds(SulphurCycle cycle, int count = 1) => count * cycle.Perimeter - 2 * cycle.Width;
-
-        void Log() {
-            int collected = cyclesToCollect * main.Deposits;
-            Test.Log($"collected: {collected}, remaining: {required - collected}, seconds: {seconds}");
-        }
+    static void Log(SulphurCycle main, int mainCount, int seconds, params SulphurCycle[] remaining) {
+        int collected = mainCount * main.Deposits + remaining.Sum(it => it.Deposits);
+        Test.Log($"collected: {collected}, remaining: {REQUIRED - collected}, seconds: {seconds}");
     }
 
     public IEnumerable<PathState2> Next(PathState2 current) {
