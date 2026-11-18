@@ -16,11 +16,11 @@ Test.Run((notes, part, expected) => {
 });
 
 abstract class Grid {
-    protected int width;
-    int height;
+    int width, height;
     protected Point start;
-    protected readonly Dictionary<Point, bool> walkableCells = [];
+    readonly Dictionary<Point, bool> walkableCells = [];
     protected readonly List<Point> sulphurCells = [];
+    protected readonly List<(HashSet<Point> path, int sulphur)> cyclesWithSulphur = [];
     protected readonly List<Point> endTargets = [];
 
     public void Read(string notes) {
@@ -42,8 +42,28 @@ abstract class Grid {
                 }
             }
         }
+        FindCycles();
         FindEndTargets();
     }
+
+    void FindCycles() {
+        foreach (var cell in sulphurCells.Where(cell => !cyclesWithSulphur.Any(it => it.path.Contains(cell)))) {
+            foreach (var direction in Point.Directions4) {
+                var next = cell + direction;
+                if (!walkableCells[next]) {
+                    continue;
+                }
+                var startMove = new Move(next, direction);
+                var path = Pathfinding<Move>.Shortest(startMove, new Move(cell), NextMove).First();
+                cyclesWithSulphur.Add((
+                        [.. path.Select(it => it.Point)], path.Count(it => sulphurCells.Contains(it.Point))
+                ));
+                break;
+            }
+        }
+    }
+
+    protected IEnumerable<Move> NextMove(Move current) => NextMove(current, width - 1);
 
     void FindEndTargets() {
         for (var x = 1; x < width; x++) {
@@ -215,15 +235,12 @@ record PathState2(Move Move, int[] TargetsReached) : IState<PathState2> {
 class Grid2 : Grid, IGame<PathState2> {
     readonly StateSearch<PathState2> stateSearch;
 
-    readonly List<(HashSet<Point> path, int sulphur)> cyclesWithSulphur = [];
-
     public Grid2() {
         stateSearch = new StateSearch<PathState2>(this, 100);
     }
 
     public override int CollectSulphurAndReachEnd() {
         const int required = 2026;
-        FindCycles();
         foreach ((var path, int sulphur) in cyclesWithSulphur) {
             Test.Log((path.Count, sulphur, (float)path.Count / sulphur, sulphur / (float)path.Count));
         }
@@ -255,25 +272,6 @@ class Grid2 : Grid, IGame<PathState2> {
         }
         return pathToCycle.Count + seconds + pathToEnd.Count;
     }
-
-    void FindCycles() {
-        foreach (var cell in sulphurCells.Where(cell => !cyclesWithSulphur.Any(it => it.path.Contains(cell)))) {
-            foreach (var direction in Point.Directions4) {
-                var next = cell + direction;
-                if (!walkableCells[next]) {
-                    continue;
-                }
-                var startMove = new Move(next, direction);
-                var path = Pathfinding<Move>.Shortest(startMove, new Move(cell), NextMove).First();
-                cyclesWithSulphur.Add((
-                        [.. path.Select(it => it.Point)], path.Count(it => sulphurCells.Contains(it.Point))
-                ));
-                break;
-            }
-        }
-    }
-
-    IEnumerable<Move> NextMove(Move current) => NextMove(current, width - 1);
 
     public IEnumerable<PathState2> Next(PathState2 current) {
         throw new NotImplementedException();
