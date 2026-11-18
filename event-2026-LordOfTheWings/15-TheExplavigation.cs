@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-Test.Until = "Part II Example";
+Test.Until = "Part II";
 // https://everybody.codes/event/2026/quests/15
 Test.Run((notes, part, expected) => {
     Grid grid = part switch {
@@ -60,7 +60,7 @@ abstract class Grid {
         }
     }
 
-    protected IEnumerable<Move> NextMove(Move current) => NextMove(current, width - 1);
+    IEnumerable<Move> NextMove(Move current) => NextMove(current, width - 1);
 
     void FindEndTargets() {
         for (var x = 1; x < width; x++) {
@@ -177,7 +177,6 @@ class Grid1 : Grid, IGame<PathState1> {
         }
     }
 
-    [SuppressMessage("ReSharper", "LoopCanBeConvertedToQuery")]
     List<(SulphurCycle, int)> NextCycles(PathState1 state) {
         List<(SulphurCycle, int)> cycles = [];
         foreach (var endTarget in endTargets) {
@@ -238,36 +237,13 @@ class Grid2 : Grid, IGame<PathState2> {
 
     public override int CollectSulphurAndReachEnd() {
         const int required = 2026;
-        foreach ((var path, int sulphur) in sulphurCycles) {
-            Test.Log((path.Count, sulphur, (float)path.Count / sulphur, sulphur / (float)path.Count));
+        foreach (var cycle in sulphurCycles) {
+            Test.Log((cycle, (float)cycle.Perimeter / cycle.Deposits, cycle.Deposits / (float)cycle.Perimeter));
         }
-        var cycle = sulphurCycles.MaxBy(it => it.Deposits / (float)it.Path.Count);
-        var cyclesToCollect = (int)Math.Ceiling(required / (float)cycle.Deposits);
-        int seconds = cyclesToCollect * cycle.Path.Count;
-        Test.Log((cycle.Path.Count, cycle.Deposits, cyclesToCollect, seconds));
-        // reach cycle
-        var startMove = new Move(start, Point.RIGHT);
-        var end = new Move(cycle.Path.First());
-        var pathToCycle = Pathfinding<Move>.Shortest(startMove, end, NextMove)!;
-        // remove overlapping cells
-        for (int i = pathToCycle.Count - 1; i >= 0; i--) {
-            var move = pathToCycle[i];
-            if (cycle.Path.Contains(move.Point)) {
-                pathToCycle.RemoveAt(i);
-            }
-        }
-        // todo: reach end from the cycle using state search
-        startMove = end with { Direction = Point.RIGHT };
-        end = new Move(endTargets.Last());
-        var pathToEnd = Pathfinding<Move>.Shortest(startMove, end, NextMove)!;
-        // remove overlapping cells
-        for (int i = pathToEnd.Count - 1; i >= 0; i--) {
-            var move = pathToEnd[i];
-            if (cycle.Path.Contains(move.Point)) {
-                pathToEnd.RemoveAt(i);
-            }
-        }
-        return pathToCycle.Count + seconds + pathToEnd.Count;
+        var bestCycle = sulphurCycles.MaxBy(it => it.Deposits / (float)it.Perimeter);
+        var cyclesToCollect = (int)Math.Ceiling(required / (float)bestCycle.Deposits);
+        Test.Log((bestCycle, cyclesToCollect, cyclesToCollect * bestCycle.Perimeter));
+        return bestCycle.X.min + cyclesToCollect * bestCycle.Perimeter + endTargets.Last().X - bestCycle.X.max;
     }
 
     public IEnumerable<PathState2> Next(PathState2 current) {
