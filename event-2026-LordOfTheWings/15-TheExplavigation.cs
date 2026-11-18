@@ -52,7 +52,7 @@ abstract class Grid {
                     continue;
                 }
                 var startMove = new Move(next, direction);
-                var path = Pathfinding<Move>.Shortest(startMove, new Move(cell), NextMove).First();
+                var path = Pathfinding<Move>.Shortest(startMove, new Move(cell), NextMove)!;
                 int deposits = path.Count(it => sulphurDeposits.Contains(it.Point));
                 sulphurCycles.Add(new SulphurCycle([.. path.Select(it => it.Point)], deposits));
                 break;
@@ -248,7 +248,7 @@ class Grid2 : Grid, IGame<PathState2> {
         // reach cycle
         var startMove = new Move(start, Point.RIGHT);
         var end = new Move(cycle.Path.First());
-        var pathToCycle = Pathfinding<Move>.Shortest(startMove, end, NextMove).First();
+        var pathToCycle = Pathfinding<Move>.Shortest(startMove, end, NextMove)!;
         // remove overlapping cells
         for (int i = pathToCycle.Count - 1; i >= 0; i--) {
             var move = pathToCycle[i];
@@ -259,7 +259,7 @@ class Grid2 : Grid, IGame<PathState2> {
         // todo: reach end from the cycle using state search
         startMove = end with { Direction = Point.RIGHT };
         end = new Move(endTargets.Last());
-        var pathToEnd = Pathfinding<Move>.Shortest(startMove, end, NextMove).First();
+        var pathToEnd = Pathfinding<Move>.Shortest(startMove, end, NextMove)!;
         // remove overlapping cells
         for (int i = pathToEnd.Count - 1; i >= 0; i--) {
             var move = pathToEnd[i];
@@ -321,8 +321,7 @@ readonly record struct Point(int X, int Y) {
 
 static class Pathfinding<T> where T : IEquatable<T> {
     /// BFS
-    public static List<List<T>> Shortest(T start, T end, Func<T, IEnumerable<T>> getNext, int max = 1) {
-        List<List<T>> paths = [];
+    public static List<T>? Shortest(T start, T end, Func<T, IEnumerable<T>> getNext) {
         Dictionary<T, T> parents = [];
         Queue<T> queue = [];
         HashSet<T> visited = [];
@@ -330,21 +329,17 @@ static class Pathfinding<T> where T : IEquatable<T> {
         visited.Add(start);
         while (queue.TryDequeue(out var current)) {
             if (current.Equals(end)) {
-                paths.Add(Reconstruct(parents, start, current));
-                if (paths.Count == max) {
-                    return paths;
-                }
-                continue;
+                return Reconstruct(parents, start, current);
             }
             foreach (var next in getNext(current)) {
-                if (!visited.Add(next) && !next.Equals(end)) {
+                if (!visited.Add(next)) {
                     continue;
                 }
                 queue.Enqueue(next);
                 parents[next] = current;
             }
         }
-        return paths;
+        return null;
     }
 
     static List<T> Reconstruct(Dictionary<T, T> parents, T start, T end) {
