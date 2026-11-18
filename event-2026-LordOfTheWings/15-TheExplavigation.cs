@@ -243,7 +243,7 @@ class Grid2 : Grid, IGame<PathState2> {
         var bestCycle = sulphurCycles.MaxBy(it => it.Deposits / (float)it.Perimeter);
         var cyclesToCollect = (int)Math.Ceiling(required / (float)bestCycle.Deposits);
         Test.Log((bestCycle, cyclesToCollect, cyclesToCollect * bestCycle.Perimeter));
-        return bestCycle.X.min + cyclesToCollect * bestCycle.Perimeter + endTargets.Last().X - bestCycle.X.max;
+        return bestCycle.X.min + cyclesToCollect * bestCycle.Perimeter - bestCycle.Width + endTargets.Last().X - bestCycle.X.max;
     }
 
     public IEnumerable<PathState2> Next(PathState2 current) {
