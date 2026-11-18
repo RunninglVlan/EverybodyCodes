@@ -63,7 +63,21 @@ abstract class Grid {
         }
     }
 
-    IEnumerable<Move> NextMove(Move current) => NextMove(current, width - 1);
+    IEnumerable<Move> NextMove(Move current) {
+        var directions = new[] {
+            current.Direction, Point.TurnLeft(current.Direction), Point.TurnRight(current.Direction)
+        };
+        foreach (var direction in directions) {
+            var nextPoint = current.Point + direction;
+            if (nextPoint.X < 0 || nextPoint.X > width - 1) {
+                continue;
+            }
+            var next = new Move(nextPoint, direction);
+            if (walkableCells[nextPoint]) {
+                yield return next;
+            }
+        }
+    }
 
     void FindEndTargets() {
         for (var x = 1; x < width; x++) {
@@ -94,22 +108,17 @@ abstract class Grid {
     }
 
     public abstract int CollectSulphurAndReachEnd();
+}
 
-    IEnumerable<Move> NextMove(Move current, int xMax) {
-        var directions = new[] {
-            current.Direction, Point.TurnLeft(current.Direction), Point.TurnRight(current.Direction)
-        };
-        foreach (var direction in directions) {
-            var nextPoint = current.Point + direction;
-            if (nextPoint.X < 0 || nextPoint.X > xMax) {
-                continue;
-            }
-            var next = new Move(nextPoint, direction);
-            if (walkableCells[nextPoint]) {
-                yield return next;
-            }
-        }
-    }
+static class Cells {
+    public const char START = 'S';
+    public const char WALL = '#';
+    public const char SULPHUR = '@';
+}
+
+readonly record struct Move(Point Point, Point Direction = default) {
+    public bool Equals(Move other) => Point == other.Point;
+    public override int GetHashCode() => Point.GetHashCode();
 }
 
 readonly record struct SulphurCycle {
@@ -124,11 +133,9 @@ readonly record struct SulphurCycle {
         X = (path.Min(it => it.X), path.Max(it => it.X));
         Perimeter = 2 * (height + Width);
     }
-
-    public int Seconds(int count = 1) => count * Perimeter - 2 * Width;
 }
 
-record PathState1(int X, bool[] CyclesVisited, int Seconds = 0) : IState<PathState1> {
+readonly record struct PathState1(int X, bool[] CyclesVisited, int Seconds = 0) : IState<PathState1> {
     [SuppressMessage("ReSharper", "UseObjectOrCollectionInitializer")]
     public PathState1 From(SulphurCycle cycle, int i, int xStart) {
         int nextX = cycle.X.min == xStart ? cycle.X.max : cycle.X.min;
@@ -140,11 +147,8 @@ record PathState1(int X, bool[] CyclesVisited, int Seconds = 0) : IState<PathSta
 
     public bool IsBetterThan(PathState1 other) => Seconds < other.Seconds;
 
-    public virtual bool Equals(PathState1? other) {
-        return other is not null
-                && X == other.X
-                && CyclesVisited.SequenceEqual(other.CyclesVisited)
-                && Seconds == other.Seconds;
+    public bool Equals(PathState1 other) {
+        return X == other.X && CyclesVisited.SequenceEqual(other.CyclesVisited) && Seconds == other.Seconds;
     }
 
     public override int GetHashCode() {
@@ -155,10 +159,6 @@ record PathState1(int X, bool[] CyclesVisited, int Seconds = 0) : IState<PathSta
         }
         hash.Add(Seconds);
         return hash.ToHashCode();
-    }
-
-    public override string ToString() {
-        return $"{X}, {string.Join("-", CyclesVisited.Select(it => it ? "1" : "0"))}, {Seconds}";
     }
 }
 
@@ -222,8 +222,6 @@ readonly record struct PathState2(int X, int SulphurCollected = 0) : IState<Path
 }
 
 class Grid2 : Grid, IGame<PathState2> {
-    const int REQUIRED = 2026;
-
     readonly StateSearch<PathState2> stateSearch;
 
     public Grid2() {
@@ -238,7 +236,8 @@ class Grid2 : Grid, IGame<PathState2> {
 
     [SuppressMessage("ReSharper", "InvertIf")]
     IEnumerable<(PathState2, int)> IGame<PathState2>.NextWithCost(PathState2 current) {
-        if (current.SulphurCollected < REQUIRED) {
+        const int required = 2026;
+        if (current.SulphurCollected < required) {
             foreach (var cycle in sulphurCycles) {
                 if (cycle.X.min != current.X) {
                     int distance = current.Distance(cycle, cycle.X.min);
@@ -256,18 +255,6 @@ class Grid2 : Grid, IGame<PathState2> {
     }
 
     bool IGame<PathState2>.HasReachedEnd(PathState2 state) => state.X == endTargets.Last().X;
-}
-
-readonly record struct Move(Point Point, Point Direction = default) {
-    public bool Equals(Move other) => Point == other.Point;
-    public override int GetHashCode() => Point.GetHashCode();
-}
-
-static class Cells {
-    public const char START = 'S';
-    public const char END = 'E';
-    public const char WALL = '#';
-    public const char SULPHUR = '@';
 }
 
 readonly record struct Point(int X, int Y) {
