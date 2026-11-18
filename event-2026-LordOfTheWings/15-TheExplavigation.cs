@@ -123,7 +123,7 @@ record PathState1(int X, bool[] CyclesVisited) : IState<PathState1> {
     [SuppressMessage("ReSharper", "UseObjectOrCollectionInitializer")]
     public PathState1 From(SulphurCycle cycle, int i, int xStart) {
         int nextX = cycle.X.min == xStart ? cycle.X.max : cycle.X.min;
-        int distance = Math.Abs(X - nextX) + cycle.Perimeter - cycle.Width;
+        int distance = Math.Abs(X - xStart) + cycle.Perimeter - cycle.Width;
         var next = new PathState1(nextX, [.. CyclesVisited]);
         next.CyclesVisited[i] = true;
         next.Seconds = Seconds + distance;
