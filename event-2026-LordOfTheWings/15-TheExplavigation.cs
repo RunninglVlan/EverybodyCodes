@@ -1,8 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-Test.From = "Part II Example";
-Test.Until = "Part II";
+// Test.From = "Part II Example";
+Test.From = "Part II";
+// Test.Until = "Part II";
 // https://everybody.codes/event/2026/quests/15
 Test.Run((notes, part, expected) => {
     Grid grid = part switch {
@@ -180,21 +181,62 @@ class Grid1 : Grid, IGame<PathState1> {
     bool IGame<PathState1>.HasReachedEnd(PathState1 state) => state.ReachedEnd;
 }
 
-class Grid2 : Grid {
+record PathState2(Movement Movement, int[] TargetsReached) : IState<PathState2> {
+    public int EndTargets { get; set; }
+    public int Seconds => TargetsReached.Sum();
+    public bool ReachedEnd => EndTargets == 0 && TargetsReached.Last() != 0;
+
+    public bool SulphurCollected(int i) => TargetsReached[i] != 0;
+
+    [SuppressMessage("ReSharper", "UseObjectOrCollectionInitializer")]
+    public PathState2 From(Point point, List<Movement> path, int i) {
+        var direction = path[^1].Point - path[^2].Point;
+        var next = new PathState2(new Movement(point, direction), [.. TargetsReached]);
+        next.TargetsReached[i] = path.Count - 1;
+        next.EndTargets = EndTargets;
+        return next;
+    }
+
+    public bool IsBetterThan(PathState2 other) => Seconds < other.Seconds;
+
+    public virtual bool Equals(PathState2? other) {
+        return other is not null && TargetsReached.SequenceEqual(other.TargetsReached);
+    }
+
+    public override int GetHashCode() {
+        var hash = new HashCode();
+        foreach (int item in TargetsReached) {
+            hash.Add(item);
+        }
+        return hash.ToHashCode();
+    }
+}
+
+class Grid2 : Grid, IGame<PathState2> {
+    readonly StateSearch<PathState2> stateSearch;
+
     readonly List<(HashSet<Point> path, int sulphur)> cyclesWithSulphur = [];
+
+    public Grid2() {
+        stateSearch = new StateSearch<PathState2>(this, 100);
+    }
 
     public override int CollectSulphurAndReachEnd() {
         const int required = 2026;
         FindCycles();
+        foreach ((var path, int sulphur) in cyclesWithSulphur) {
+            Test.Log((path.Count, sulphur, (float)path.Count / sulphur, sulphur / (float)path.Count));
+        }
         var cycle = cyclesWithSulphur.MaxBy(it => it.sulphur / (float)it.path.Count);
         var cyclesToCollect = (int)Math.Ceiling(required / (float)cycle.sulphur);
         int seconds = cyclesToCollect * cycle.path.Count;
+        Test.Log((cycle.path.Count, cycle.sulphur, cyclesToCollect, seconds));
         // reach cycle
         var startMovement = new Movement(start, Point.RIGHT);
         var end = new Movement(cycle.path.First());
         var pathToCycle = Pathfinding<Movement>.Shortest(startMovement, end, NextMovement).First();
         // remove overlapping cells
-        for (var i = 0; i < pathToCycle.Count; i++) {
+        for (int i = pathToCycle.Count - 1; i >= 0; i--) {
             var movement = pathToCycle[i];
             if (cycle.path.Contains(movement.Point)) {
                 pathToCycle.RemoveAt(i);
@@ -205,7 +247,7 @@ class Grid2 : Grid {
         end = new Movement(endTargets.Last());
         var pathToEnd = Pathfinding<Movement>.Shortest(startMovement, end, NextMovement).First();
         // remove overlapping cells
-        for (var i = 0; i < pathToEnd.Count; i++) {
+        for (int i = pathToEnd.Count - 1; i >= 0; i--) {
             var movement = pathToEnd[i];
             if (cycle.path.Contains(movement.Point)) {
                 pathToEnd.RemoveAt(i);
@@ -232,6 +274,14 @@ class Grid2 : Grid {
     }
 
     IEnumerable<Movement> NextMovement(Movement current) => NextMovement(current, width - 1);
+
+    public IEnumerable<PathState2> Next(PathState2 current) {
+        throw new NotImplementedException();
+    }
+
+    public bool HasReachedEnd(PathState2 state) {
+        throw new NotImplementedException();
+    }
 }
 
 readonly record struct Movement(Point Point, Point Direction = default) {
