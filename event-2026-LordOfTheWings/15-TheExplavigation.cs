@@ -236,29 +236,23 @@ class Grid2 : Grid, IGame<PathState2> {
 
     public override int CollectSulphurAndReachEnd() {
         const int required = 2026;
-        foreach (var cycle in sulphurCycles) {
-            Test.Log(cycle);
-        }
         int end = endTargets.Last().X;
         var main = sulphurCycles.MaxBy(it => it.Deposits / (float)it.Perimeter);
         var cyclesToCollect = (int)Math.Ceiling(required / (float)main.Deposits);
-        int distanceToMain = main.X.min;
-        int seconds = distanceToMain + CycleSeconds(main, cyclesToCollect) + end - main.X.max;
+        int seconds = Seconds(main, cyclesToCollect) + end;
         Log();
         for (var i = 0; i < 8; i++) {
             cyclesToCollect--;
             int remaining = required - cyclesToCollect * main.Deposits;
-            int secondsAfterMain = distanceToMain + CycleSeconds(main, cyclesToCollect);
             foreach (var right in sulphurCycles.Where(it => it.Deposits == remaining && it.X.min > main.X.max)) {
-                int distanceToRight = right.X.min - main.X.max;
-                int newSeconds = secondsAfterMain + distanceToRight + CycleSeconds(right) + end - right.X.max;
+                int newSeconds = Seconds(main, cyclesToCollect) + Seconds(right) + end;
                 seconds = Math.Min(newSeconds, seconds);
                 Log();
             }
         }
         return seconds;
 
-        int CycleSeconds(SulphurCycle cycle, int count = 1) => count * cycle.Perimeter - cycle.Width;
+        int Seconds(SulphurCycle cycle, int count = 1) => count * cycle.Perimeter - 2 * cycle.Width;
 
         void Log() {
             int collected = cyclesToCollect * main.Deposits;
