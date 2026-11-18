@@ -252,27 +252,27 @@ class Grid2 : Grid, IGame<PathState2> {
     public override int CollectSulphurAndReachEnd() {
         int end = endTargets.Last().X;
         var main = sulphurCycles.MaxBy(it => it.Deposits / (float)it.Perimeter);
-        var cyclesToCollect = (int)Math.Ceiling(REQUIRED / (float)main.Deposits);
-        int seconds = main.Seconds(cyclesToCollect) + end;
+        var mainCount = (int)Math.Ceiling(REQUIRED / (float)main.Deposits);
+        int seconds = main.Seconds(mainCount) + end;
         var leftCycles = sulphurCycles.Where(it => it.X.max < main.X.min).ToArray();
         var rightCycles = sulphurCycles.Where(it => it.X.min > main.X.max).ToArray();
         int maxLeft = leftCycles.Length > 0 ? leftCycles.Max(it => it.Deposits) : 0;
         int maxRight = rightCycles.Length > 0 ? rightCycles.Max(it => it.Deposits) : 0;
-        Log(main, cyclesToCollect, seconds);
+        Log(main, mainCount, seconds);
         for (var i = 0; i <= (maxLeft + maxRight) / main.Deposits; i++) {
-            cyclesToCollect--;
-            int remaining = REQUIRED - cyclesToCollect * main.Deposits;
+            mainCount--;
+            int remaining = REQUIRED - mainCount * main.Deposits;
             foreach (var right in rightCycles.Where(it => it.Deposits == remaining)) {
-                int newSeconds = main.Seconds(cyclesToCollect) + right.Seconds() + end;
+                int newSeconds = main.Seconds(mainCount) + right.Seconds() + end;
                 seconds = Math.Min(newSeconds, seconds);
-                Log(main, cyclesToCollect, seconds, right);
+                Log(main, mainCount, seconds, right);
             }
             foreach (var left in leftCycles.Where(it => it.Deposits <= remaining)) {
                 int newRemaining = remaining - left.Deposits;
                 foreach (var right in rightCycles.Where(it => it.Deposits == newRemaining)) {
-                    int newSeconds = left.Seconds() + main.Seconds(cyclesToCollect) + right.Seconds() + end;
+                    int newSeconds = left.Seconds() + main.Seconds(mainCount) + right.Seconds() + end;
                     seconds = Math.Min(newSeconds, seconds);
-                    Log(main, cyclesToCollect, seconds, left, right);
+                    Log(main, mainCount, seconds, left, right);
                 }
             }
         }
