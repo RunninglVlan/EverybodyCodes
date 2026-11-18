@@ -169,7 +169,9 @@ class Grid1 : Grid, IGame<PathState1> {
             if (sulphur.X > endTarget.X || current.SulphurCollected(i)) {
                 continue;
             }
-            var paths = Pathfinding<Move>.Shortest(current.Move, new Move(sulphur), nextMove, 2);
+            var sulphurCycle = sulphurCycles.First(it => it.path.Contains(sulphur));
+            int maxPaths = sulphurCycle.sulphur == 1 ? 2 : 1;
+            var paths = Pathfinding<Move>.Shortest(current.Move, new Move(sulphur), nextMove, maxPaths);
             if (paths.Count == 0) {
                 continue;
             }
