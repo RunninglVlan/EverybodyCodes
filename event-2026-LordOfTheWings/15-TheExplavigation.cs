@@ -1,8 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-Test.From = "Part I Example";
-Test.Until = "Part I";
+Test.Until = "Part II Example";
 // https://everybody.codes/event/2026/quests/15
 Test.Run((notes, part, expected) => {
     Grid grid = part switch {
@@ -117,23 +116,23 @@ readonly record struct SulphurCycle(HashSet<Point> Path, int Deposits) {
     public int Perimeter => 2 * (Height + Width);
 }
 
-record PathState1(int X, bool[] CyclesVisited) : IState<PathState1> {
-    public int Seconds { get; set; }
-
+record PathState1(int X, bool[] CyclesVisited, int Seconds = 0) : IState<PathState1> {
     [SuppressMessage("ReSharper", "UseObjectOrCollectionInitializer")]
     public PathState1 From(SulphurCycle cycle, int i, int xStart) {
         int nextX = cycle.X.min == xStart ? cycle.X.max : cycle.X.min;
         int distance = Math.Abs(X - xStart) + cycle.Perimeter - cycle.Width;
-        var next = new PathState1(nextX, [.. CyclesVisited]);
+        var next = new PathState1(nextX, [.. CyclesVisited], Seconds + distance);
         next.CyclesVisited[i] = true;
-        next.Seconds = Seconds + distance;
         return next;
     }
 
     public bool IsBetterThan(PathState1 other) => Seconds < other.Seconds;
 
     public virtual bool Equals(PathState1? other) {
-        return other is not null && X == other.X && CyclesVisited.SequenceEqual(other.CyclesVisited);
+        return other is not null
+                && X == other.X
+                && CyclesVisited.SequenceEqual(other.CyclesVisited)
+                && Seconds == other.Seconds;
     }
 
     public override int GetHashCode() {
@@ -142,6 +141,7 @@ record PathState1(int X, bool[] CyclesVisited) : IState<PathState1> {
         foreach (bool item in CyclesVisited) {
             hash.Add(item);
         }
+        hash.Add(Seconds);
         return hash.ToHashCode();
     }
 
@@ -367,7 +367,6 @@ class StateSearch<T>(IGame<T> game, int depthMax) where T : IState<T>, IEquatabl
     public T? FindBest(T start) {
         visited.Clear();
         visited.Add(start);
-        Test.Log(start);
         return FindBest(start, 0);
     }
 
@@ -383,7 +382,6 @@ class StateSearch<T>(IGame<T> game, int depthMax) where T : IState<T>, IEquatabl
             if (!visited.Add(next)) {
                 continue;
             }
-            Test.Log(next, depth + 1);
             var nextBest = FindBest(next, depth + 1);
             if (nextBest == null) {
                 continue;
