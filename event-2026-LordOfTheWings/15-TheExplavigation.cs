@@ -18,8 +18,8 @@ abstract class Grid {
     int width, height;
     protected Point start;
     readonly Dictionary<Point, bool> walkableCells = [];
-    protected readonly List<Point> sulphurDeposits = [];
-    protected readonly List<(HashSet<Point> path, int sulphur)> sulphurCycles = [];
+    readonly List<Point> sulphurDeposits = [];
+    protected readonly List<SulphurCycle> sulphurCycles = [];
     protected readonly List<Point> endTargets = [];
 
     public void Read(string notes) {
@@ -46,7 +46,7 @@ abstract class Grid {
     }
 
     void FindCycles() {
-        foreach (var cell in sulphurDeposits.Where(cell => !sulphurCycles.Any(it => it.path.Contains(cell)))) {
+        foreach (var cell in sulphurDeposits.Where(cell => !sulphurCycles.Any(it => it.Path.Contains(cell)))) {
             foreach (var direction in Point.Directions4) {
                 var next = cell + direction;
                 if (!walkableCells[next]) {
@@ -54,9 +54,8 @@ abstract class Grid {
                 }
                 var startMove = new Move(next, direction);
                 var path = Pathfinding<Move>.Shortest(startMove, new Move(cell), NextMove).First();
-                sulphurCycles.Add((
-                        [.. path.Select(it => it.Point)], path.Count(it => sulphurDeposits.Contains(it.Point))
-                ));
+                int deposits = path.Count(it => sulphurDeposits.Contains(it.Point));
+                sulphurCycles.Add(new SulphurCycle([.. path.Select(it => it.Point)], deposits));
                 break;
             }
         }
@@ -94,7 +93,7 @@ abstract class Grid {
 
     public abstract int CollectSulphurAndReachEnd();
 
-    protected IEnumerable<Move> NextMove(Move current, int xMax) {
+    IEnumerable<Move> NextMove(Move current, int xMax) {
         var directions = new[] {
             current.Direction, Point.TurnLeft(current.Direction), Point.TurnRight(current.Direction)
         };
@@ -111,34 +110,43 @@ abstract class Grid {
     }
 }
 
-record PathState1(Move Move, int[] TargetsReached) : IState<PathState1> {
-    public int EndTargets { get; set; }
-    public int Seconds => TargetsReached.Sum();
-    public bool ReachedEnd => EndTargets == 0 && TargetsReached.Last() != 0;
+readonly record struct SulphurCycle(HashSet<Point> Path, int Deposits) {
+    int Height { get; } = Path.Max(it => it.Y) - Path.Min(it => it.Y);
+    public (int min, int max) X { get; } = (Path.Min(it => it.X), Path.Max(it => it.X));
+    public int Width => X.max - X.min;
+    public int Perimeter => 2 * (Height + Width);
+}
 
-    public bool SulphurCollected(int i) => TargetsReached[i] != 0;
+record PathState1(int X, bool[] CyclesVisited) : IState<PathState1> {
+    public int Seconds { get; set; }
 
     [SuppressMessage("ReSharper", "UseObjectOrCollectionInitializer")]
-    public PathState1 From(Point point, List<Move> path, int i) {
-        var direction = path[^1].Point - path[^2].Point;
-        var next = new PathState1(new Move(point, direction), [.. TargetsReached]);
-        next.TargetsReached[i] = path.Count - 1;
-        next.EndTargets = EndTargets;
+    public PathState1 From(SulphurCycle cycle, int i, int xStart) {
+        int nextX = cycle.X.min == xStart ? cycle.X.max : cycle.X.min;
+        int distance = Math.Abs(X - nextX) + cycle.Perimeter - cycle.Width;
+        var next = new PathState1(nextX, [.. CyclesVisited]);
+        next.CyclesVisited[i] = true;
+        next.Seconds = Seconds + distance;
         return next;
     }
 
     public bool IsBetterThan(PathState1 other) => Seconds < other.Seconds;
 
     public virtual bool Equals(PathState1? other) {
-        return other is not null && TargetsReached.SequenceEqual(other.TargetsReached);
+        return other is not null && X == other.X && CyclesVisited.SequenceEqual(other.CyclesVisited);
     }
 
     public override int GetHashCode() {
         var hash = new HashCode();
-        foreach (int item in TargetsReached) {
+        hash.Add(X);
+        foreach (bool item in CyclesVisited) {
             hash.Add(item);
         }
         return hash.ToHashCode();
+    }
+
+    public override string ToString() {
+        return $"{X}, {string.Join("-", CyclesVisited.Select(it => it ? "1" : "0"))}, {Seconds}";
     }
 }
 
@@ -150,56 +158,44 @@ class Grid1 : Grid, IGame<PathState1> {
     }
 
     public override int CollectSulphurAndReachEnd() {
-        var startMove = new Move(start, Point.RIGHT);
-        var startState = new PathState1(startMove, new int[sulphurDeposits.Count + endTargets.Count]) {
-            EndTargets = endTargets.Count
-        };
+        var startState = new PathState1(start.X, new bool[sulphurCycles.Count]);
         var endState = stateSearch.FindBest(startState)!;
         return endState.Seconds;
     }
 
-    [SuppressMessage("ReSharper", "InvertIf")]
     IEnumerable<PathState1> IGame<PathState1>.Next(PathState1 current) {
-        Func<Move, IEnumerable<Move>> nextMove = it => NextMove(current, it);
-        var sulphurCollected = true;
-        int endTargetIndex = endTargets.Count - current.EndTargets;
-        var endTarget = endTargets[endTargetIndex];
-        for (var i = 0; i < sulphurDeposits.Count; i++) {
-            var sulphur = sulphurDeposits[i];
-            if (sulphur.X > endTarget.X || current.SulphurCollected(i)) {
-                continue;
+        var nextCycles = NextCycles(current);
+        if (nextCycles.Count > 0) {
+            foreach ((var cycle, int i) in nextCycles) {
+                yield return current.From(cycle, i, cycle.X.min);
+                yield return current.From(cycle, i, cycle.X.max);
             }
-            var sulphurCycle = sulphurCycles.First(it => it.path.Contains(sulphur));
-            int maxPaths = sulphurCycle.sulphur == 1 ? 2 : 1;
-            var paths = Pathfinding<Move>.Shortest(current.Move, new Move(sulphur), nextMove, maxPaths);
-            if (paths.Count == 0) {
-                continue;
-            }
-            foreach (var path in paths) {
-                yield return current.From(sulphur, path, i);
-            }
-            sulphurCollected = false;
-        }
-        if (sulphurCollected) {
-            var path = Pathfinding<Move>.Shortest(current.Move, new Move(endTarget), nextMove).First();
-            var next = current.From(endTarget, path, sulphurDeposits.Count + endTargetIndex);
-            next.EndTargets--;
-            yield return next;
+        } else {
+            int nextX = endTargets.Last().X;
+            int distance = nextX - current.X;
+            yield return current with { X = nextX, Seconds = current.Seconds + distance };
         }
     }
 
-    IEnumerable<Move> NextMove(PathState1 state, Move current) {
-        var remainingSulphur = sulphurDeposits.Where((_, i) => state.TargetsReached[i] == 0);
-        if (remainingSulphur.Contains(current.Point)) {
-            yield break;
+    [SuppressMessage("ReSharper", "LoopCanBeConvertedToQuery")]
+    List<(SulphurCycle, int)> NextCycles(PathState1 state) {
+        List<(SulphurCycle, int)> cycles = [];
+        foreach (var endTarget in endTargets) {
+            for (var i = 0; i < sulphurCycles.Count; i++) {
+                var cycle = sulphurCycles[i];
+                if (state.CyclesVisited[i] || cycle.X.max > endTarget.X) {
+                    continue;
+                }
+                cycles.Add((cycle, i));
+            }
+            if (cycles.Count > 0) {
+                return cycles;
+            }
         }
-        var endTarget = endTargets[^state.EndTargets];
-        foreach (var move in NextMove(current, endTarget.X)) {
-            yield return move;
-        }
+        return cycles;
     }
 
-    bool IGame<PathState1>.HasReachedEnd(PathState1 state) => state.ReachedEnd;
+    bool IGame<PathState1>.HasReachedEnd(PathState1 state) => state.X == endTargets.Last().X;
 }
 
 record PathState2(Move Move, int[] TargetsReached) : IState<PathState2> {
@@ -245,18 +241,18 @@ class Grid2 : Grid, IGame<PathState2> {
         foreach ((var path, int sulphur) in sulphurCycles) {
             Test.Log((path.Count, sulphur, (float)path.Count / sulphur, sulphur / (float)path.Count));
         }
-        var cycle = sulphurCycles.MaxBy(it => it.sulphur / (float)it.path.Count);
-        var cyclesToCollect = (int)Math.Ceiling(required / (float)cycle.sulphur);
-        int seconds = cyclesToCollect * cycle.path.Count;
-        Test.Log((cycle.path.Count, cycle.sulphur, cyclesToCollect, seconds));
+        var cycle = sulphurCycles.MaxBy(it => it.Deposits / (float)it.Path.Count);
+        var cyclesToCollect = (int)Math.Ceiling(required / (float)cycle.Deposits);
+        int seconds = cyclesToCollect * cycle.Path.Count;
+        Test.Log((cycle.Path.Count, cycle.Deposits, cyclesToCollect, seconds));
         // reach cycle
         var startMove = new Move(start, Point.RIGHT);
-        var end = new Move(cycle.path.First());
+        var end = new Move(cycle.Path.First());
         var pathToCycle = Pathfinding<Move>.Shortest(startMove, end, NextMove).First();
         // remove overlapping cells
         for (int i = pathToCycle.Count - 1; i >= 0; i--) {
             var move = pathToCycle[i];
-            if (cycle.path.Contains(move.Point)) {
+            if (cycle.Path.Contains(move.Point)) {
                 pathToCycle.RemoveAt(i);
             }
         }
@@ -267,7 +263,7 @@ class Grid2 : Grid, IGame<PathState2> {
         // remove overlapping cells
         for (int i = pathToEnd.Count - 1; i >= 0; i--) {
             var move = pathToEnd[i];
-            if (cycle.path.Contains(move.Point)) {
+            if (cycle.Path.Contains(move.Point)) {
                 pathToEnd.RemoveAt(i);
             }
         }
