@@ -239,29 +239,29 @@ class Grid2 : Grid, IGame<PathState2> {
         foreach (var cycle in sulphurCycles) {
             Test.Log(cycle);
         }
-        var cycle1 = sulphurCycles.MaxBy(it => it.Deposits / (float)it.Perimeter);
-        var cyclesToCollect = (int)Math.Ceiling(required / (float)cycle1.Deposits);
-        int distanceTo1 = cycle1.X.min;
         int end = endTargets.Last().X;
-        int seconds = distanceTo1 + CycleSeconds(cycle1, cyclesToCollect) + end - cycle1.X.max;
+        var main = sulphurCycles.MaxBy(it => it.Deposits / (float)it.Perimeter);
+        var cyclesToCollect = (int)Math.Ceiling(required / (float)main.Deposits);
+        int distanceToMain = main.X.min;
+        int seconds = distanceToMain + CycleSeconds(main, cyclesToCollect) + end - main.X.max;
         Log();
         for (var i = 0; i < 8; i++) {
             cyclesToCollect--;
-            int remaining = required - cyclesToCollect * cycle1.Deposits;
-            int secondsAfterCycle1 = distanceTo1 + CycleSeconds(cycle1, cyclesToCollect);
-            foreach (var cycle2 in sulphurCycles.Where(it => it.Deposits == remaining && it.X.min > cycle1.X.max)) {
-                int distanceTo2 = cycle2.X.min - cycle1.X.max;
-                int newSeconds = secondsAfterCycle1 + distanceTo2 + CycleSeconds(cycle2) + end - cycle2.X.max;
+            int remaining = required - cyclesToCollect * main.Deposits;
+            int secondsAfterMain = distanceToMain + CycleSeconds(main, cyclesToCollect);
+            foreach (var right in sulphurCycles.Where(it => it.Deposits == remaining && it.X.min > main.X.max)) {
+                int distanceToRight = right.X.min - main.X.max;
+                int newSeconds = secondsAfterMain + distanceToRight + CycleSeconds(right) + end - right.X.max;
                 seconds = Math.Min(newSeconds, seconds);
                 Log();
             }
         }
         return seconds;
 
-        int CycleSeconds(SulphurCycle cycle, int cycleCount = 1) => cycleCount * cycle.Perimeter - cycle.Width;
+        int CycleSeconds(SulphurCycle cycle, int count = 1) => count * cycle.Perimeter - cycle.Width;
 
         void Log() {
-            int collected = cyclesToCollect * cycle1.Deposits;
+            int collected = cyclesToCollect * main.Deposits;
             Test.Log($"collected: {collected}, remaining: {required - collected}, seconds: {seconds}");
         }
     }
