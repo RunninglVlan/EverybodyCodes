@@ -367,6 +367,7 @@ class StateSearch<T>(IGame<T> game, int depthMax) where T : IState<T>, IEquatabl
     public T? FindBest(T start) {
         visited.Clear();
         visited.Add(start);
+        Test.Log(start);
         return FindBest(start, 0);
     }
 
@@ -382,6 +383,7 @@ class StateSearch<T>(IGame<T> game, int depthMax) where T : IState<T>, IEquatabl
             if (!visited.Add(next)) {
                 continue;
             }
+            Test.Log(next, depth + 1);
             var nextBest = FindBest(next, depth + 1);
             if (nextBest == null) {
                 continue;
@@ -406,6 +408,7 @@ interface IState<in T> where T : IState<T> {
 static class Test {
     const string CASE_FILE = "../Test.Cases.txt";
     const string LOG_FILE = "../Test.Log.txt";
+    const int TAB_LENGTH = 2;
 
     public static bool StepEnabled { get; set; } = true;
     public static string? From { get; set; }
@@ -480,11 +483,12 @@ static class Test {
         Console.ReadKey();
     }
 
-    public static void Log(object? line = null, bool console = true, ConsoleColor? color = null) {
+    public static void Log(object? line = null, int tab = 0, bool console = true, ConsoleColor? color = null) {
         if (!LogEnabled) {
             return;
         }
-        LogInternal(line, console, color ?? ConsoleColor.Red);
+        var padding = new string(' ', tab * TAB_LENGTH);
+        LogInternal($"{padding}{line}", console, color ?? ConsoleColor.Red);
     }
 
     static void LogInternal(object? line = null, bool console = false, ConsoleColor? color = null) {
