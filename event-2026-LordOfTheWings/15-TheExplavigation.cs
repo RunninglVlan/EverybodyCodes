@@ -236,23 +236,29 @@ class Grid2 : Grid, IGame<PathState2> {
 
     public override int CollectSulphurAndReachEnd() {
         const int required = 2026;
+        foreach (var cycle in sulphurCycles) {
+            Test.Log(cycle);
+        }
         var cycle1 = sulphurCycles.MaxBy(it => it.Deposits / (float)it.Perimeter);
         var cyclesToCollect = (int)Math.Ceiling(required / (float)cycle1.Deposits);
         int distanceTo1 = cycle1.X.min;
         int end = endTargets.Last().X;
-        int seconds = distanceTo1 + cyclesToCollect * cycle1.Perimeter - cycle1.Width + end - cycle1.X.max;
+        int seconds = distanceTo1 + CycleSeconds(cycle1, cyclesToCollect) + end - cycle1.X.max;
         Log();
-        for (var i = 0; i < 2; i++) {
+        for (var i = 0; i < 8; i++) {
             cyclesToCollect--;
             int remaining = required - cyclesToCollect * cycle1.Deposits;
-            int secondsAfterCycle1 = distanceTo1 + cyclesToCollect * cycle1.Perimeter - cycle1.Width;
-            var cycle2 = sulphurCycles.Where(it => it.Deposits == remaining).MinBy(it => it.Perimeter);
-            int distanceTo2 = cycle2.X.min - cycle1.X.max;
-            int newSeconds = secondsAfterCycle1 + distanceTo2 + cycle2.Perimeter - cycle2.Width + end - cycle2.X.max;
-            seconds = Math.Min(newSeconds, seconds);
-            Log();
+            int secondsAfterCycle1 = distanceTo1 + CycleSeconds(cycle1, cyclesToCollect);
+            foreach (var cycle2 in sulphurCycles.Where(it => it.Deposits == remaining)) {
+                int distanceTo2 = cycle2.X.min - cycle1.X.max;
+                int newSeconds = secondsAfterCycle1 + distanceTo2 + CycleSeconds(cycle2) + end - cycle2.X.max;
+                seconds = Math.Min(newSeconds, seconds);
+                Log();
+            }
         }
         return seconds;
+
+        int CycleSeconds(SulphurCycle cycle, int cycleCount = 1) => cycleCount * cycle.Perimeter - cycle.Width;
 
         void Log() {
             int collected = cyclesToCollect * cycle1.Deposits;
