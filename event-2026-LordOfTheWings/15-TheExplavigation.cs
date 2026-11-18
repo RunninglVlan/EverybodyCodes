@@ -240,14 +240,26 @@ class Grid2 : Grid, IGame<PathState2> {
         var main = sulphurCycles.MaxBy(it => it.Deposits / (float)it.Perimeter);
         var cyclesToCollect = (int)Math.Ceiling(required / (float)main.Deposits);
         int seconds = Seconds(main, cyclesToCollect) + end;
+        var leftCycles = sulphurCycles.Where(it => it.X.max < main.X.min).ToArray();
+        var rightCycles = sulphurCycles.Where(it => it.X.min > main.X.max).ToArray();
+        int maxLeft = leftCycles.Length > 0 ? leftCycles.Max(it => it.Deposits) : 0;
+        int maxRight = rightCycles.Length > 0 ? rightCycles.Max(it => it.Deposits) : 0;
         Log();
-        for (var i = 0; i < 8; i++) {
+        for (var i = 0; i <= (maxLeft + maxRight) / main.Deposits; i++) {
             cyclesToCollect--;
             int remaining = required - cyclesToCollect * main.Deposits;
-            foreach (var right in sulphurCycles.Where(it => it.Deposits == remaining && it.X.min > main.X.max)) {
+            foreach (var right in rightCycles.Where(it => it.Deposits == remaining)) {
                 int newSeconds = Seconds(main, cyclesToCollect) + Seconds(right) + end;
                 seconds = Math.Min(newSeconds, seconds);
                 Log();
+            }
+            foreach (var left in leftCycles.Where(it => it.Deposits <= remaining)) {
+                int newRemaining = remaining - left.Deposits;
+                foreach (var right in rightCycles.Where(it => it.Deposits == newRemaining)) {
+                    int newSeconds = Seconds(left) + Seconds(main, cyclesToCollect) + Seconds(right) + end;
+                    seconds = Math.Min(newSeconds, seconds);
+                    Log();
+                }
             }
         }
         return seconds;
