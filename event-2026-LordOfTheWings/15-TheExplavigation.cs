@@ -44,16 +44,20 @@ abstract class Grid {
     }
 
     void FindCycles() {
-        foreach (var cell in sulphurDeposits.Where(cell => !sulphurCycles.Any(it => it.Path.Contains(cell)))) {
+        List<HashSet<Point>> cyclePaths = [];
+        foreach (var cell in sulphurDeposits.Where(cell => !cyclePaths.Any(it => it.Contains(cell)))) {
             foreach (var direction in Point.Directions4) {
                 var next = cell + direction;
                 if (!walkableCells[next]) {
                     continue;
                 }
                 var startMove = new Move(next, direction);
-                var path = Pathfinding<Move>.Shortest(startMove, new Move(cell), NextMove)!;
-                int deposits = path.Count(it => sulphurDeposits.Contains(it.Point));
-                sulphurCycles.Add(new SulphurCycle([.. path.Select(it => it.Point)], deposits));
+                var path = Pathfinding<Move>.Shortest(startMove, new Move(cell), NextMove)!
+                        .Select(it => it.Point)
+                        .ToHashSet();
+                cyclePaths.Add(path);
+                int deposits = path.Count(it => sulphurDeposits.Contains(it));
+                sulphurCycles.Add(new SulphurCycle(path, deposits));
                 break;
             }
         }
@@ -108,11 +112,18 @@ abstract class Grid {
     }
 }
 
-readonly record struct SulphurCycle(HashSet<Point> Path, int Deposits) {
-    int Height { get; } = Path.Max(it => it.Y) - Path.Min(it => it.Y);
-    public (int min, int max) X { get; } = (Path.Min(it => it.X), Path.Max(it => it.X));
+readonly record struct SulphurCycle {
+    public int Deposits { get; }
+    public (int min, int max) X { get; }
+    public int Perimeter { get; }
     public int Width => X.max - X.min;
-    public int Perimeter => 2 * (Height + Width);
+
+    public SulphurCycle(HashSet<Point> path, int deposits) {
+        Deposits = deposits;
+        int height = path.Max(it => it.Y) - path.Min(it => it.Y);
+        X = (path.Min(it => it.X), path.Max(it => it.X));
+        Perimeter = 2 * (height + Width);
+    }
 
     public int Seconds(int count = 1) => count * Perimeter - 2 * Width;
 }
@@ -271,6 +282,11 @@ class Grid2 : Grid, IGame<PathState2> {
     static void Log(SulphurCycle main, int mainCount, int seconds, params SulphurCycle[] remaining) {
         int collected = mainCount * main.Deposits + remaining.Sum(it => it.Deposits);
         Test.Log($"collected: {collected}, remaining: {REQUIRED - collected}, seconds: {seconds}");
+        var depth = 1;
+        Test.Log(main, depth++);
+        foreach (var cycle in remaining) {
+            Test.Log(cycle, depth++);
+        }
     }
 
     public IEnumerable<PathState2> Next(PathState2 current) {
