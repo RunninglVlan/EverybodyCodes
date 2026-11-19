@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
+Test.From = "Part III";
 // https://everybody.codes/event/2026/quests/15
 Test.Run((notes, part, expected) => {
     Grid grid = part switch {
@@ -226,39 +227,50 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
 
     // todo: move best version inside
     public override long CollectSulphurAndReachEnd() {
-        // Test.Log("Deposits: " + string.Join(", ", sulphurCycles.Select(it => it.Deposits)));
-        // Test.Log("Perimeter: " + string.Join(", ", sulphurCycles.Select(it => it.Perimeter)));
-        // Test.Log("gain: " + string.Join(", ", sulphurCycles
-        //                 .Select(it => (it.Deposits / (float)it.Perimeter).ToString("F"))));
-        // Test.Log("zone: " + string.Join(", ", sulphurCycles
-        //                 .Select(it => it.X.max < endTargets[0].X ? 0 : it.X.max < endTargets[1].X ? 1 : 2)));
-        // for (var i = 0; i < 10; i++) {
-        //     required = 2026 + i;
-        //     var fast = Fast();
-        //     Test.Log((required, string.Join(", ", fast.cyclesVisited), fast.seconds));
-        // }
-        // for (var i = 0; i < 10; i++) {
-        //     required = 20262026 + i;
-        //     var fast = Fast();
-        //     Test.Log((required, string.Join(", ", fast.cyclesVisited), fast.seconds));
-        // }
-        // for (var i = 0; i < 10; i++) {
-        //     required = 202620262026 + i;
-        //     var fast = Fast();
-        //     Test.Log((required, string.Join(", ", fast.cyclesVisited), fast.seconds));
-        // }
-        // Test.Step();
+        DoTest();
         if (false) {
-            return Slow();
+            return Slow().seconds;
         }
         {
             return Fast().seconds;
         }
     }
 
-    long Slow() {
+    void DoTest() {
+        Test.Log("Deposits: " + string.Join(", ", sulphurCycles.Select(it => it.Deposits)));
+        Test.Log("Perimeter: " + string.Join(", ", sulphurCycles.Select(it => it.Perimeter)));
+        Test.Log("gain: "
+                + string.Join(", ", sulphurCycles.Select(it => (it.Deposits / (float)it.Perimeter).ToString("F"))));
+        Test.Log("zone: "
+                + string.Join(", ", sulphurCycles
+                        .Select(it => it.X.max < endTargets[0].X ? 0 : it.X.max < endTargets[1].X ? 1 : 2)));
+        for (var i = 0; i < 10; i++) {
+            required = 2026 + i;
+            var result = Slow();
+            Test.Log((required, string.Join(", ", result.cyclesVisited), result.seconds));
+        }
+        Test.Step();
+        for (var i = 0; i < 10; i++) {
+            required = 2026 + i;
+            var result = Fast();
+            Test.Log((required, string.Join(", ", result.cyclesVisited), result.seconds));
+        }
+        for (var i = 0; i < 10; i++) {
+            required = 20262026 + i;
+            var result = Fast();
+            Test.Log((required, string.Join(", ", result.cyclesVisited), result.seconds));
+        }
+        for (var i = 0; i < 10; i++) {
+            required = 202620262026 + i;
+            var result = Fast();
+            Test.Log((required, string.Join(", ", result.cyclesVisited), result.seconds));
+        }
+        Test.Step();
+    }
+
+    (long[] cyclesVisited, long seconds) Slow() {
         return stateSearch.TryFindCheapest(new State(start.X, new long[sulphurCycles.Count]), out var endState)
-                ? endState.cost
+                ? (endState.Item1.CyclesVisited, endState.cost)
                 : throw new UnreachableException();
     }
 
@@ -274,8 +286,10 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         for (var j = 0; j < endTargets.Count; j++) {
             int min = j == 0 ? 0 : endTargets[j - 1].X;
             int max = endTargets[j].X;
-            zoneCycles.Add([.. sulphurCycles.Select((cycle, i) => (cycle, i))
-                    .Where(it => it.cycle.X.max > min && it.cycle.X.max < max)]);
+            zoneCycles.Add([
+                .. sulphurCycles.Select((cycle, i) => (cycle, i))
+                        .Where(it => it.cycle.X.max > min && it.cycle.X.max < max)
+            ]);
             if (main.X.max > min && main.X.max < max) {
                 mainZone = j;
             }
