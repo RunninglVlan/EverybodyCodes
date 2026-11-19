@@ -286,11 +286,10 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
                 x = main.X.max;
                 continue;
             }
-            var cycles = remaining.Where(it => it.zone == zone).Select(it => it.cycle).ToArray();
-            if (cycles.Length == 0) {
+            var cycle = remaining.Where(it => it.zone == zone).Select(it => it.cycle).FirstOrDefault();
+            if (cycle == default) {
                 continue;
             }
-            var cycle = cycles.First();
             newSeconds += Math.Abs(x - cycle.X.min) + cycle.Seconds();
             x = cycle.X.max;
         }
