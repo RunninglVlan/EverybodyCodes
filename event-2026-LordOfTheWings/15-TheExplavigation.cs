@@ -228,27 +228,33 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
 
     // todo: move best version inside
     public override long CollectSulphurAndReachEnd() {
-        Test.Log("Deposits: " + string.Join(", ", sulphurCycles.Select(it => it.Deposits)));
-        Test.Log("Perimeter: " + string.Join(", ", sulphurCycles.Select(it => it.Perimeter)));
-        Test.Log("gain: " + string.Join(", ", sulphurCycles
-                        .Select(it => (it.Deposits / (float)it.Perimeter).ToString("F"))));
-        Test.Log("zone: " + string.Join(", ", sulphurCycles
-                        .Select(it => it.X.max < endTargets[0].X ? 0 : it.X.max < endTargets[1].X ? 1 : 2)));
-        for (var i = 0; i < 100; i++) {
-            required = 2026 + i;
-            // Test.Log((required, string.Join(", ", end.Item1.CyclesVisited), end.cost));
-            // Test.Step();
-            long slow = Slow();
-            long fast = Fast();
-            if (slow != fast) {
-                Test.Log($"differ: slow: {slow}, fast: {fast}");
-            }
-        }
+        // Test.Log("Deposits: " + string.Join(", ", sulphurCycles.Select(it => it.Deposits)));
+        // Test.Log("Perimeter: " + string.Join(", ", sulphurCycles.Select(it => it.Perimeter)));
+        // Test.Log("gain: " + string.Join(", ", sulphurCycles
+        //                 .Select(it => (it.Deposits / (float)it.Perimeter).ToString("F"))));
+        // Test.Log("zone: " + string.Join(", ", sulphurCycles
+        //                 .Select(it => it.X.max < endTargets[0].X ? 0 : it.X.max < endTargets[1].X ? 1 : 2)));
+        // for (var i = 0; i < 10; i++) {
+        //     required = 2026 + i;
+        //     var fast = Fast();
+        //     Test.Log((required, string.Join(", ", fast.cyclesVisited), fast.seconds));
+        // }
+        // for (var i = 0; i < 10; i++) {
+        //     required = 20262026 + i;
+        //     var fast = Fast();
+        //     Test.Log((required, string.Join(", ", fast.cyclesVisited), fast.seconds));
+        // }
+        // for (var i = 0; i < 10; i++) {
+        //     required = 202620262026 + i;
+        //     var fast = Fast();
+        //     Test.Log((required, string.Join(", ", fast.cyclesVisited), fast.seconds));
+        // }
+        // Test.Step();
         if (false) {
             return Slow();
         }
         {
-            return Fast();
+            return Fast().seconds;
         }
     }
 
@@ -258,45 +264,52 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
                 : throw new UnreachableException();
     }
 
-    long Fast() {
+    // todo: remove cyclesVisited
+    (long[] cyclesVisited, long seconds) Fast() {
         int end = endTargets.Last().X;
-        var main = sulphurCycles.MaxBy(it => it.Deposits / (float)it.Perimeter);
+        (var main, int mainI) = sulphurCycles.Select((cycle, i) => (cycle, i))
+                .MaxBy(it => it.cycle.Deposits / (float)it.cycle.Perimeter);
         var mainCount = (long)Math.Ceiling(required / (float)main.Deposits);
         int mainZone = -1;
         long seconds = main.Seconds(mainCount) + end;
-        List<SulphurCycle[]> zoneCycles = [];
-        for (var i = 0; i < endTargets.Count; i++) {
-            int min = i == 0 ? 0 : endTargets[i - 1].X;
-            int max = endTargets[i].X;
-            zoneCycles.Add([.. sulphurCycles.Where(it => it.X.max > min && it.X.max < max)]);
+        List<(SulphurCycle cycle, int i)[]> zoneCycles = [];
+        for (var j = 0; j < endTargets.Count; j++) {
+            int min = j == 0 ? 0 : endTargets[j - 1].X;
+            int max = endTargets[j].X;
+            zoneCycles.Add([.. sulphurCycles.Select((cycle, i) => (cycle, i))
+                    .Where(it => it.cycle.X.max > min && it.cycle.X.max < max)]);
             if (main.X.max > min && main.X.max < max) {
-                mainZone = i;
+                mainZone = j;
             }
         }
-        Collect((main, mainCount, mainZone), end, ref seconds);
-        const int maxCount = 2;
+        var cyclesVisited = new long[sulphurCycles.Count];
+        Collect((main, mainI, mainCount, mainZone), end, ref cyclesVisited, ref seconds);
+        const long maxCount = 2;
         for (var _ = 0; _ <= sulphurCycles.Sum(it => it.Deposits) / main.Deposits * maxCount; _++) {
             mainCount--;
             for (var iCount = 0; iCount <= maxCount; iCount++)
             for (var i = 0; i < zoneCycles[0].Length; i++) {
-                var cycleI = zoneCycles[0][i];
+                (var cycleI, int cycleIIndex) = zoneCycles[0][i];
                 for (var jCount = 0; jCount <= maxCount; jCount++)
                 for (var j = 0; j < zoneCycles[1].Length; j++) {
-                    var cycleJ = zoneCycles[1][j];
+                    (var cycleJ, int cycleJIndex) = zoneCycles[1][j];
                     for (var kCount = 0; kCount <= maxCount; kCount++)
                     for (var k = 0; k < zoneCycles[2].Length; k++) {
-                        var cycleK = zoneCycles[2][k];
-                        Collect((main, mainCount, mainZone), end, ref seconds,
-                                (cycleI, iCount, 0), (cycleJ, jCount, 1), (cycleK, kCount, 2));
+                        (var cycleK, int cycleKIndex) = zoneCycles[2][k];
+                        Collect((main, mainI, mainCount, mainZone), end, ref cyclesVisited, ref seconds,
+                                (cycleI, cycleIIndex, iCount, 0),
+                                (cycleJ, cycleJIndex, jCount, 1),
+                                (cycleK, cycleKIndex, kCount, 2));
                     }
                 }
             }
         }
-        return seconds;
+        return (cyclesVisited, seconds);
     }
 
-    void Collect((SulphurCycle cycle, long count, int zone) main, int end, ref long seconds,
-            params (SulphurCycle cycle, long count, int zone)[] remaining) {
+    void Collect((SulphurCycle cycle, int i, long count, int zone) main, int end,
+            ref long[] cyclesVisited, ref long seconds,
+            params (SulphurCycle cycle, int i, long count, int zone)[] remaining) {
         long collected = main.cycle.Deposits * main.count + remaining.Sum(it => it.cycle.Deposits * it.count);
         if (collected != required) {
             return;
@@ -320,7 +333,16 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
                 newSeconds -= 2 * Math.Abs(main.cycle.X.min - cycle.X.max);
             }
         }
-        seconds = Math.Min(newSeconds + end - x, seconds);
+        newSeconds += end - x;
+        if (newSeconds >= seconds) {
+            return;
+        }
+        seconds = newSeconds;
+        Array.Fill(cyclesVisited, 0);
+        cyclesVisited[main.i] = main.count;
+        foreach ((_, int i, long count, int _) in remaining) {
+            cyclesVisited[i] = count;
+        }
     }
 
     [SuppressMessage("ReSharper", "InvertIf")]
