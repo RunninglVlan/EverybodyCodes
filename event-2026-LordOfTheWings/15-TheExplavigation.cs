@@ -136,6 +136,8 @@ readonly record struct SulphurCycle {
         X = (path.Min(it => it.X), path.Max(it => it.X));
         Perimeter = 2 * (height + Width);
     }
+
+    public long Seconds(long count = 1) => count * Perimeter - 2 * Width;
 }
 
 readonly record struct PathState1(int X, bool[] CyclesVisited, int Seconds = 0) : IState<PathState1> {
@@ -235,9 +237,37 @@ class Grid2 : Grid, IGame<PathState2> {
     }
 
     public override long CollectSulphurAndReachEnd() {
-        return stateSearch.TryFindCheapest(new PathState2(start.X), out var endState)
-                ? endState.cost
-                : throw new UnreachableException();
+        if (false) {
+            return stateSearch.TryFindCheapest(new PathState2(start.X), out var endState)
+                    ? endState.cost
+                    : throw new UnreachableException();
+        }
+        {
+            int end = endTargets.Last().X;
+            var main = sulphurCycles.MaxBy(it => it.Deposits / (float)it.Perimeter);
+            var mainCount = (long)Math.Ceiling(required / (float)main.Deposits);
+            long seconds = main.Seconds(mainCount) + end;
+            var leftCycles = sulphurCycles.Where(it => it.X.max < main.X.min).ToArray();
+            var rightCycles = sulphurCycles.Where(it => it.X.min > main.X.max).ToArray();
+            int maxLeft = leftCycles.Length > 0 ? leftCycles.Max(it => it.Deposits) : 0;
+            int maxRight = rightCycles.Length > 0 ? rightCycles.Max(it => it.Deposits) : 0;
+            for (var i = 0; i <= (maxLeft + maxRight) / main.Deposits; i++) {
+                mainCount--;
+                long remaining = required - mainCount * main.Deposits;
+                foreach (var right in rightCycles.Where(it => it.Deposits == remaining)) {
+                    long newSeconds = main.Seconds(mainCount) + right.Seconds() + end;
+                    seconds = Math.Min(newSeconds, seconds);
+                }
+                foreach (var left in leftCycles.Where(it => it.Deposits <= remaining)) {
+                    long newRemaining = remaining - left.Deposits;
+                    foreach (var right in rightCycles.Where(it => it.Deposits == newRemaining)) {
+                        long newSeconds = left.Seconds() + main.Seconds(mainCount) + right.Seconds() + end;
+                        seconds = Math.Min(newSeconds, seconds);
+                    }
+                }
+            }
+            return seconds;
+        }
     }
 
     [SuppressMessage("ReSharper", "InvertIf")]
