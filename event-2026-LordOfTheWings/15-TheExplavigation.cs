@@ -232,11 +232,20 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
             return Slow().seconds;
         }
         {
+            return Backtracking();
+        }
+        {
             return Fast().seconds;
         }
     }
 
     void DoTest() {
+        required = 2026;
+        var slow = Slow();
+        long newVersion = Backtracking();
+        Test.Log((slow.seconds, newVersion));
+        Test.Step();
+
         Test.Log("Deposits: " + string.Join(", ", sulphurCycles.Select(it => it.Deposits)));
         Test.Log("Perimeter: " + string.Join(", ", sulphurCycles.Select(it => it.Perimeter)));
         Test.Log("gain: "
@@ -272,6 +281,30 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         return stateSearch.TryFindCheapest(new State(start.X, new long[sulphurCycles.Count]), out var endState)
                 ? (endState.Item1.CyclesVisited, endState.cost)
                 : throw new UnreachableException();
+    }
+
+    [SuppressMessage("ReSharper", "InvertIf")]
+    long Backtracking() {
+        required = 2026;
+        return Find(start.X, 0, 0);
+
+        long Find(int x, long sulphurCollected, long seconds) {
+            // Test.Log($"{sulphurCollected}, {seconds}");
+            if (sulphurCollected >= required) {
+                return seconds + endTargets.Last().X - x;
+            }
+            foreach (var cycle in sulphurCycles) {
+                if (cycle.X.min != x) {
+                    long newSeconds = seconds + Math.Abs(x - cycle.X.min) + cycle.Seconds();
+                    return Find(cycle.X.max, sulphurCollected + cycle.Deposits, newSeconds);
+                }
+                if (cycle.X.max != x) {
+                    long newSeconds = seconds + Math.Abs(x - cycle.X.max) + cycle.Seconds();
+                    return Find(cycle.X.min, sulphurCollected + cycle.Deposits, newSeconds);
+                }
+            }
+            return 0;
+        }
     }
 
     // todo: remove cyclesVisited
