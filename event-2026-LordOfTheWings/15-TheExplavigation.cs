@@ -6,9 +6,9 @@ Test.Until = "Part III Example";
 // https://everybody.codes/event/2026/quests/15
 Test.Run((notes, part, expected) => {
     Grid grid = part switch {
-        1 => new Grid1(),
-        2 => new Grid2(2026),
-        _ => new Grid2(202620262026)
+        1 => new FiniteDepositGrid(),
+        2 => new InfiniteDepositGrid(2026),
+        _ => new InfiniteDepositGrid(202620262026)
     };
     grid.Read(notes);
     long seconds = grid.CollectSulphurAndReachEnd();
@@ -140,48 +140,21 @@ readonly record struct SulphurCycle {
     public long Seconds(long count = 1) => count * Perimeter - 2 * Width;
 }
 
-readonly record struct PathState1(int X, bool[] CyclesVisited, int Seconds = 0) : IState<PathState1> {
-    [SuppressMessage("ReSharper", "UseObjectOrCollectionInitializer")]
-    public PathState1 From(SulphurCycle cycle, int i, int xStart) {
-        int nextX = cycle.X.min == xStart ? cycle.X.max : cycle.X.min;
-        int distance = Math.Abs(X - xStart) + cycle.Perimeter - cycle.Width;
-        var next = new PathState1(nextX, [.. CyclesVisited], Seconds + distance);
-        next.CyclesVisited[i] = true;
-        return next;
-    }
+class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
+    readonly StateSearch<State> stateSearch;
 
-    public bool IsBetterThan(PathState1 other) => Seconds < other.Seconds;
-
-    public bool Equals(PathState1 other) {
-        return X == other.X && CyclesVisited.SequenceEqual(other.CyclesVisited) && Seconds == other.Seconds;
-    }
-
-    public override int GetHashCode() {
-        var hash = new HashCode();
-        hash.Add(X);
-        foreach (bool item in CyclesVisited) {
-            hash.Add(item);
-        }
-        hash.Add(Seconds);
-        return hash.ToHashCode();
-    }
-}
-
-class Grid1 : Grid, IGame<PathState1> {
-    readonly StateSearch<PathState1> stateSearch;
-
-    public Grid1() {
-        stateSearch = new StateSearch<PathState1>(this);
+    public FiniteDepositGrid() {
+        stateSearch = new StateSearch<State>(this);
     }
 
     public override long CollectSulphurAndReachEnd() {
-        var startState = new PathState1(start.X, new bool[sulphurCycles.Count]);
+        var startState = new State(start.X, new bool[sulphurCycles.Count]);
         return stateSearch.TryFindBest(startState, out var endState)
                 ? endState.Seconds
                 : throw new UnreachableException();
     }
 
-    IEnumerable<PathState1> IGame<PathState1>.Next(PathState1 current) {
+    IEnumerable<State> IGame<State>.Next(State current) {
         var nextCycles = NextCycles(current);
         if (nextCycles.Count > 0) {
             foreach ((var cycle, int i) in nextCycles) {
@@ -195,7 +168,7 @@ class Grid1 : Grid, IGame<PathState1> {
         }
     }
 
-    List<(SulphurCycle, int)> NextCycles(PathState1 state) {
+    List<(SulphurCycle, int)> NextCycles(State state) {
         List<(SulphurCycle, int)> cycles = [];
         foreach (var endTarget in endTargets) {
             for (var i = 0; i < sulphurCycles.Count; i++) {
@@ -212,33 +185,49 @@ class Grid1 : Grid, IGame<PathState1> {
         return cycles;
     }
 
-    bool IGame<PathState1>.HasReachedEnd(PathState1 state) => state.X == endTargets.Last().X;
+    bool IGame<State>.HasReachedEnd(State state) => state.X == endTargets.Last().X;
+
+    readonly record struct State(int X, bool[] CyclesVisited, int Seconds = 0) : IState<State> {
+        [SuppressMessage("ReSharper", "UseObjectOrCollectionInitializer")]
+        public State From(SulphurCycle cycle, int i, int xStart) {
+            int nextX = cycle.X.min == xStart ? cycle.X.max : cycle.X.min;
+            int distance = Math.Abs(X - xStart) + cycle.Perimeter - cycle.Width;
+            var next = new State(nextX, [.. CyclesVisited], Seconds + distance);
+            next.CyclesVisited[i] = true;
+            return next;
+        }
+
+        public bool IsBetterThan(State other) => Seconds < other.Seconds;
+
+        public bool Equals(State other) {
+            return X == other.X && CyclesVisited.SequenceEqual(other.CyclesVisited) && Seconds == other.Seconds;
+        }
+
+        public override int GetHashCode() {
+            var hash = new HashCode();
+            hash.Add(X);
+            foreach (bool item in CyclesVisited) {
+                hash.Add(item);
+            }
+            hash.Add(Seconds);
+            return hash.ToHashCode();
+        }
+    }
 }
 
-readonly record struct PathState2(int X, int SulphurCollected = 0) : IState<PathState2> {
-    public PathState2 From(SulphurCycle cycle, int xStart) {
-        int nextX = cycle.X.min == xStart ? cycle.X.max : cycle.X.min;
-        return new PathState2(nextX, SulphurCollected + cycle.Deposits);
-    }
-
-    public int Distance(SulphurCycle cycle, int xStart) {
-        return Math.Abs(X - xStart) + cycle.Perimeter - cycle.Width;
-    }
-}
-
-class Grid2 : Grid, IGame<PathState2> {
-    readonly StateSearch<PathState2> stateSearch;
+class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
+    readonly StateSearch<State> stateSearch;
 
     readonly long required;
 
-    public Grid2(long required) {
-        stateSearch = new StateSearch<PathState2>(this);
+    public InfiniteDepositGrid(long required) {
+        stateSearch = new StateSearch<State>(this);
         this.required = required;
     }
 
     public override long CollectSulphurAndReachEnd() {
         if (false) {
-            return stateSearch.TryFindCheapest(new PathState2(start.X), out var endState)
+            return stateSearch.TryFindCheapest(new State(start.X), out var endState)
                     ? endState.cost
                     : throw new UnreachableException();
         }
@@ -271,7 +260,7 @@ class Grid2 : Grid, IGame<PathState2> {
     }
 
     [SuppressMessage("ReSharper", "InvertIf")]
-    IEnumerable<(PathState2, long)> IGame<PathState2>.NextWithCost(PathState2 current) {
+    IEnumerable<(State, long)> IGame<State>.NextWithCost(State current) {
         if (current.SulphurCollected < required) {
             foreach (var cycle in sulphurCycles) {
                 if (cycle.X.min != current.X) {
@@ -289,7 +278,18 @@ class Grid2 : Grid, IGame<PathState2> {
         }
     }
 
-    bool IGame<PathState2>.HasReachedEnd(PathState2 state) => state.X == endTargets.Last().X;
+    bool IGame<State>.HasReachedEnd(State state) => state.X == endTargets.Last().X;
+
+    readonly record struct State(int X, int SulphurCollected = 0) : IState<State> {
+        public State From(SulphurCycle cycle, int xStart) {
+            int nextX = cycle.X.min == xStart ? cycle.X.max : cycle.X.min;
+            return new State(nextX, SulphurCollected + cycle.Deposits);
+        }
+
+        public int Distance(SulphurCycle cycle, int xStart) {
+            return Math.Abs(X - xStart) + cycle.Perimeter - cycle.Width;
+        }
+    }
 }
 
 readonly record struct Point(int X, int Y) {
