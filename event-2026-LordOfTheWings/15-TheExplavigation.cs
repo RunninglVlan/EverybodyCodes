@@ -277,12 +277,24 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         if (collected < required) {
             return;
         }
-        long secondsMain = main.Seconds(mainCount);
-        long remainingSeconds = remaining.Where(it => it.zone != mainZone).Sum(it => it.cycle.Seconds());
-        seconds = Math.Min(secondsMain + remainingSeconds + end, seconds);
+        long mainSeconds = main.Seconds(mainCount);
+        long newSeconds = 0;
+        for (var zone = 0; zone < 3; zone++) {
+            if (zone == mainZone) {
+                newSeconds += mainSeconds;
+                continue;
+            }
+            var cycles = remaining.Where(it => it.zone == zone).Select(it => it.cycle).ToArray();
+            if (cycles.Length == 0) {
+                continue;
+            }
+            var cycle = cycles.First();
+            newSeconds += cycle.Seconds();
+        }
+        seconds = Math.Min(newSeconds + end, seconds);
         Test.Log($"collected: {collected}, remaining: {required - collected}, seconds: {seconds}", console: false);
         var depth = 1;
-        Test.Log($"{main}, {secondsMain}", depth++, console: false);
+        Test.Log($"{main}, {mainSeconds}", depth++, console: false);
         foreach (var tuple in remaining) {
             Test.Log($"{tuple.cycle}, {tuple.cycle.Seconds()}", depth++, console: false);
         }
