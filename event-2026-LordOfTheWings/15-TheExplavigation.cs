@@ -231,9 +231,9 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         Test.Log("Deposits: " + string.Join(", ", sulphurCycles.Select(it => it.Deposits)));
         Test.Log("Perimeter: " + string.Join(", ", sulphurCycles.Select(it => it.Perimeter)));
         Test.Log("gain: " + string.Join(", ", sulphurCycles
-                .Select(it => (it.Deposits / (float)it.Perimeter).ToString("F"))));
+                        .Select(it => (it.Deposits / (float)it.Perimeter).ToString("F"))));
         Test.Log("zone: " + string.Join(", ", sulphurCycles
-                .Select(it => it.X.max < endTargets[0].X ? 0 : it.X.max < endTargets[1].X ? 1 : 2)));
+                        .Select(it => it.X.max < endTargets[0].X ? 0 : it.X.max < endTargets[1].X ? 1 : 2)));
         for (var i = 0; i < 100; i++) {
             required = 2026 + i;
             // Test.Log((required, string.Join(", ", end.Item1.CyclesVisited), end.cost));
@@ -273,7 +273,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
                 mainZone = i;
             }
         }
-        Collect(main, mainCount, mainZone, end, ref seconds);
+        Collect((main, mainCount, mainZone), end, ref seconds);
         const int maxCount = 2;
         for (var _ = 0; _ <= sulphurCycles.Sum(it => it.Deposits) / main.Deposits * maxCount; _++) {
             mainCount--;
@@ -286,7 +286,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
                     for (var kCount = 0; kCount <= maxCount; kCount++)
                     for (var k = 0; k < zoneCycles[2].Length; k++) {
                         var cycleK = zoneCycles[2][k];
-                        Collect(main, mainCount, mainZone, end, ref seconds,
+                        Collect((main, mainCount, mainZone), end, ref seconds,
                                 (cycleI, iCount, 0), (cycleJ, jCount, 1), (cycleK, kCount, 2));
                     }
                 }
@@ -295,19 +295,19 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         return seconds;
     }
 
-    void Collect(SulphurCycle main, long mainCount, int mainZone, int end, ref long seconds,
+    void Collect((SulphurCycle cycle, long count, int zone) main, int end, ref long seconds,
             params (SulphurCycle cycle, long count, int zone)[] remaining) {
-        long collected = main.Deposits * mainCount + remaining.Sum(it => it.cycle.Deposits * it.count);
+        long collected = main.cycle.Deposits * main.count + remaining.Sum(it => it.cycle.Deposits * it.count);
         if (collected != required) {
             return;
         }
-        long mainSeconds = main.Seconds(mainCount);
+        long mainSeconds = main.cycle.Seconds(main.count);
         long newSeconds = 0;
         var x = 0;
         for (var zone = 0; zone < 3; zone++) {
-            if (zone == mainZone) {
-                newSeconds += Math.Abs(x - main.X.min) + mainSeconds;
-                x = main.X.max;
+            if (zone == main.zone) {
+                newSeconds += Math.Abs(x - main.cycle.X.min) + mainSeconds;
+                x = main.cycle.X.max;
             }
             var tuple = remaining.FirstOrDefault(it => it.zone == zone);
             if (tuple == default || tuple.count == 0) {
@@ -316,8 +316,8 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
             var cycle = tuple.cycle;
             newSeconds += Math.Abs(x - cycle.X.min) + cycle.Seconds(tuple.count);
             x = cycle.X.max;
-            if (tuple.count == 2 && tuple.zone == mainZone && cycle.X.min < main.X.min) {
-                newSeconds -= 2 * Math.Abs(main.X.min - cycle.X.max);
+            if (tuple.count == 2 && tuple.zone == main.zone && cycle.X.min < main.cycle.X.min) {
+                newSeconds -= 2 * Math.Abs(main.cycle.X.min - cycle.X.max);
             }
         }
         seconds = Math.Min(newSeconds + end - x, seconds);
