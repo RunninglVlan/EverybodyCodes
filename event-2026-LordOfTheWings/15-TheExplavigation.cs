@@ -223,47 +223,57 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         this.required = required;
     }
 
+    // todo: move best version inside
     public override long CollectSulphurAndReachEnd() {
         if (false) {
-            return stateSearch.TryFindCheapest(new State(start.X), out var endState)
-                    ? endState.cost
-                    : throw new UnreachableException();
+            return Slow();
         }
         {
-            int end = endTargets.Last().X;
-            var main = sulphurCycles.MaxBy(it => it.Deposits / (float)it.Perimeter);
-            var mainCount = (long)Math.Ceiling(required / (float)main.Deposits);
-            int mainZone = -1;
-            long seconds = main.Seconds(mainCount) + end;
-            List<SulphurCycle[]> zoneCycles = [];
-            for (var i = 0; i < endTargets.Count; i++) {
-                int min = i == 0 ? 0 : endTargets[i - 1].X;
-                int max = endTargets[i].X;
-                zoneCycles.Add([.. sulphurCycles.Where(it => it.X.max > min && it.X.max < max)]);
-                if (main.X.max > min && main.X.max < max) {
-                    mainZone = i;
-                }
+            return Fast();
+        }
+    }
+
+    long Slow() {
+        return stateSearch.TryFindCheapest(new State(start.X), out var endState)
+                ? endState.cost
+                : throw new UnreachableException();
+    }
+
+    long Fast() {
+        int end = endTargets.Last().X;
+        var main = sulphurCycles.MaxBy(it => it.Deposits / (float)it.Perimeter);
+        var mainCount = (long)Math.Ceiling(required / (float)main.Deposits);
+        int mainZone = -1;
+        long seconds = main.Seconds(mainCount) + end;
+        List<SulphurCycle[]> zoneCycles = [];
+        for (var i = 0; i < endTargets.Count; i++) {
+            int min = i == 0 ? 0 : endTargets[i - 1].X;
+            int max = endTargets[i].X;
+            zoneCycles.Add([.. sulphurCycles.Where(it => it.X.max > min && it.X.max < max)]);
+            if (main.X.max > min && main.X.max < max) {
+                mainZone = i;
             }
-            Collect(main, mainCount, mainZone, end, ref seconds);
-            for (var _ = 0; _ <= sulphurCycles.Sum(it => it.Deposits) / main.Deposits * 2; _++) {
-                mainCount--;
-                for (var iCount = 0; iCount <= 2; iCount++)
-                for (var i = 0; i < zoneCycles[0].Length; i++) {
-                    var cycleI = zoneCycles[0][i];
-                    for (var jCount = 0; jCount <= 2; jCount++)
-                    for (var j = 0; j < zoneCycles[1].Length; j++) {
-                        var cycleJ = zoneCycles[1][j];
-                        for (var kCount = 0; kCount <= 2; kCount++)
-                        for (var k = 0; k < zoneCycles[2].Length; k++) {
-                            var cycleK = zoneCycles[2][k];
-                            Collect(main, mainCount, mainZone, end, ref seconds,
-                                    (cycleI, iCount, 0), (cycleJ, jCount, 1), (cycleK, kCount, 2));
-                        }
+        }
+        Collect(main, mainCount, mainZone, end, ref seconds);
+        const int maxCount = 2;
+        for (var _ = 0; _ <= sulphurCycles.Sum(it => it.Deposits) / main.Deposits * maxCount; _++) {
+            mainCount--;
+            for (var iCount = 0; iCount <= maxCount; iCount++)
+            for (var i = 0; i < zoneCycles[0].Length; i++) {
+                var cycleI = zoneCycles[0][i];
+                for (var jCount = 0; jCount <= maxCount; jCount++)
+                for (var j = 0; j < zoneCycles[1].Length; j++) {
+                    var cycleJ = zoneCycles[1][j];
+                    for (var kCount = 0; kCount <= maxCount; kCount++)
+                    for (var k = 0; k < zoneCycles[2].Length; k++) {
+                        var cycleK = zoneCycles[2][k];
+                        Collect(main, mainCount, mainZone, end, ref seconds,
+                                (cycleI, iCount, 0), (cycleJ, jCount, 1), (cycleK, kCount, 2));
                     }
                 }
             }
-            return seconds;
         }
+        return seconds;
     }
 
     void Collect(SulphurCycle main, long mainCount, int mainZone, int end, ref long seconds,
