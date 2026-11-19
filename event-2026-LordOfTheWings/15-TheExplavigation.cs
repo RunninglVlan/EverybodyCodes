@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-Test.From = "Part III";
 // https://everybody.codes/event/2026/quests/15
 Test.Run((notes, part, expected) => {
     Grid grid = part switch {
@@ -227,11 +226,11 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
 
     // todo: move best version inside
     public override long CollectSulphurAndReachEnd() {
-        DoTest();
+        // DoTest();
         if (false) {
             return Slow().seconds;
         }
-        {
+        if (false) {
             return Backtracking();
         }
         {
@@ -327,8 +326,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
                 mainZone = j;
             }
         }
-        var cyclesVisited = new long[sulphurCycles.Count];
-        Collect((main, mainI, mainCount, mainZone), end, ref cyclesVisited, ref seconds);
+        Collect(end, ref seconds, (main, mainI, mainCount));
         const long maxCount = 2;
         for (var _ = 0; _ <= sulphurCycles.Sum(it => it.Deposits) / main.Deposits * maxCount; _++) {
             mainCount--;
@@ -341,53 +339,36 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
                     for (var kCount = 0; kCount <= maxCount; kCount++)
                     for (var k = 0; k < zoneCycles[2].Length; k++) {
                         (var cycleK, int cycleKIndex) = zoneCycles[2][k];
-                        Collect((main, mainI, mainCount, mainZone), end, ref cyclesVisited, ref seconds,
-                                (cycleI, cycleIIndex, iCount, 0),
-                                (cycleJ, cycleJIndex, jCount, 1),
-                                (cycleK, cycleKIndex, kCount, 2));
+                        Collect(end, ref seconds,
+                                (main, mainI, mainCount),
+                                (cycleI, cycleIIndex, cycleIIndex != mainI ? iCount : 0),
+                                (cycleJ, cycleJIndex, cycleJIndex != mainI ? jCount : 0),
+                                (cycleK, cycleKIndex, cycleKIndex != mainI ? kCount : 0));
                     }
                 }
             }
         }
-        return (cyclesVisited, seconds);
+        return (null!, seconds);
     }
 
-    void Collect((SulphurCycle cycle, int i, long count, int zone) main, int end,
-            ref long[] cyclesVisited, ref long seconds,
-            params (SulphurCycle cycle, int i, long count, int zone)[] remaining) {
-        long collected = main.cycle.Deposits * main.count + remaining.Sum(it => it.cycle.Deposits * it.count);
+    void Collect(int end, ref long seconds, params (SulphurCycle value, int i, long count)[] cycles) {
+        long collected = cycles.Sum(it => it.value.Deposits * it.count);
         if (collected != required) {
             return;
         }
-        long mainSeconds = main.cycle.Seconds(main.count);
         long newSeconds = 0;
         var x = 0;
-        for (var zone = 0; zone < 3; zone++) {
-            if (zone == main.zone) {
-                newSeconds += Math.Abs(x - main.cycle.X.min) + mainSeconds;
-                x = main.cycle.X.max;
+        long previousCount = -1;
+        foreach ((var cycle, int _, long count) in cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min)) {
+            newSeconds += Math.Abs(x - cycle.X.min) + cycle.Seconds(count);
+            if (previousCount == 2 && cycle.X.min < x) {
+                newSeconds -= 2 * Math.Abs(cycle.X.min - x);
             }
-            var tuple = remaining.FirstOrDefault(it => it.zone == zone);
-            if (tuple == default || tuple.count == 0) {
-                continue;
-            }
-            var cycle = tuple.cycle;
-            newSeconds += Math.Abs(x - cycle.X.min) + cycle.Seconds(tuple.count);
             x = cycle.X.max;
-            if (tuple.count == 2 && tuple.zone == main.zone && cycle.X.min < main.cycle.X.min) {
-                newSeconds -= 2 * Math.Abs(main.cycle.X.min - cycle.X.max);
-            }
+            previousCount = count;
         }
         newSeconds += end - x;
-        if (newSeconds >= seconds) {
-            return;
-        }
-        seconds = newSeconds;
-        Array.Fill(cyclesVisited, 0);
-        cyclesVisited[main.i] = main.count;
-        foreach ((_, int i, long count, int _) in remaining) {
-            cyclesVisited[i] = count;
-        }
+        seconds = Math.Min(newSeconds, seconds);
     }
 
     [SuppressMessage("ReSharper", "InvertIf")]
