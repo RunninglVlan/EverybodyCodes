@@ -272,8 +272,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
 
     void Collect(SulphurCycle main, long mainCount, int mainZone, int end, ref long seconds,
             params (SulphurCycle cycle, int zone)[] remaining) {
-        int remainingDeposits = remaining.Where(it => it.zone != mainZone).Sum(it => it.cycle.Deposits);
-        long collected = mainCount * main.Deposits + remainingDeposits;
+        long collected = mainCount * main.Deposits + remaining.Sum(it => it.cycle.Deposits);
         if (collected < required) {
             return;
         }
@@ -284,7 +283,6 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
             if (zone == mainZone) {
                 newSeconds += Math.Abs(x - main.X.min) + mainSeconds;
                 x = main.X.max;
-                continue;
             }
             var cycle = remaining.Where(it => it.zone == zone).Select(it => it.cycle).FirstOrDefault();
             if (cycle == default) {
