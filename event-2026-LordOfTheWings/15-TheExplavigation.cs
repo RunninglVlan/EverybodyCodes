@@ -7,10 +7,11 @@ Test.Until = "Part III Example";
 Test.Run((notes, part, expected) => {
     Grid grid = part switch {
         1 => new Grid1(),
-        _ => new Grid2()
+        2 => new Grid2(2026),
+        _ => new Grid2(202620262026)
     };
     grid.Read(notes);
-    int seconds = grid.CollectSulphurAndReachEnd();
+    long seconds = grid.CollectSulphurAndReachEnd();
     Assert.ActualEqualsExpected(seconds, expected);
 });
 
@@ -109,7 +110,7 @@ abstract class Grid {
         }
     }
 
-    public abstract int CollectSulphurAndReachEnd();
+    public abstract long CollectSulphurAndReachEnd();
 }
 
 static class Cells {
@@ -171,7 +172,7 @@ class Grid1 : Grid, IGame<PathState1> {
         stateSearch = new StateSearch<PathState1>(this);
     }
 
-    public override int CollectSulphurAndReachEnd() {
+    public override long CollectSulphurAndReachEnd() {
         var startState = new PathState1(start.X, new bool[sulphurCycles.Count]);
         return stateSearch.TryFindBest(startState, out var endState)
                 ? endState.Seconds
@@ -226,19 +227,21 @@ readonly record struct PathState2(int X, int SulphurCollected = 0) : IState<Path
 class Grid2 : Grid, IGame<PathState2> {
     readonly StateSearch<PathState2> stateSearch;
 
-    public Grid2() {
+    readonly long required;
+
+    public Grid2(long required) {
         stateSearch = new StateSearch<PathState2>(this);
+        this.required = required;
     }
 
-    public override int CollectSulphurAndReachEnd() {
+    public override long CollectSulphurAndReachEnd() {
         return stateSearch.TryFindCheapest(new PathState2(start.X), out var endState)
                 ? endState.cost
                 : throw new UnreachableException();
     }
 
     [SuppressMessage("ReSharper", "InvertIf")]
-    IEnumerable<(PathState2, int)> IGame<PathState2>.NextWithCost(PathState2 current) {
-        const int required = 2026;
+    IEnumerable<(PathState2, long)> IGame<PathState2>.NextWithCost(PathState2 current) {
         if (current.SulphurCollected < required) {
             foreach (var cycle in sulphurCycles) {
                 if (cycle.X.min != current.X) {
@@ -357,20 +360,20 @@ class StateSearch<T>(IGame<T> game, int depthMax = 100) where T : IState<T>, IEq
     }
 
     /// Dijkstra
-    public bool TryFindCheapest(T start, out (T, int cost) end) {
+    public bool TryFindCheapest(T start, out (T, long cost) end) {
         end = default!;
-        PriorityQueue<T, int> queue = new();
-        Dictionary<T, int> visited = [];
+        PriorityQueue<T, long> queue = new();
+        Dictionary<T, long> visited = [];
         queue.Enqueue(start, 0);
         visited.Add(start, 0);
-        while (queue.TryDequeue(out var current, out int currentCost)) {
+        while (queue.TryDequeue(out var current, out long currentCost)) {
             if (game.HasReachedEnd(current)) {
                 end = (current, currentCost);
                 return true;
             }
-            foreach ((var next, int cost) in game.NextWithCost(current)) {
-                int newCost = currentCost + cost;
-                if (newCost >= visited.GetValueOrDefault(next, int.MaxValue)) {
+            foreach ((var next, long cost) in game.NextWithCost(current)) {
+                long newCost = currentCost + cost;
+                if (newCost >= visited.GetValueOrDefault(next, long.MaxValue)) {
                     continue;
                 }
                 queue.Enqueue(next, newCost);
@@ -386,7 +389,7 @@ interface IGame<TState> {
         throw new NotSupportedException("Implement Next");
     }
 
-    IEnumerable<(TState, int)> NextWithCost(TState current) {
+    IEnumerable<(TState, long)> NextWithCost(TState current) {
         throw new NotSupportedException("Implement NextWithCost");
     }
 
