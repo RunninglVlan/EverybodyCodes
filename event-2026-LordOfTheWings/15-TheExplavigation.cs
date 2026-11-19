@@ -137,7 +137,7 @@ readonly record struct SulphurCycle {
         Perimeter = 2 * (height + Width);
     }
 
-    public long Seconds(long count = 1) => count * Perimeter - Width;
+    public long Seconds(long count = 1) => count == 0 ? 0 : count * Perimeter - Width;
 }
 
 class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
@@ -247,21 +247,18 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
                 }
             }
             Collect(main, mainCount, mainZone, end, ref seconds);
-            for (var _ = 0; _ <= sulphurCycles.Sum(it => it.Deposits) / main.Deposits; _++) {
+            for (var _ = 0; _ <= sulphurCycles.Sum(it => it.Deposits) / main.Deposits * 2; _++) {
                 mainCount--;
+                for (var iCount = 0; iCount <= 2; iCount++)
                 for (var i = 0; i < zoneCycles[0].Length; i++) {
                     var cycleI = zoneCycles[0][i];
-                    Collect(main, mainCount, mainZone, end, ref seconds, (cycleI, 0));
+                    for (var jCount = 0; jCount <= 2; jCount++)
                     for (var j = 0; j < zoneCycles[1].Length; j++) {
                         var cycleJ = zoneCycles[1][j];
-                        Collect(main, mainCount, mainZone, end, ref seconds, (cycleJ, 1));
-                        Collect(main, mainCount, mainZone, end, ref seconds, (cycleI, 0), (cycleJ, 1));
+                        for (var kCount = 0; kCount <= 2; kCount++)
                         for (var k = 0; k < zoneCycles[2].Length; k++) {
                             var cycleK = zoneCycles[2][k];
-                            Collect(main, mainCount, mainZone, end, ref seconds, (cycleK, 2));
-                            Collect(main, mainCount, mainZone, end, ref seconds, (cycleI, 0), (cycleK, 2));
-                            Collect(main, mainCount, mainZone, end, ref seconds, (cycleJ, 1), (cycleK, 2));
-                            Collect(main, mainCount, mainZone, end, ref seconds, (cycleI, 0), (cycleJ, 1), (cycleK, 2));
+                            Collect(main, mainCount, mainZone, end, ref seconds, (cycleI, iCount, 0), (cycleJ, jCount, 1), (cycleK, kCount, 2));
                         }
                     }
                 }
@@ -271,9 +268,9 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
     }
 
     void Collect(SulphurCycle main, long mainCount, int mainZone, int end, ref long seconds,
-            params (SulphurCycle cycle, int zone)[] remaining) {
-        long collected = mainCount * main.Deposits + remaining.Sum(it => it.cycle.Deposits);
-        if (collected < required) {
+            params (SulphurCycle cycle, long count, int zone)[] remaining) {
+        long collected = main.Deposits * mainCount + remaining.Sum(it => it.cycle.Deposits * it.count);
+        if (collected != required) {
             return;
         }
         long mainSeconds = main.Seconds(mainCount);
@@ -284,19 +281,19 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
                 newSeconds += Math.Abs(x - main.X.min) + mainSeconds;
                 x = main.X.max;
             }
-            var cycle = remaining.Where(it => it.zone == zone).Select(it => it.cycle).FirstOrDefault();
-            if (cycle == default) {
+            var tuple = remaining.FirstOrDefault(it => it.zone == zone);
+            if (tuple == default || tuple.count == 0) {
                 continue;
             }
-            newSeconds += Math.Abs(x - cycle.X.min) + cycle.Seconds();
-            x = cycle.X.max;
+            newSeconds += Math.Abs(x - tuple.cycle.X.min) + tuple.cycle.Seconds(tuple.count);
+            x = tuple.cycle.X.max;
         }
         seconds = Math.Min(newSeconds + end - x, seconds);
         Test.Log($"collected: {collected}, remaining: {required - collected}, seconds: {seconds}", console: false);
         var depth = 1;
         Test.Log($"{main}, {mainSeconds}", depth++, console: false);
         foreach (var tuple in remaining) {
-            Test.Log($"{tuple.cycle}, {tuple.cycle.Seconds()}", depth++, console: false);
+            Test.Log($"{tuple.cycle}, {tuple.cycle.Seconds(tuple.count)}", depth++, console: false);
         }
     }
 
