@@ -15,10 +15,11 @@ Test.Run((notes, part, expected) => {
 });
 
 abstract class Grid {
-    int width, height;
+    protected int width;
+    int height;
     protected Point start;
-    readonly Dictionary<Point, bool> walkableCells = [];
-    readonly List<Point> sulphurDeposits = [];
+    protected readonly Dictionary<Point, bool> walkableCells = [];
+    protected readonly HashSet<Point> sulphurDeposits = [];
     protected readonly List<SulphurCycle> sulphurCycles = [];
     protected readonly List<Point> endTargets = [];
 
@@ -214,27 +215,43 @@ class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
     }
 }
 
-class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
+class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<InfiniteDepositGrid.MoveState> {
     readonly StateSearch<State> stateSearch;
+    readonly StateSearch<MoveState> moveStateSearch;
 
     // todo: should be readonly
     long required;
 
     public InfiniteDepositGrid(long required) {
         stateSearch = new StateSearch<State>(this);
+        moveStateSearch = new StateSearch<MoveState>(this);
         this.required = required;
     }
 
     // todo: move best version inside
     public override long CollectSulphurAndReachEnd() {
-        DoTest();
+        // DoTest();
         if (false) {
             return Slow().seconds;
+        }
+        {
+            return NewOption();
         }
         {
             return Fast().seconds;
         }
     }
+
+    long NewOption() {
+        return moveStateSearch.TryFindCheapest(new MoveState(start, Point.RIGHT), out var endState)
+                ? endState.cost
+                : throw new UnreachableException();
+    }
+
+    bool[] visit = [
+        .. "1, _, 1, _, 1, _, 1, 1, 1, 1, 1, 1, 1, _, _, 1, 1, 1, _, _, _, _, _, _, _, _, _, _, _, _".Split(", ")
+                .Select(it => it == "1")
+    ];
 
     void DoTest() {
         Test.Log("Deposits: " + string.Join(", ", sulphurCycles.Select(it => it.Deposits)));
@@ -244,10 +261,23 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         Test.Log("zone: "
                 + string.Join(", ", sulphurCycles
                         .Select(it => it.X.max < endTargets[0].X ? 0 : it.X.max < endTargets[1].X ? 1 : 2)));
-        for (var i = 0; i < 10; i++) {
+        visit = new bool[sulphurCycles.Count];
+        var max = 0;
+        for (var i = 0; i < 200; i++) {
             required = 2026 + i;
             var result = Slow();
-            Test.Log((required, string.Join(", ", result.cyclesVisited), result.seconds));
+            bool[] previous = [.. visit];
+            for (var j = 0; j < result.cyclesVisited.Length; j++) {
+                if (result.cyclesVisited[j] > 0) {
+                    visit[j] = true;
+                }
+            }
+            int count = result.cyclesVisited.Count(it => it > 0);
+            max = Math.Max(max, count);
+            Test.Log((required, string.Join(", ", result.cyclesVisited), result.seconds, count));
+            if (!previous.SequenceEqual(visit)) {
+                Test.Log((required, string.Join(", ", visit.Select(it => it ? "1" : "_")), result.seconds, max));
+            }
         }
         Test.Step();
         for (var i = 0; i < 10; i++) {
@@ -269,8 +299,8 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
     }
 
     (long[] cyclesVisited, long seconds) Slow() {
-        return stateSearch.TryFindCheapest(new State(start.X, new long[sulphurCycles.Count]), out var endState)
-                ? (endState.Item1.CyclesVisited, endState.cost)
+        return stateSearch.TryFindCheapest(new State(start.X /*, new long[sulphurCycles.Count]*/), out var endState)
+                ? ( /*endState.Item1.CyclesVisited*/null!, endState.cost)
                 : throw new UnreachableException();
     }
 
@@ -362,6 +392,9 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         if (current.SulphurCollected < required) {
             for (var i = 0; i < sulphurCycles.Count; i++) {
                 var cycle = sulphurCycles[i];
+                if (!visit[i]) {
+                    continue;
+                }
                 if (cycle.X.min != current.X) {
                     long distance = current.Distance(cycle, cycle.X.min);
                     yield return (current.From(cycle, i, cycle.X.min), distance);
@@ -379,12 +412,35 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
 
     bool IGame<State>.HasReachedEnd(State state) => state.X == endTargets.Last().X;
 
+    IEnumerable<(MoveState, long)> IGame<MoveState>.NextWithCost(MoveState current) {
+        var directions = new[] {
+            current.Direction, Point.TurnLeft(current.Direction), Point.TurnRight(current.Direction)
+        };
+        foreach (var direction in directions) {
+            var nextPoint = current.Point + direction;
+            if (nextPoint.X < 0 || nextPoint.X > width - 1 || !walkableCells[nextPoint]) {
+                continue;
+            }
+            var next = current with { Point = nextPoint, Direction = direction };
+            if (sulphurDeposits.Contains(nextPoint)) {
+                next.SulphurCollected++;
+            }
+            yield return (next, 1);
+        }
+    }
+
+    bool IGame<MoveState>.HasReachedEnd(MoveState state) {
+        return state.SulphurCollected == required && state.Point == endTargets.Last();
+    }
+
     // todo: CyclesVisited is debug, remove custom equals too
-    readonly record struct State(int X, long[] CyclesVisited, int SulphurCollected = 0) : IState<State> {
+    readonly record struct State(int X, /*long[] CyclesVisited, */int SulphurCollected = 0) : IState<State> {
+        // public int Value => SulphurCollected;
+
         public State From(SulphurCycle cycle, int i, int xStart) {
             int nextX = cycle.X.min == xStart ? cycle.X.max : cycle.X.min;
-            var next = new State(nextX, [.. CyclesVisited], SulphurCollected + cycle.Deposits);
-            next.CyclesVisited[i]++;
+            var next = new State(nextX, /*[.. CyclesVisited], */SulphurCollected + cycle.Deposits);
+            // next.CyclesVisited[i]++;
             return next;
         }
 
@@ -392,8 +448,13 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
             return Math.Abs(X - xStart) + cycle.Seconds();
         }
 
-        public bool Equals(State other) => X == other.X && SulphurCollected == other.SulphurCollected;
-        public override int GetHashCode() => HashCode.Combine(X, SulphurCollected);
+        // public bool Equals(State other) => X == other.X && SulphurCollected == other.SulphurCollected;
+        // public override int GetHashCode() => HashCode.Combine(X, SulphurCollected);
+    }
+
+    record struct MoveState(Point Point, Point Direction) : IState<MoveState> {
+        public int SulphurCollected { get; set; }
+        public int Value => SulphurCollected;
     }
 }
 
@@ -496,6 +557,7 @@ class StateSearch<T>(IGame<T> game, int depthMax = 100) where T : IState<T>, IEq
 
     /// Dijkstra
     public bool TryFindCheapest(T start, out (T, long cost) end) {
+        const int interval = 1000;
         end = default!;
         PriorityQueue<T, long> queue = new();
         Dictionary<T, long> visited = [];
@@ -513,6 +575,9 @@ class StateSearch<T>(IGame<T> game, int depthMax = 100) where T : IState<T>, IEq
                 }
                 queue.Enqueue(next, newCost);
                 visited[next] = newCost;
+                if (next.Value % interval == 0) {
+                    Test.Log(next.Value);
+                }
             }
         }
         return false;
@@ -532,6 +597,8 @@ interface IGame<TState> {
 }
 
 interface IState<in T> where T : IState<T> {
+    int Value => 0;
+
     bool IsBetterThan(T other) {
         throw new NotSupportedException("Implement IsBetterThan");
     }
