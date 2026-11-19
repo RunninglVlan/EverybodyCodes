@@ -235,27 +235,56 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
             int end = endTargets.Last().X;
             var main = sulphurCycles.MaxBy(it => it.Deposits / (float)it.Perimeter);
             var mainCount = (long)Math.Ceiling(required / (float)main.Deposits);
+            int mainZone = -1;
             long seconds = main.Seconds(mainCount) + end;
-            var leftCycles = sulphurCycles.Where(it => it.X.max < main.X.min).ToArray();
-            var rightCycles = sulphurCycles.Where(it => it.X.min > main.X.max).ToArray();
-            int maxLeft = leftCycles.Length > 0 ? leftCycles.Max(it => it.Deposits) : 0;
-            int maxRight = rightCycles.Length > 0 ? rightCycles.Max(it => it.Deposits) : 0;
-            for (var i = 0; i <= (maxLeft + maxRight) / main.Deposits; i++) {
-                mainCount--;
-                long remaining = required - mainCount * main.Deposits;
-                foreach (var right in rightCycles.Where(it => it.Deposits == remaining)) {
-                    long newSeconds = main.Seconds(mainCount) + right.Seconds() + end;
-                    seconds = Math.Min(newSeconds, seconds);
+            List<SulphurCycle[]> zoneCycles = [];
+            for (var i = 0; i < endTargets.Count; i++) {
+                int min = i == 0 ? 0 : endTargets[i - 1].X;
+                int max = endTargets[i].X;
+                zoneCycles.Add([.. sulphurCycles.Where(it => it.X.max > min && it.X.max < max)]);
+                if (main.X.max > min && main.X.max < max) {
+                    mainZone = i;
                 }
-                foreach (var left in leftCycles.Where(it => it.Deposits <= remaining)) {
-                    long newRemaining = remaining - left.Deposits;
-                    foreach (var right in rightCycles.Where(it => it.Deposits == newRemaining)) {
-                        long newSeconds = left.Seconds() + main.Seconds(mainCount) + right.Seconds() + end;
-                        seconds = Math.Min(newSeconds, seconds);
+            }
+            Collect(main, mainCount, mainZone, end, ref seconds);
+            for (var _ = 0; _ <= sulphurCycles.Sum(it => it.Deposits) / main.Deposits; _++) {
+                mainCount--;
+                for (var i = 0; i < zoneCycles[0].Length; i++) {
+                    var cycleI = zoneCycles[0][i];
+                    Collect(main, mainCount, mainZone, end, ref seconds, (cycleI, 0));
+                    for (var j = 0; j < zoneCycles[1].Length; j++) {
+                        var cycleJ = zoneCycles[1][j];
+                        Collect(main, mainCount, mainZone, end, ref seconds, (cycleJ, 1));
+                        Collect(main, mainCount, mainZone, end, ref seconds, (cycleI, 0), (cycleJ, 1));
+                        for (var k = 0; k < zoneCycles[2].Length; k++) {
+                            var cycleK = zoneCycles[2][k];
+                            Collect(main, mainCount, mainZone, end, ref seconds, (cycleK, 2));
+                            Collect(main, mainCount, mainZone, end, ref seconds, (cycleI, 0), (cycleK, 2));
+                            Collect(main, mainCount, mainZone, end, ref seconds, (cycleJ, 1), (cycleK, 2));
+                            Collect(main, mainCount, mainZone, end, ref seconds, (cycleI, 0), (cycleJ, 1), (cycleK, 2));
+                        }
                     }
                 }
             }
             return seconds;
+        }
+    }
+
+    void Collect(SulphurCycle main, long mainCount, int mainZone, int end, ref long seconds,
+            params (SulphurCycle cycle, int zone)[] remaining) {
+        int remainingDeposits = remaining.Where(it => it.zone != mainZone).Sum(it => it.cycle.Deposits);
+        long collected = mainCount * main.Deposits + remainingDeposits;
+        if (collected < required) {
+            return;
+        }
+        long secondsMain = main.Seconds(mainCount);
+        long remainingSeconds = remaining.Where(it => it.zone != mainZone).Sum(it => it.cycle.Seconds());
+        seconds = Math.Min(secondsMain + remainingSeconds + end, seconds);
+        Test.Log($"collected: {collected}, remaining: {required - collected}, seconds: {seconds}", console: false);
+        var depth = 1;
+        Test.Log($"{main}, {secondsMain}", depth++, console: false);
+        foreach (var tuple in remaining) {
+            Test.Log($"{tuple.cycle}, {tuple.cycle.Seconds()}", depth++, console: false);
         }
     }
 
