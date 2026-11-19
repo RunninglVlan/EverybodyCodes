@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
+Test.From = "Part III Example";
+Test.Until = "Part III";
 // https://everybody.codes/event/2026/quests/15
 Test.Run((notes, part, expected) => {
     Grid grid = part switch {
@@ -216,7 +218,8 @@ class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
 class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
     readonly StateSearch<State> stateSearch;
 
-    readonly long required;
+    // todo: should be readonly
+    long required;
 
     public InfiniteDepositGrid(long required) {
         stateSearch = new StateSearch<State>(this);
@@ -225,6 +228,22 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
 
     // todo: move best version inside
     public override long CollectSulphurAndReachEnd() {
+        Test.Log("Deposits: " + string.Join(", ", sulphurCycles.Select(it => it.Deposits)));
+        Test.Log("Perimeter: " + string.Join(", ", sulphurCycles.Select(it => it.Perimeter)));
+        Test.Log("gain: " + string.Join(", ", sulphurCycles
+                .Select(it => (it.Deposits / (float)it.Perimeter).ToString("F"))));
+        Test.Log("zone: " + string.Join(", ", sulphurCycles
+                .Select(it => it.X.max < endTargets[0].X ? 0 : it.X.max < endTargets[1].X ? 1 : 2)));
+        for (var i = 0; i < 100; i++) {
+            required = 2026 + i;
+            // Test.Log((required, string.Join(", ", end.Item1.CyclesVisited), end.cost));
+            // Test.Step();
+            long slow = Slow();
+            long fast = Fast();
+            if (slow != fast) {
+                Test.Log($"differ: slow: {slow}, fast: {fast}");
+            }
+        }
         if (false) {
             return Slow();
         }
@@ -234,7 +253,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
     }
 
     long Slow() {
-        return stateSearch.TryFindCheapest(new State(start.X), out var endState)
+        return stateSearch.TryFindCheapest(new State(start.X, new long[sulphurCycles.Count]), out var endState)
                 ? endState.cost
                 : throw new UnreachableException();
     }
@@ -307,14 +326,15 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
     [SuppressMessage("ReSharper", "InvertIf")]
     IEnumerable<(State, long)> IGame<State>.NextWithCost(State current) {
         if (current.SulphurCollected < required) {
-            foreach (var cycle in sulphurCycles) {
+            for (var i = 0; i < sulphurCycles.Count; i++) {
+                var cycle = sulphurCycles[i];
                 if (cycle.X.min != current.X) {
                     long distance = current.Distance(cycle, cycle.X.min);
-                    yield return (current.From(cycle, cycle.X.min), distance);
+                    yield return (current.From(cycle, i, cycle.X.min), distance);
                 }
                 if (cycle.X.max != current.X) {
                     long distance = current.Distance(cycle, cycle.X.max);
-                    yield return (current.From(cycle, cycle.X.max), distance);
+                    yield return (current.From(cycle, i, cycle.X.max), distance);
                 }
             }
         } else {
@@ -325,15 +345,21 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
 
     bool IGame<State>.HasReachedEnd(State state) => state.X == endTargets.Last().X;
 
-    readonly record struct State(int X, int SulphurCollected = 0) : IState<State> {
-        public State From(SulphurCycle cycle, int xStart) {
+    // todo: CyclesVisited is debug, remove custom equals too
+    readonly record struct State(int X, long[] CyclesVisited, int SulphurCollected = 0) : IState<State> {
+        public State From(SulphurCycle cycle, int i, int xStart) {
             int nextX = cycle.X.min == xStart ? cycle.X.max : cycle.X.min;
-            return new State(nextX, SulphurCollected + cycle.Deposits);
+            var next = new State(nextX, [.. CyclesVisited], SulphurCollected + cycle.Deposits);
+            next.CyclesVisited[i]++;
+            return next;
         }
 
         public long Distance(SulphurCycle cycle, int xStart) {
             return Math.Abs(X - xStart) + cycle.Seconds();
         }
+
+        public bool Equals(State other) => X == other.X && SulphurCollected == other.SulphurCollected;
+        public override int GetHashCode() => HashCode.Combine(X, SulphurCollected);
     }
 }
 
