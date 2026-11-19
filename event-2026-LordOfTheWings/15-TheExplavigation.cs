@@ -1,8 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-Test.From = "Part III Example";
-Test.Until = "Part III";
 // https://everybody.codes/event/2026/quests/15
 Test.Run((notes, part, expected) => {
     Grid grid = part switch {
@@ -269,7 +267,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         int end = endTargets.Last().X;
         (var main, int mainI) = sulphurCycles.Select((cycle, i) => (cycle, i))
                 .MaxBy(it => it.cycle.Deposits / (float)it.cycle.Perimeter);
-        var mainCount = (long)Math.Ceiling(required / (float)main.Deposits);
+        var mainCount = (long)Math.Ceiling(required / (double)main.Deposits);
         int mainZone = -1;
         long seconds = main.Seconds(mainCount) + end;
         List<(SulphurCycle cycle, int i)[]> zoneCycles = [];
