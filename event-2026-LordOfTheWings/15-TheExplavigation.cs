@@ -1,8 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-Test.From = "Part II";
-Test.Until = "Part III Example";
 // https://everybody.codes/event/2026/quests/15
 Test.Run((notes, part, expected) => {
     Grid grid = part switch {
@@ -258,7 +256,8 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
                         for (var kCount = 0; kCount <= 2; kCount++)
                         for (var k = 0; k < zoneCycles[2].Length; k++) {
                             var cycleK = zoneCycles[2][k];
-                            Collect(main, mainCount, mainZone, end, ref seconds, (cycleI, iCount, 0), (cycleJ, jCount, 1), (cycleK, kCount, 2));
+                            Collect(main, mainCount, mainZone, end, ref seconds,
+                                    (cycleI, iCount, 0), (cycleJ, jCount, 1), (cycleK, kCount, 2));
                         }
                     }
                 }
@@ -285,16 +284,14 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
             if (tuple == default || tuple.count == 0) {
                 continue;
             }
-            newSeconds += Math.Abs(x - tuple.cycle.X.min) + tuple.cycle.Seconds(tuple.count);
-            x = tuple.cycle.X.max;
+            var cycle = tuple.cycle;
+            newSeconds += Math.Abs(x - cycle.X.min) + cycle.Seconds(tuple.count);
+            x = cycle.X.max;
+            if (tuple.count == 2 && tuple.zone == mainZone && cycle.X.min < main.X.min) {
+                newSeconds -= 2 * Math.Abs(main.X.min - cycle.X.max);
+            }
         }
         seconds = Math.Min(newSeconds + end - x, seconds);
-        Test.Log($"collected: {collected}, remaining: {required - collected}, seconds: {seconds}", console: false);
-        var depth = 1;
-        Test.Log($"{main}, {mainSeconds}", depth++, console: false);
-        foreach (var tuple in remaining) {
-            Test.Log($"{tuple.cycle}, {tuple.cycle.Seconds(tuple.count)}", depth++, console: false);
-        }
     }
 
     [SuppressMessage("ReSharper", "InvertIf")]
