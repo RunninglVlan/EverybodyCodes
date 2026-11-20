@@ -15,10 +15,10 @@ Test.Run((notes, part, expected) => {
 });
 
 abstract class Grid {
-    int width, height;
+    protected int width, height;
     protected Point start;
-    readonly Dictionary<Point, bool> walkableCells = [];
-    readonly HashSet<Point> sulphurDeposits = [];
+    protected readonly Dictionary<Point, bool> walkableCells = [];
+    protected readonly HashSet<Point> sulphurDeposits = [];
     protected readonly List<SulphurCycle> sulphurCycles = [];
     protected readonly List<Point> endTargets = [];
 
@@ -214,14 +214,16 @@ class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
     }
 }
 
-class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
+class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<InfiniteDepositGrid.MoveState> {
     readonly StateSearch<State> stateSearch;
+    readonly StateSearch<MoveState> moveStateSearch;
 
     // todo: should be readonly
     long required;
 
     public InfiniteDepositGrid(long required) {
         stateSearch = new StateSearch<State>(this);
+        moveStateSearch = new StateSearch<MoveState>(this);
         this.required = required;
     }
 
@@ -234,8 +236,11 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         if (false) {
             return Backtracking();
         }
-        {
+        if (false) {
             return Fast().seconds;
+        }
+        {
+            return MoveVersion();
         }
     }
 
@@ -371,6 +376,12 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         }
     }
 
+    long MoveVersion() {
+        return moveStateSearch.TryFindCheapest(new MoveState(new Move(start, Point.RIGHT)), out var endState)
+                ? endState.cost
+                : throw new UnreachableException();
+    }
+
     [SuppressMessage("ReSharper", "InvertIf")]
     IEnumerable<(State, long)> IGame<State>.NextWithCost(State current) {
         if (current.SulphurCollected < required) {
@@ -393,6 +404,28 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
 
     bool IGame<State>.HasReachedEnd(State state) => state.X == endTargets.Last().X;
 
+    IEnumerable<(MoveState, long)> IGame<MoveState>.NextWithCost(MoveState current) {
+        var directions = new[] {
+            current.Move.Direction, Point.TurnLeft(current.Move.Direction), Point.TurnRight(current.Move.Direction)
+        };
+        foreach (var direction in directions) {
+            var nextPoint = current.Move.Point + direction;
+            if (nextPoint.X < 0 || nextPoint.X > width - 1 || !walkableCells[nextPoint]) {
+                continue;
+            }
+            var nextMove = new Move(nextPoint, direction);
+            var next = current with { Move = nextMove };
+            if (sulphurDeposits.Contains(nextPoint)) {
+                next.SulphurCollected++;
+            }
+            yield return (next, 1);
+        }
+    }
+
+    bool IGame<MoveState>.HasReachedEnd(MoveState state) {
+        return state.SulphurCollected == required && state.Move.Point == endTargets.Last();
+    }
+
     // todo: CyclesVisited is debug, remove custom equals too
     readonly record struct State(int X, long[] CyclesVisited, int SulphurCollected = 0) : IState<State> {
         public State From(SulphurCycle cycle, int i, int xStart) {
@@ -408,6 +441,10 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
 
         public bool Equals(State other) => X == other.X && SulphurCollected == other.SulphurCollected;
         public override int GetHashCode() => HashCode.Combine(X, SulphurCollected);
+    }
+
+    record struct MoveState(Move Move) : IState<MoveState> {
+        public int SulphurCollected { get; set; }
     }
 }
 
