@@ -67,7 +67,7 @@ abstract class Grid {
 
     IEnumerable<Move> NextMove(Move current) {
         var directions = new[] {
-            current.Direction, Point.TurnLeft(current.Direction), Point.TurnRight(current.Direction)
+            current.Direction, Screen.TurnLeft(current.Direction), Screen.TurnRight(current.Direction)
         };
         foreach (var direction in directions) {
             var nextPoint = current.Point + direction;
@@ -419,7 +419,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
 
     IEnumerable<(MoveState, long)> IGame<MoveState>.NextWithCost(MoveState current) {
         var directions = new[] {
-            current.Move.Direction, Point.TurnLeft(current.Move.Direction), Point.TurnRight(current.Move.Direction)
+            current.Move.Direction, Screen.TurnLeft(current.Move.Direction), Screen.TurnRight(current.Move.Direction)
         };
         foreach (var direction in directions) {
             var nextPoint = current.Move.Point + direction;
@@ -436,7 +436,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
     }
 
     bool IGame<MoveState>.HasReachedEnd(MoveState state) {
-        return state.SulphurCollected == required && state.Move.Point == endTargets.Last();
+        return state.SulphurCollected >= required && state.Move.Point == endTargets.Last();
     }
 
     // todo: CyclesVisited is debug, remove custom equals too
@@ -480,9 +480,6 @@ readonly record struct Point(int X, int Y) {
         _ => throw new ArgumentException($"Unsupported direction: {direction}")
     };
 
-    public static Point TurnLeft(Point direction) => new(-direction.Y, direction.X);
-    public static Point TurnRight(Point direction) => new(direction.Y, -direction.X);
-
     public static Point operator +(Point a, Point b) => new(a.X + b.X, a.Y + b.Y);
     public static Point operator -(Point a, Point b) => new(a.X - b.X, a.Y - b.Y);
     public static Point operator +(Point a, int value) => new(a.X + value, a.Y + value);
@@ -490,6 +487,11 @@ readonly record struct Point(int X, int Y) {
     public static Point operator -(Point value) => new(-value.X, -value.Y);
 
     public override string ToString() => $"({X}, {Y})";
+}
+
+static class Screen {
+    public static Point TurnLeft(Point direction) => new(direction.Y, -direction.X);
+    public static Point TurnRight(Point direction) => new(-direction.Y, direction.X);
 }
 
 static class Pathfinding<T> where T : IEquatable<T> {
