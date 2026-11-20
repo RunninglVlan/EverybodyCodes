@@ -257,9 +257,11 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
             var slow = Slow();
             int remainingCycles = slow.cyclesVisited.Where((it, j) => j is not 4 and not 7 && it > 0).Count();
             var fast = Fast();
+            long move = MoveVersion();
             Test.Log((required, slow.seconds - fast.seconds));
             Test.Log((string.Join(", ", slow.cyclesVisited), slow.seconds), 1);
             Test.Log((string.Join(", ", fast.cyclesVisited), fast.seconds), 1);
+            Test.Log(move, 1);
             Test.Step();
         }
         Test.Step();
@@ -346,9 +348,9 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         if (cycles.Where(it => it.count > 0).Select(it => it.i).OrderBy(it => it).ToArray()
                 .SequenceEqual([2, 4, 6, 7])) {
             foreach ((var cycle, int i, long count) in cycles.Where(it => it.count > 0)) {
-                Test.Log(cycle);
+                // Test.Log(cycle);
             }
-            Test.Step();
+            // Test.Step();
         }
         long collected = cycles.Sum(it => it.value.Deposits * it.count);
         if (collected != required) {
