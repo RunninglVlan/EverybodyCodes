@@ -377,9 +377,22 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
     }
 
     long MoveVersion() {
-        return moveStateSearch.TryFindCheapest(new MoveState(new Move(start, Point.RIGHT)), out var endState)
-                ? endState.cost
-                : throw new UnreachableException();
+        if (!moveStateSearch.TryFindCheapest(new MoveState(new Move(start, Point.RIGHT), []), out var endState)) {
+            throw new UnreachableException();
+        }
+        Print(endState.Item1);
+        return endState.cost;
+    }
+
+    void Print(MoveState state) {
+        var visited = state.Visited.ToHashSet();
+        for (var y = 0; y < height; y++) {
+            for (var x = 0; x < width; x++) {
+                var point = new Point(x, y);
+                Console.Write(visited.Contains(point) ? "X" : " ");
+            }
+            Console.WriteLine();
+        }
     }
 
     [SuppressMessage("ReSharper", "InvertIf")]
@@ -414,7 +427,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
                 continue;
             }
             var nextMove = new Move(nextPoint, direction);
-            var next = current with { Move = nextMove };
+            var next = current with { Move = nextMove, Visited = [.. current.Visited, nextPoint] };
             if (sulphurDeposits.Contains(nextPoint)) {
                 next.SulphurCollected++;
             }
@@ -443,8 +456,11 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         public override int GetHashCode() => HashCode.Combine(X, SulphurCollected);
     }
 
-    record struct MoveState(Move Move) : IState<MoveState> {
+    record struct MoveState(Move Move, List<Point> Visited) : IState<MoveState> {
         public int SulphurCollected { get; set; }
+
+        public bool Equals(MoveState other) => Move == other.Move && SulphurCollected == other.SulphurCollected;
+        public override int GetHashCode() => HashCode.Combine(Move, SulphurCollected);
     }
 }
 
