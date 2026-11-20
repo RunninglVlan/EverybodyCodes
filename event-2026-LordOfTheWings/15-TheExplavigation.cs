@@ -234,7 +234,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
             return Backtracking();
         }
         {
-            return Fast();
+            return Fast().seconds;
         }
     }
 
@@ -290,60 +290,47 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         }
     }
 
-    long Fast() {
+    (long[] cyclesVisited, long seconds) Fast() {
         int end = endTargets.Last().X;
         var bestCycles = sulphurCycles.Select((cycle, i) => (cycle, i))
                 .OrderByDescending(it => it.cycle.Deposits / (float)it.cycle.Perimeter)
                 .Take(7)
                 .ToList();
-        /* max and min is xMax and xMin
-- so one normal cycle is start at xMin, p-w, finish at xMax, so count*p-w  b1s1  s2b2
-- unoptimized 2 rect cycles: 2b+1s, b is (4x2), s is (2x1)                 0 1 2 3 4
-- 2*b.p-b.w + b.max-s.min + s.p-s.w + b.max-s.max = 2*12-4 + 4-1 + 6-2 + 4-3 = 28
-- optimized 2 rect cycles: 2b+1s
-- b.p-b.w + b.max-s.max + s.p-s.w + s.min-b.min + b.p-b.w = 2*(b.p-b.w) + b.max-s.max + s.p-s.w + s.min-b.min
-- => 2*(12-4) + 4-3 + 6-2 + 1-0 = 22, diff is 6, so 2*(b.max-s.min)
-- now let's check 2b+2s
-- unoptimized: 2*b.p-b.w + b.max-s.min + 2*s.p-s.w + b.max-s.max = 2*12-4 + 4-1 + 2*6-2 + 4-3 = 34
-- optimized: hm, i could either do 2 s circles right away, or split them
-- 1: b.p-b.w + b.max-s.max + s.p-s.w + s.min-b.min + b.p-b.w + b.max-s.min + s.p-s.w + b.max-s.max
-- => 2*(b.p-b.w) + 2*(b.max-s.max) + 2*(s.p-s.w) + s.min-b.min + b.max-s.min = 2*(12-4) + 2*(4-3) + 2*(6-2) + 1-0 + 4-1 = 30
-- 2: b.p-b.w + b.max-s.max + 2*s.p-s.w + s.min-b.min + b.p-b.w = 2*(b.p-b.w) + b.max-s.max + 2*s.p-s.w + s.min-b.min
-- => 2*(12-4) + 4-3 + 2*6-2 + 1-0 = 28, diff is 6 again
-- so it seems that diff is always const
-         */
         (var main, int mainI) = bestCycles.First();
         bestCycles.RemoveAt(0);
         var mainCount = (long)Math.Ceiling(required / (double)main.Deposits);
         long seconds = main.Seconds(mainCount) + end;
-        List<(SulphurCycle value, long count)> visited = [(main, mainCount)];
-        Collect(end, ref seconds, visited);
+        List<(SulphurCycle value, int i, long count)> visited = [(main, mainI, mainCount)];
+        var cyclesVisited = new long[sulphurCycles.Count];
+        Collect(end, ref cyclesVisited, ref seconds, visited);
         const long maxCount = 2;
         for (var _ = 0; _ <= bestCycles.Sum(it => it.cycle.Deposits) / main.Deposits * maxCount; _++) {
             mainCount--;
             visited.Clear();
-            visited.Add((main, mainCount));
+            visited.Add((main, mainI, mainCount));
             Visit(0);
         }
-        return seconds;
+        return (cyclesVisited, seconds);
 
         void Visit(int i) {
             if (i == mainI) {
                 i++;
             }
             if (i >= bestCycles.Count) {
-                Collect(end, ref seconds, visited);
+                Collect(end, ref cyclesVisited, ref seconds, visited);
                 return;
             }
             for (var count = 0; count <= maxCount; count++) {
-                visited.Add((bestCycles[i].cycle, count));
+                var tuple = bestCycles[i];
+                visited.Add((tuple.cycle, tuple.i, count));
                 Visit(i + 1);
                 visited.RemoveAt(visited.Count - 1);
             }
         }
     }
 
-    void Collect(int end, ref long seconds, List<(SulphurCycle value, long count)> cycles) {
+    void Collect(int end, ref long[] cyclesVisited, ref long seconds,
+            List<(SulphurCycle value, int i, long count)> cycles) {
         long collected = cycles.Sum(it => it.value.Deposits * it.count);
         if (collected != required) {
             return;
@@ -351,16 +338,23 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         long newSeconds = 0;
         var x = 0;
         long previousCount = -1;
-        foreach ((var cycle, long count) in cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min)) {
+        foreach ((var cycle, int _, long count) in cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min)) {
             newSeconds += Math.Abs(x - cycle.X.min) + cycle.Seconds(count);
-            if (previousCount == 2 && cycle.X.min < x) {
+            if (previousCount > 1 && cycle.X.min < x) {
                 newSeconds -= 2 * Math.Abs(cycle.X.min - x);
             }
             x = cycle.X.max;
             previousCount = count;
         }
         newSeconds += end - x;
-        seconds = Math.Min(newSeconds, seconds);
+        if (newSeconds >= seconds) {
+            return;
+        }
+        seconds = newSeconds;
+        Array.Fill(cyclesVisited, 0);
+        foreach ((_, int i, long count) in cycles) {
+            cyclesVisited[i] = count;
+        }
     }
 
     [SuppressMessage("ReSharper", "InvertIf")]
