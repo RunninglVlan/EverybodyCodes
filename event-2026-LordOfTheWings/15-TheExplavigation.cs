@@ -296,6 +296,22 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
                 .OrderByDescending(it => it.cycle.Deposits / (float)it.cycle.Perimeter)
                 .Take(7)
                 .ToList();
+        /* max and min is xMax and xMin
+- so one normal cycle is start at xMin, p-w, finish at xMax, so count*p-w  b1s1  s2b2
+- unoptimized 2 rect cycles: 2b+1s, b is (4x2), s is (2x1)                 0 1 2 3 4
+- 2*b.p-b.w + b.max-s.min + s.p-s.w + b.max-s.max = 2*12-4 + 4-1 + 6-2 + 4-3 = 28
+- optimized 2 rect cycles: 2b+1s
+- b.p-b.w + b.max-s.max + s.p-s.w + s.min-b.min + b.p-b.w = 2*(b.p-b.w) + b.max-s.max + s.p-s.w + s.min-b.min
+- => 2*(12-4) + 4-3 + 6-2 + 1-0 = 22, diff is 6, so 2*(b.max-s.min)
+- now let's check 2b+2s
+- unoptimized: 2*b.p-b.w + b.max-s.min + 2*s.p-s.w + b.max-s.max = 2*12-4 + 4-1 + 2*6-2 + 4-3 = 34
+- optimized: hm, i could either do 2 s circles right away, or split them
+- 1: b.p-b.w + b.max-s.max + s.p-s.w + s.min-b.min + b.p-b.w + b.max-s.min + s.p-s.w + b.max-s.max
+- => 2*(b.p-b.w) + 2*(b.max-s.max) + 2*(s.p-s.w) + s.min-b.min + b.max-s.min = 2*(12-4) + 2*(4-3) + 2*(6-2) + 1-0 + 4-1 = 30
+- 2: b.p-b.w + b.max-s.max + 2*s.p-s.w + s.min-b.min + b.p-b.w = 2*(b.p-b.w) + b.max-s.max + 2*s.p-s.w + s.min-b.min
+- => 2*(12-4) + 4-3 + 2*6-2 + 1-0 = 28, diff is 6 again
+- so it seems that diff is always const
+         */
         (var main, int mainI) = bestCycles.First();
         bestCycles.RemoveAt(0);
         var mainCount = (long)Math.Ceiling(required / (double)main.Deposits);
