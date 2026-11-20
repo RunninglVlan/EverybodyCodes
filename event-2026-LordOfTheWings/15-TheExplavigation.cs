@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
+Test.From = "Part III";
 // https://everybody.codes/event/2026/quests/15
 Test.Run((notes, part, expected) => {
     Grid grid = part switch {
@@ -239,12 +240,6 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
     }
 
     void DoTest() {
-        required = 2026;
-        var slow = Slow();
-        long newVersion = Backtracking();
-        Test.Log((slow.seconds, newVersion));
-        Test.Step();
-
         Test.Log("Deposits: " + string.Join(", ", sulphurCycles.Select(it => it.Deposits)));
         Test.Log("Perimeter: " + string.Join(", ", sulphurCycles.Select(it => it.Perimeter)));
         Test.Log("gain: "
@@ -252,10 +247,15 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         Test.Log("zone: "
                 + string.Join(", ", sulphurCycles
                         .Select(it => it.X.max < endTargets[0].X ? 0 : it.X.max < endTargets[1].X ? 1 : 2)));
-        for (var i = 0; i < 10; i++) {
-            required = 2026 + i;
-            var result = Slow();
-            Test.Log((required, string.Join(", ", result.cyclesVisited), result.seconds));
+        for (var i = 552; i <= 555; i++) {
+            required = i;
+            var slow = Slow();
+            int remainingCycles = slow.cyclesVisited.Where((it, j) => j is not 4 and not 7 && it > 0).Count();
+            var fast = Fast();
+            Test.Log((required, slow.seconds - fast.seconds));
+            Test.Log((string.Join(", ", slow.cyclesVisited), slow.seconds), 1);
+            Test.Log((string.Join(", ", fast.cyclesVisited), fast.seconds), 1);
+            Test.Step();
         }
         Test.Step();
     }
@@ -292,30 +292,37 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
 
     (long[] cyclesVisited, long seconds) Fast() {
         int end = endTargets.Last().X;
+        bool[] visit = [
+            .. "1, _, 1, _, 1, _, 1, 1, 1, 1, 1, 1, 1, _, _, 1, 1, 1, _, _, _, _, _, _, _, _, _, _, _, _"
+                    .Split(", ").Select(it => it == "1")
+        ];
         var bestCycles = sulphurCycles.Select((cycle, i) => (cycle, i))
-                .OrderByDescending(it => it.cycle.Deposits / (float)it.cycle.Perimeter)
-                .Take(7)
+                .Where(it => visit[it.i])
                 .ToList();
-        (var main, int mainI) = bestCycles.First();
-        bestCycles.RemoveAt(0);
-        var mainCount = (long)Math.Ceiling(required / (double)main.Deposits);
-        long seconds = main.Seconds(mainCount) + end;
-        List<(SulphurCycle value, int i, long count)> visited = [(main, mainI, mainCount)];
+        var mainCycles = sulphurCycles.Select((cycle, i) => (cycle, i)).Where(it => it.i is 4 or 7).ToList();
+        bestCycles.RemoveAll(it => it.i is 4 or 7);
+        var mainCount = (long)Math.Ceiling(required / (double)mainCycles.Select(it => it.cycle.Deposits).Sum());
+        long[] mainCounts = [mainCount, mainCount];
+        var seconds = long.MaxValue;
+        List<(SulphurCycle value, int i, long count)> visited =
+                [.. mainCycles.Select((tuple, i) => (tuple.cycle, tuple.i, mainCounts[i]))];
         var cyclesVisited = new long[sulphurCycles.Count];
         Collect(end, ref cyclesVisited, ref seconds, visited);
         const long maxCount = 2;
-        for (var _ = 0; _ <= bestCycles.Sum(it => it.cycle.Deposits) / main.Deposits * maxCount; _++) {
-            mainCount--;
+        long max = bestCycles.Sum(it => it.cycle.Deposits) / mainCycles.Sum(it => it.cycle.Deposits) * maxCount;
+        for (var _ = 0; _ <= max; _++) {
+            mainCounts[1]--;
             visited.Clear();
-            visited.Add((main, mainI, mainCount));
+            visited.AddRange(mainCycles.Select((tuple, i) => (tuple.cycle, tuple.i, mainCounts[i])));
+            Visit(0);
+            mainCounts[0]--;
+            visited.Clear();
+            visited.AddRange(mainCycles.Select((tuple, i) => (tuple.cycle, tuple.i, mainCounts[i])));
             Visit(0);
         }
         return (cyclesVisited, seconds);
 
         void Visit(int i) {
-            if (i == mainI) {
-                i++;
-            }
             if (i >= bestCycles.Count) {
                 Collect(end, ref cyclesVisited, ref seconds, visited);
                 return;
@@ -331,6 +338,13 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
 
     void Collect(int end, ref long[] cyclesVisited, ref long seconds,
             List<(SulphurCycle value, int i, long count)> cycles) {
+        if (cycles.Where(it => it.count > 0).Select(it => it.i).OrderBy(it => it).ToArray()
+                .SequenceEqual([2, 4, 6, 7])) {
+            foreach ((var cycle, int i, long count) in cycles.Where(it => it.count > 0)) {
+                Test.Log(cycle);
+            }
+            Test.Step();
+        }
         long collected = cycles.Sum(it => it.value.Deposits * it.count);
         if (collected != required) {
             return;
