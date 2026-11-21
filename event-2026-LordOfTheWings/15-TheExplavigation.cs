@@ -262,12 +262,16 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
             required = 2026 + i;
             var slow = Slow();
             int cyclesVisited = slow.cyclesVisited.Count(it => it > 0);
+            var fast = Fast();
+            if (slow.seconds == fast.seconds) {
+                continue;
+            }
             Test.Log(("slow\n" + string.Join(", ", slow.cyclesVisited.Select(it => it.ToString().PadLeft(2))),
                     slow.seconds, cyclesVisited), 1);
-            var fast = Fast();
             Test.Log((required, slow.seconds - fast.seconds));
             Test.Log(("fast\n" + string.Join(", ", fast.cyclesVisited.Select(it => it.ToString().PadLeft(2))),
                     fast.seconds), 1);
+            continue;
             bool[] previous = [.. visit];
             for (var j = 0; j < slow.cyclesVisited.Length; j++) {
                 if (slow.cyclesVisited[j] > 0) {
