@@ -127,18 +127,21 @@ readonly record struct SulphurCycle {
     // todo: need only count
     public HashSet<Point> Deposits { get; }
     public (int min, int max) X { get; }
+    public (int min, int max) Y { get; }
     public int Perimeter { get; }
     public int Width => X.max - X.min;
 
     public SulphurCycle(HashSet<Point> path, HashSet<Point> deposits) {
         Deposits = deposits;
-        int height = path.Max(it => it.Y) - path.Min(it => it.Y);
         X = (path.Min(it => it.X), path.Max(it => it.X));
+        Y = (path.Min(it => it.Y), path.Max(it => it.Y));
+        int height = Y.max - Y.min;
         Perimeter = 2 * (height + Width);
     }
 
     public long Seconds(long count = 1) => count == 0 ? 0 : count * Perimeter - Width;
-    public long BigSeconds(long count = 1) => count == 0 ? 0 : count * Perimeter - count * Width;
+
+    public override string ToString() => $"Deposits: {Deposits.Count}, X: {X}, Y: {Y}, Perimeter: {Perimeter}";
 }
 
 class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
@@ -378,26 +381,51 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         if (collected < required) {
             return;
         }
+        long[] slowCounts = [
+            .. " 0,  0, 35,  0,  1,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 34"
+                    .Split(", ").Select(long.Parse)
+        ];
         long newSeconds = 0;
         var x = 0;
         (SulphurCycle cycle, long count) previous = (default, -1);
+        var log = true;
+        for (var i = 0; i < slowCounts.Length; i++) {
+            long slowCount = slowCounts[i];
+            long fastCount = cycles.Where(it => it.i == i).Select(it => it.count).FirstOrDefault();
+            if (fastCount != slowCount) {
+                log = false;
+                break;
+            }
+        }
+        if (log) Test.Log("new");
         foreach ((var cycle, int _, long count) in cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min)) {
             if (cycle.X.max == x) {
-                // at least for now removing incorrect seconds
                 newSeconds -= previous.cycle.Seconds(previous.count);
-                newSeconds += previous.cycle.BigSeconds(previous.count);
-                newSeconds += cycle.BigSeconds(count);
-                x = previous.count == count ? cycle.X.min : cycle.X.max;
+                int bigHeight = Math.Max(previous.cycle.Y.max, cycle.Y.max)
+                        - Math.Min(previous.cycle.Y.min, cycle.Y.min);
+                int bigPerimeter = 2 * (bigHeight + cycle.Width);
+                if (previous.count == count) {
+                    newSeconds += count * bigPerimeter;
+                    x = cycle.X.min;
+                    if (log) Test.Log(($"seconds: {newSeconds}", $"x: {x}", $"count: {count}", cycle), 1);
+                } else {
+                    newSeconds += Math.Min(previous.count, count) * bigPerimeter;
+                    newSeconds += cycle.Seconds();
+                    x = cycle.X.max;
+                    if (log) Test.Log(($"seconds: {newSeconds}", $"x: {x}", $"count: {count}", cycle), 1);
+                }
             } else {
                 newSeconds += Math.Abs(x - cycle.X.min) + cycle.Seconds(count);
                 if (previous.count > 1 && cycle.X.min < x) {
                     newSeconds -= 2 * Math.Abs(cycle.X.min - x);
                 }
                 x = cycle.X.max;
+                if (log) Test.Log(($"seconds: {newSeconds}", $"x: {x}", $"count: {count}", cycle), 1);
             }
             previous = (cycle, count);
         }
         newSeconds += end - x;
+        if (log) Test.Log(($"seconds: {newSeconds}", $"x: {x}"), 1);
         if (newSeconds >= seconds) {
             return;
         }
