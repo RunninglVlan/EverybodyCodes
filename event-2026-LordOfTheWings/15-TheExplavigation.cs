@@ -388,7 +388,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         (int previousX, int x, long seconds, SulphurCycle cycle, long count, bool whole) previous =
                 (0, 0, -1, default, -1, false);
         var log = new StringBuilder();
-        log.AppendLine("new");
+        log.AppendLine($"new, required: {required}");
         var visited = cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min).ToArray();
         var j = 1;
         foreach ((var cycle, int _, long count) in visited) {
