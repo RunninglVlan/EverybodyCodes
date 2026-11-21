@@ -250,19 +250,19 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         Test.Log("Perimeter: " + string.Join(", ", sulphurCycles.Select(it => it.Perimeter)));
         Test.Log("gain: "
                 + string.Join(", ",
-                        sulphurCycles.Select(it => (it.Deposits.Count / (float)it.Perimeter).ToString("F"))));
+                        sulphurCycles.Select(it => (it.Deposits.Count / (float)it.Perimeter).ToString("F1")[1..])));
         Test.Log("zone: "
                 + string.Join(", ", sulphurCycles
                         .Select(it => it.X.max < endTargets[0].X ? 0 : it.X.max < endTargets[1].X ? 1 : 2)));
         for (var i = 0; i < 100; i++) {
             required = 552 + i;
             var slow = Slow();
+            Test.Log(("slow", string.Join(", ", slow.cyclesVisited), slow.seconds), 1);
             int remainingCycles = slow.cyclesVisited.Where((it, j) => j is not 4 and not 7 && it > 0).Count();
             var fast = Fast();
-            var move = MoveVersion();
             Test.Log((required, slow.seconds - fast.seconds));
-            Test.Log((string.Join(", ", slow.cyclesVisited), slow.seconds), 1);
-            Test.Log((string.Join(", ", fast.cyclesVisited), fast.seconds), 1);
+            Test.Log(("fast", string.Join(", ", fast.cyclesVisited), fast.seconds), 1);
+            var move = MoveVersion();
             var moveCyclesVisited = new long[sulphurCycles.Count];
             foreach (var point in move.Item1.Visited) {
                 for (var j = 0; j < sulphurCycles.Count; j++) {
@@ -274,8 +274,8 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
             for (var j = 0; j < sulphurCycles.Count; j++) {
                 moveCyclesVisited[j] /= sulphurCycles[j].Deposits.Count;
             }
-            Test.Log((string.Join(", ", moveCyclesVisited), move.seconds), 1);
-            // Test.Step();
+            Test.Log(("move", string.Join(", ", moveCyclesVisited), move.seconds), 1);
+            Test.Step();
         }
         Test.Step();
     }
