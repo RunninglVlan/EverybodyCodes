@@ -389,14 +389,13 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         foreach ((var cycle, int _, long count) in cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min)) {
             if (cycle.X.max == x) {
                 newSeconds -= previous.cycle.Seconds(previous.count);
-                newSeconds += previous.cycle.WholeSeconds(previous.count);
-                newSeconds += cycle.WholeSeconds(count);
+                newSeconds += previous.cycle.WholeSeconds(previous.count) + cycle.WholeSeconds(count);
                 x = previous.count == count ? cycle.X.min : cycle.X.max;
                 log.AppendLine("  whole cycle");
                 previous = (cycle, count, true);
             } else {
                 newSeconds += Math.Abs(x - cycle.X.min) + cycle.Seconds(count);
-                if (previous.count > 1 && cycle.X.min < x && !previous.whole) {
+                if (cycle.X.min < x && previous is { count: > 1, whole: false }) {
                     newSeconds -= 2 * Math.Abs(cycle.X.min - x);
                 }
                 x = cycle.X.max;
