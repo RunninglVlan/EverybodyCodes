@@ -385,31 +385,31 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         }
         long newSeconds = 0;
         var x = 0;
-        (int previousX, int x, int distance, SulphurCycle cycle, long count, bool whole) previous =
+        (int previousX, int x, long seconds, SulphurCycle cycle, long count, bool whole) previous =
                 (-1, -1, -1, default, -1, false);
         var log = new StringBuilder();
         log.AppendLine("new");
         var visited = cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min).ToArray();
         foreach ((var cycle, int _, long count) in visited) {
             if (cycle.X.max == x) {
-                newSeconds -= previous.distance + previous.cycle.Seconds(previous.count);
+                newSeconds -= previous.seconds;
                 (int cycleStart, int cycleEnd) = previous.previousX > cycle.X.max
                         ? (previous.cycle.X.max, previous.cycle.X.min)
                         : (previous.cycle.X.min, previous.cycle.X.max);
-                int distance = Math.Abs(previous.previousX - cycleStart);
-                newSeconds += distance;
-                newSeconds += previous.cycle.WholeSeconds(previous.count) + cycle.WholeSeconds(count);
+                long cycleSeconds = Math.Abs(previous.previousX - cycleStart);
+                cycleSeconds += previous.cycle.WholeSeconds(previous.count) + cycle.WholeSeconds(count);
                 x = previous.count == count ? cycleStart : cycleEnd;
                 log.AppendLine("  whole cycle");
-                previous = (previous.x, x, distance, cycle, count, true);
+                newSeconds += cycleSeconds;
+                previous = (previous.x, x, cycleSeconds, cycle, count, true);
             } else {
-                int distance = Math.Abs(x - cycle.X.min);
-                newSeconds += distance + cycle.Seconds(count);
+                long cycleSeconds = Math.Abs(x - cycle.X.min) + cycle.Seconds(count);
                 if (cycle.X.min < x && previous is { count: > 1, whole: false }) {
-                    newSeconds -= 2 * Math.Abs(cycle.X.min - x);
+                    cycleSeconds -= 2 * Math.Abs(cycle.X.min - x);
                 }
                 x = cycle.X.max;
-                previous = (previous.x, x, distance, cycle, count, false);
+                newSeconds += cycleSeconds;
+                previous = (previous.x, x, cycleSeconds, cycle, count, false);
             }
             log.AppendLine($"  seconds: {newSeconds}, x: {x}, count: {count}, {cycle}");
         }
