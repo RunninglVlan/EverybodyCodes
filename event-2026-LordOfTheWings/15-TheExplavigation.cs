@@ -386,11 +386,14 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         (SulphurCycle cycle, long count, bool whole) previous = (default, -1, false);
         var log = new StringBuilder();
         log.AppendLine("new");
-        foreach ((var cycle, int _, long count) in cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min)) {
+        var visited = cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min).ToArray();
+        for (var i = 0; i < visited.Length; i++) {
+            (var cycle, int _, long count) = visited[i];
             if (cycle.X.max == x) {
                 newSeconds -= previous.cycle.Seconds(previous.count);
                 newSeconds += previous.cycle.WholeSeconds(previous.count) + cycle.WholeSeconds(count);
-                x = previous.count == count ? cycle.X.min : cycle.X.max;
+                bool previousIsBigger = i - 2 > 0 && visited[i - 2].value.X.max > cycle.X.max;
+                x = previous.count == count && !previousIsBigger ? cycle.X.min : cycle.X.max;
                 log.AppendLine("  whole cycle");
                 previous = (cycle, count, true);
             } else {
