@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 Test.From = "Part III";
 // https://everybody.codes/event/2026/quests/15
@@ -127,21 +128,20 @@ readonly record struct SulphurCycle {
     // todo: need only count
     public HashSet<Point> Deposits { get; }
     public (int min, int max) X { get; }
-    public (int min, int max) Y { get; }
     public int Perimeter { get; }
     public int Width => X.max - X.min;
 
     public SulphurCycle(HashSet<Point> path, HashSet<Point> deposits) {
         Deposits = deposits;
+        int height = path.Max(it => it.Y) - path.Min(it => it.Y);
         X = (path.Min(it => it.X), path.Max(it => it.X));
-        Y = (path.Min(it => it.Y), path.Max(it => it.Y));
-        int height = Y.max - Y.min;
         Perimeter = 2 * (height + Width);
     }
 
     public long Seconds(long count = 1) => count == 0 ? 0 : count * Perimeter - Width;
+    public long BigSeconds(long count = 1) => count == 0 ? 0 : count * Perimeter - count * Width;
 
-    public override string ToString() => $"Deposits: {Deposits.Count}, X: {X}, Y: {Y}, Perimeter: {Perimeter}";
+    public override string ToString() => $"Deposits: {Deposits.Count}, X: {X}, Perimeter: {Perimeter}";
 }
 
 class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
@@ -378,57 +378,37 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
     void Collect(int end, ref long[] cyclesVisited, ref long seconds,
             List<(SulphurCycle value, int i, long count)> cycles) {
         long collected = cycles.Sum(it => it.value.Deposits.Count * it.count);
-        if (collected < required) {
+        if (collected != required) {
             return;
         }
-        long[] slowCounts = [
-            .. " 0,  0, 35,  0,  1,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 34"
-                    .Split(", ").Select(long.Parse)
-        ];
         long newSeconds = 0;
         var x = 0;
         (SulphurCycle cycle, long count) previous = (default, -1);
-        var log = true;
-        for (var i = 0; i < slowCounts.Length; i++) {
-            long slowCount = slowCounts[i];
-            long fastCount = cycles.Where(it => it.i == i).Select(it => it.count).FirstOrDefault();
-            if (fastCount != slowCount) {
-                log = false;
-                break;
-            }
-        }
-        if (log) Test.Log("new");
+        var log = new StringBuilder();
+        log.AppendLine("new");
         foreach ((var cycle, int _, long count) in cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min)) {
             if (cycle.X.max == x) {
                 newSeconds -= previous.cycle.Seconds(previous.count);
-                int bigHeight = Math.Max(previous.cycle.Y.max, cycle.Y.max)
-                        - Math.Min(previous.cycle.Y.min, cycle.Y.min);
-                int bigPerimeter = 2 * (bigHeight + cycle.Width);
-                if (previous.count == count) {
-                    newSeconds += count * bigPerimeter;
-                    x = cycle.X.min;
-                    if (log) Test.Log(($"seconds: {newSeconds}", $"x: {x}", $"count: {count}", cycle), 1);
-                } else {
-                    newSeconds += Math.Min(previous.count, count) * bigPerimeter;
-                    newSeconds += cycle.Seconds();
-                    x = cycle.X.max;
-                    if (log) Test.Log(($"seconds: {newSeconds}", $"x: {x}", $"count: {count}", cycle), 1);
-                }
+                newSeconds += previous.cycle.BigSeconds(previous.count);
+                newSeconds += cycle.BigSeconds(count);
+                x = previous.count == count ? cycle.X.min : cycle.X.max;
+                log.AppendLine("  big cycle");
             } else {
                 newSeconds += Math.Abs(x - cycle.X.min) + cycle.Seconds(count);
                 if (previous.count > 1 && cycle.X.min < x) {
                     newSeconds -= 2 * Math.Abs(cycle.X.min - x);
                 }
                 x = cycle.X.max;
-                if (log) Test.Log(($"seconds: {newSeconds}", $"x: {x}", $"count: {count}", cycle), 1);
             }
+            log.AppendLine($"  seconds: {newSeconds}, x: {x}, count: {count}, {cycle}");
             previous = (cycle, count);
         }
         newSeconds += end - x;
-        if (log) Test.Log(($"seconds: {newSeconds}", $"x: {x}"), 1);
+        log.Append($"  seconds: {newSeconds}");
         if (newSeconds >= seconds) {
             return;
         }
+        Test.Log(log);
         seconds = newSeconds;
         Array.Fill(cyclesVisited, 0);
         foreach ((_, int i, long count) in cycles) {
