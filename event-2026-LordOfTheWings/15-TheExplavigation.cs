@@ -392,7 +392,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         var visited = cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min).ToArray();
         var j = 1;
         foreach ((var cycle, int _, long count) in visited) {
-            if (cycle.X.max == x) {
+            if (cycle.X.max == x && Math.Abs(count - previous.count) <= 1) {
                 newSeconds -= previous.seconds;
                 (int cycleStart, int cycleEnd) = previous.previousX > cycle.X.max
                         ? (cycle.X.max, cycle.X.min)
