@@ -404,11 +404,11 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
                 newSeconds += cycleSeconds;
                 previous = (previous.x, x, cycleSeconds, cycle, count, true);
             } else {
-                long cycleSeconds = Math.Abs(x - cycle.X.min) + cycle.Seconds(count);
-                if (cycle.X.min < x && previous is { count: > 1, whole: false }) {
-                    cycleSeconds -= 2 * Math.Abs(cycle.X.min - x);
-                }
-                x = cycle.X.max;
+                (int cycleStart, int cycleEnd) = x < cycle.X.min
+                        ? (cycle.X.min, cycle.X.max)
+                        : (cycle.X.max, cycle.X.min);
+                long cycleSeconds = Math.Abs(x - cycleStart) + cycle.Seconds(count);
+                x = cycleEnd;
                 newSeconds += cycleSeconds;
                 previous = (previous.x, x, cycleSeconds, cycle, count, false);
             }
