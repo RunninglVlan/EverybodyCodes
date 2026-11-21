@@ -246,23 +246,39 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
     }
 
     void DoTest() {
-        Test.Log("Deposits: " + string.Join(", ", sulphurCycles.Select(it => it.Deposits.Count)));
-        Test.Log("Perimeter: " + string.Join(", ", sulphurCycles.Select(it => it.Perimeter)));
-        Test.Log("gain: "
+        Test.Log("Deposits:\n"
+                + string.Join(", ", sulphurCycles.Select(it => it.Deposits.Count.ToString().PadLeft(2))));
+        Test.Log("Perimeter:\n" + string.Join(", ", sulphurCycles.Select(it => it.Perimeter.ToString().PadLeft(2))));
+        Test.Log("gain:\n"
                 + string.Join(", ",
-                        sulphurCycles.Select(it => (it.Deposits.Count / (float)it.Perimeter).ToString("F1")[1..])));
-        Test.Log("zone: "
+                        sulphurCycles.Select(it => (it.Deposits.Count / (float)it.Perimeter).ToString("F")[2..])));
+        Test.Log("zone:\n"
                 + string.Join(", ", sulphurCycles
-                        .Select(it => it.X.max < endTargets[0].X ? 0 : it.X.max < endTargets[1].X ? 1 : 2)));
+                        .Select(it => it.X.max < endTargets[0].X ? " 0" : it.X.max < endTargets[1].X ? " 1" : " 2")));
+        var visit = new bool[sulphurCycles.Count];
+        var max = 0;
         for (var i = 0; i < 100; i++) {
-            required = 552 + i;
+            required = 2026 + i;
             var slow = Slow();
-            Test.Log(("slow", string.Join(", ", slow.cyclesVisited), slow.seconds), 1);
-            int remainingCycles = slow.cyclesVisited.Where((it, j) => j is not 4 and not 7 && it > 0).Count();
+            int cyclesVisited = slow.cyclesVisited.Count(it => it > 0);
+            Test.Log(("slow\n" + string.Join(", ", slow.cyclesVisited.Select(it => it.ToString().PadLeft(2))),
+                    slow.seconds, cyclesVisited), 1);
             var fast = Fast();
             Test.Log((required, slow.seconds - fast.seconds));
-            Test.Log(("fast", string.Join(", ", fast.cyclesVisited), fast.seconds), 1);
-            Test.Step();
+            Test.Log(("fast\n" + string.Join(", ", fast.cyclesVisited.Select(it => it.ToString().PadLeft(2))),
+                    fast.seconds), 1);
+            bool[] previous = [.. visit];
+            for (var j = 0; j < slow.cyclesVisited.Length; j++) {
+                if (slow.cyclesVisited[j] > 0) {
+                    visit[j] = true;
+                }
+            }
+            int count = slow.cyclesVisited.Count(it => it > 0);
+            max = Math.Max(max, count);
+            if (!previous.SequenceEqual(visit)) {
+                Test.Log(($"{required}\n" + string.Join(", ", visit.Select(it => it ? " 1" : " _")), slow.seconds,
+                        max));
+            }
         }
         Test.Step();
     }
@@ -347,13 +363,6 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
 
     void Collect(int end, ref long[] cyclesVisited, ref long seconds,
             List<(SulphurCycle value, int i, long count)> cycles) {
-        if (cycles.Where(it => it.count > 0).Select(it => it.i).OrderBy(it => it).ToArray()
-                .SequenceEqual([2, 4, 6, 7])) {
-            foreach ((var cycle, int i, long count) in cycles.Where(it => it.count > 0)) {
-                // Test.Log(cycle);
-            }
-            // Test.Step();
-        }
         long collected = cycles.Sum(it => it.value.Deposits.Count * it.count);
         if (collected != required) {
             return;
