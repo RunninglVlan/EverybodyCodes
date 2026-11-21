@@ -342,7 +342,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
                 [.. mainCycles.Select((tuple, i) => (tuple.cycle, tuple.i, mainCounts[i]))];
         var cyclesVisited = new long[sulphurCycles.Count];
         Collect(end, ref cyclesVisited, ref seconds, visited);
-        const long maxCount = 2;
+        const long maxCount = 3;
         long max = bestCycles.Sum(it => it.cycle.Deposits.Count)
                 / mainCycles.Sum(it => it.cycle.Deposits.Count)
                 * maxCount;
