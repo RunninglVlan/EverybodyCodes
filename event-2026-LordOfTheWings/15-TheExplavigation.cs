@@ -138,6 +138,7 @@ readonly record struct SulphurCycle {
     }
 
     public long Seconds(long count = 1) => count == 0 ? 0 : count * Perimeter - Width;
+    public long BigSeconds(long count = 1) => count == 0 ? 0 : count * Perimeter - count * Width;
 }
 
 class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
@@ -316,14 +317,15 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
     (long[] cyclesVisited, long seconds) Fast() {
         int end = endTargets.Last().X;
         bool[] visit = [
-            .. "1, _, 1, _, 1, _, 1, 1, 1, 1, 1, 1, 1, _, _, 1, 1, 1, _, _, _, _, _, _, _, _, _, _, _, _"
-                    .Split(", ").Select(it => it == "1")
+            .. " 1,  _,  1,  _,  1,  _,  1,  1,  _,  1,  _,  _,  1,  _,  _,  _,  1,  _,  1,  1,  1,  _,  _,  _,  _,  _,  _,  _,  _,  1"
+                    .Split(", ").Select(it => it == " 1")
         ];
         var bestCycles = sulphurCycles.Select((cycle, i) => (cycle, i))
                 .Where(it => visit[it.i])
                 .ToList();
-        var mainCycles = sulphurCycles.Select((cycle, i) => (cycle, i)).Where(it => it.i is 4 or 7).ToList();
-        bestCycles.RemoveAll(it => it.i is 4 or 7);
+        var mainCycles = sulphurCycles.Select((cycle, i) => (cycle, i))
+                .Where(it => it.i == 2 || it.i == sulphurCycles.Count - 1).ToList();
+        bestCycles.RemoveAll(it => mainCycles.Any(main => main.i == it.i));
         var mainCount = (long)Math.Ceiling(required / (double)mainCycles.Select(it => it.cycle.Deposits.Count).Sum());
         long[] mainCounts = [mainCount, mainCount];
         var seconds = long.MaxValue;
@@ -336,6 +338,11 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
                 / mainCycles.Sum(it => it.cycle.Deposits.Count)
                 * maxCount;
         for (var _ = 0; _ <= max; _++) {
+            mainCounts[0]--;
+            visited.Clear();
+            visited.AddRange(mainCycles.Select((tuple, i) => (tuple.cycle, tuple.i, mainCounts[i])));
+            Visit(0);
+            mainCounts[0]++;
             mainCounts[1]--;
             visited.Clear();
             visited.AddRange(mainCycles.Select((tuple, i) => (tuple.cycle, tuple.i, mainCounts[i])));
@@ -364,19 +371,27 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
     void Collect(int end, ref long[] cyclesVisited, ref long seconds,
             List<(SulphurCycle value, int i, long count)> cycles) {
         long collected = cycles.Sum(it => it.value.Deposits.Count * it.count);
-        if (collected != required) {
+        if (collected < required) {
             return;
         }
         long newSeconds = 0;
         var x = 0;
-        long previousCount = -1;
+        (SulphurCycle cycle, long count) previous = (default, -1);
         foreach ((var cycle, int _, long count) in cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min)) {
-            newSeconds += Math.Abs(x - cycle.X.min) + cycle.Seconds(count);
-            if (previousCount > 1 && cycle.X.min < x) {
-                newSeconds -= 2 * Math.Abs(cycle.X.min - x);
+            if (cycle.X.max == x) {
+                // at least for now removing incorrect seconds
+                newSeconds -= previous.cycle.Seconds(previous.count);
+                newSeconds += previous.cycle.BigSeconds(previous.count);
+                newSeconds += cycle.BigSeconds(count);
+                x = previous.count == count ? cycle.X.min : cycle.X.max;
+            } else {
+                newSeconds += Math.Abs(x - cycle.X.min) + cycle.Seconds(count);
+                if (previous.count > 1 && cycle.X.min < x) {
+                    newSeconds -= 2 * Math.Abs(cycle.X.min - x);
+                }
+                x = cycle.X.max;
             }
-            x = cycle.X.max;
-            previousCount = count;
+            previous = (cycle, count);
         }
         newSeconds += end - x;
         if (newSeconds >= seconds) {
