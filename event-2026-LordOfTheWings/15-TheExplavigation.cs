@@ -259,36 +259,41 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         Test.Log("zone:\n"
                 + string.Join(", ", sulphurCycles
                         .Select(it => it.X.max < endTargets[0].X ? " 0" : it.X.max < endTargets[1].X ? " 1" : " 2")));
-        var visit = new bool[sulphurCycles.Count];
+        var visit = new int[sulphurCycles.Count];
         var max = 0;
         const int increment = 10;
         for (var i = 0; i < 100; i++) {
-            required = 161 + i * increment;
+            required = 280 + i * increment;
             var slow = Slow();
-            var fast = Fast();
-            if (slow.seconds == fast.seconds) {
-                continue;
-            }
+            // var fast = Fast();
+            // if (slow.seconds == fast.seconds) {
+            //     continue;
+            // }
             int slowVisited = slow.cyclesVisited.Count(it => it > 0);
             Test.Log(("slow\n" + string.Join(", ", slow.cyclesVisited.Select(it => it.ToString().PadLeft(2))),
-                    $"seconds: {slow.seconds}, visited: {slowVisited}"), 1);
-            Test.Log($"required: {required}, difference: {slow.seconds - fast.seconds}");
-            int fastVisited = fast.cyclesVisited.Count(it => it > 0);
-            Test.Log(("fast\n" + string.Join(", ", fast.cyclesVisited.Select(it => it.ToString().PadLeft(2))),
-                    $"seconds: {fast.seconds}, visited: {fastVisited}"), 1);
-            bool[] previous = [.. visit];
+                    $"seconds: {slow.seconds}, visited: {slowVisited}, required: {required}"), 1);
+            // Test.Log($"required: {required}, difference: {slow.seconds - fast.seconds}");
+            // int fastVisited = fast.cyclesVisited.Count(it => it > 0);
+            // Test.Log(("fast\n" + string.Join(", ", fast.cyclesVisited.Select(it => it.ToString().PadLeft(2))),
+            //         $"seconds: {fast.seconds}, visited: {fastVisited}"), 1);
+            int[] previous = [.. visit];
             for (var j = 0; j < slow.cyclesVisited.Length; j++) {
-                if (slow.cyclesVisited[j] > 0) {
-                    visit[j] = true;
-                }
+                visit[j] = slow.cyclesVisited[j] switch {
+                    > 3 => 2,
+                    > 0 => 1,
+                    _ => visit[j]
+                };
             }
-            int count = slow.cyclesVisited.Count(it => it > 0);
-            max = Math.Max(max, count);
+            max = Math.Max(max, slow.cyclesVisited.Count(it => it > 0));
             if (!previous.SequenceEqual(visit)) {
-                Test.Log(($"{required}\n" + string.Join(", ", visit.Select(it => it ? " 1" : " _")), slow.seconds,
+                Test.Log(($"{required}\n" + string.Join(", ", visit.Select(it => it switch {
+                            2 => " 2",
+                            1 => " 1",
+                            _ => " _"
+                        })), slow.seconds,
                         max));
             }
-            Test.Step();
+            // Test.Step();
         }
         Test.Step();
     }
@@ -334,6 +339,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
                 .ToList();
         var mainCycles = sulphurCycles.Select((cycle, i) => (cycle, i))
                 .Where(it => it.i == 2 || it.i == sulphurCycles.Count - 1).ToList();
+        // mainCycles = [.. sulphurCycles.Select((cycle, i) => (cycle, i)).Where(it => it.i is 6 or 16)];
         bestCycles.RemoveAll(it => mainCycles.Any(main => main.i == it.i));
         var mainCount = (long)Math.Ceiling(required / (double)mainCycles.Select(it => it.cycle.Deposits.Count).Sum());
         long[] mainCounts = [mainCount, mainCount];
@@ -420,7 +426,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
             cyclesVisited[i] = count;
         }
         const string slowVisited =
-                " 0,  0,  2,  0,  1,  0,  1,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  1";
+                " 0,  0,  4,  0,  1,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  2,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  3";
         string fastVisited = string.Join(", ", cyclesVisited.Select(it => it.ToString().PadLeft(2)));
         if (newSeconds >= seconds && fastVisited != slowVisited) {
             return;
