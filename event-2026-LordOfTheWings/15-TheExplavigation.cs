@@ -394,7 +394,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
     }
 
     (MoveState, long seconds) MoveVersion() {
-        if (!moveStateSearch.TryFindCheapest(new MoveState(new Move(start, Point.RIGHT), []), out var endState)) {
+        if (!moveStateSearch.TryFindCheapest(new MoveState(start, Point.RIGHT, []), out var endState)) {
             throw new UnreachableException();
         }
         // Print(endState.Item1);
@@ -436,15 +436,16 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
 
     IEnumerable<(MoveState, long)> IGame<MoveState>.NextWithCost(MoveState current) {
         var directions = new[] {
-            current.Move.Direction, Screen.TurnLeft(current.Move.Direction), Screen.TurnRight(current.Move.Direction)
+            current.Direction, Screen.TurnLeft(current.Direction), Screen.TurnRight(current.Direction)
         };
         foreach (var direction in directions) {
-            var nextPoint = current.Move.Point + direction;
+            var nextPoint = current.Point + direction;
             if (nextPoint.X < 0 || nextPoint.X > width - 1 || !walkableCells[nextPoint]) {
                 continue;
             }
-            var nextMove = new Move(nextPoint, direction);
-            var next = current with { Move = nextMove, Visited = [.. current.Visited, nextPoint] };
+            var next = current with {
+                Point = nextPoint, Direction = direction, Visited = [.. current.Visited, nextPoint]
+            };
             if (sulphurDeposits.Contains(nextPoint)) {
                 next.SulphurCollected++;
             }
@@ -453,7 +454,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
     }
 
     bool IGame<MoveState>.HasReachedEnd(MoveState state) {
-        return state.SulphurCollected >= required && state.Move.Point == endTargets.Last();
+        return state.SulphurCollected >= required && state.Point == endTargets.Last();
     }
 
     // todo: CyclesVisited is debug, remove custom equals too
@@ -473,11 +474,14 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         public override int GetHashCode() => HashCode.Combine(X, SulphurCollected);
     }
 
-    record struct MoveState(Move Move, List<Point> Visited) : IState<MoveState> {
+    record struct MoveState(Point Point, Point Direction, List<Point> Visited) : IState<MoveState> {
         public int SulphurCollected { get; set; }
 
-        public bool Equals(MoveState other) => Move == other.Move && SulphurCollected == other.SulphurCollected;
-        public override int GetHashCode() => HashCode.Combine(Move, SulphurCollected);
+        public bool Equals(MoveState other) => Point == other.Point
+                && Direction == other.Direction
+                && SulphurCollected == other.SulphurCollected;
+
+        public override int GetHashCode() => HashCode.Combine(Point, Direction, SulphurCollected);
     }
 }
 
