@@ -263,7 +263,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         var max = 0;
         const int increment = 10;
         for (var i = 0; i < 100; i++) {
-            required = 141 + i * increment;
+            required = 161 + i * increment;
             var slow = Slow();
             var fast = Fast();
             if (slow.seconds == fast.seconds) {
@@ -390,6 +390,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         var log = new StringBuilder();
         log.AppendLine("new");
         var visited = cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min).ToArray();
+        var j = 1;
         foreach ((var cycle, int _, long count) in visited) {
             if (cycle.X.max == x) {
                 newSeconds -= previous.seconds;
@@ -411,7 +412,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
                 newSeconds += cycleSeconds;
                 previous = (previous.x, x, cycleSeconds, cycle, count, false);
             }
-            log.AppendLine($"  seconds: {newSeconds}, x: {x}, count: {count}, {cycle}");
+            log.AppendLine($"  {j++}: seconds: {newSeconds}, x: {x}, count: {count}, {cycle}, ");
         }
         newSeconds += end - x;
         Array.Fill(cyclesVisited, 0);
