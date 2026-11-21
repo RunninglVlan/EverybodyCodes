@@ -237,10 +237,10 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         if (false) {
             return Backtracking();
         }
-        if (false) {
+        if (true) {
             return Fast().seconds;
         }
-        {
+        if (false) {
             return MoveVersion().seconds;
         }
     }
@@ -262,19 +262,6 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
             var fast = Fast();
             Test.Log((required, slow.seconds - fast.seconds));
             Test.Log(("fast", string.Join(", ", fast.cyclesVisited), fast.seconds), 1);
-            var move = MoveVersion();
-            var moveCyclesVisited = new long[sulphurCycles.Count];
-            foreach (var point in move.Item1.Visited) {
-                for (var j = 0; j < sulphurCycles.Count; j++) {
-                    if (sulphurCycles[j].Deposits.Contains(point)) {
-                        moveCyclesVisited[j]++;
-                    }
-                }
-            }
-            for (var j = 0; j < sulphurCycles.Count; j++) {
-                moveCyclesVisited[j] /= sulphurCycles[j].Deposits.Count;
-            }
-            Test.Log(("move", string.Join(", ", moveCyclesVisited), move.seconds), 1);
             Test.Step();
         }
         Test.Step();
