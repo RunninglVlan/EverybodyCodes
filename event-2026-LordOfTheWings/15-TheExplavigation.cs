@@ -395,8 +395,8 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
             if (cycle.X.max == x) {
                 newSeconds -= previous.seconds;
                 (int cycleStart, int cycleEnd) = previous.previousX > cycle.X.max
-                        ? (previous.cycle.X.max, previous.cycle.X.min)
-                        : (previous.cycle.X.min, previous.cycle.X.max);
+                        ? (cycle.X.max, cycle.X.min)
+                        : (cycle.X.min, cycle.X.max);
                 long cycleSeconds = Math.Abs(previous.previousX - cycleStart);
                 cycleSeconds += previous.cycle.WholeSeconds(previous.count) + cycle.WholeSeconds(count);
                 x = previous.count == count ? cycleStart : cycleEnd;
