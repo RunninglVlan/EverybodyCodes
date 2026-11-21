@@ -139,7 +139,7 @@ readonly record struct SulphurCycle {
     }
 
     public long Seconds(long count = 1) => count == 0 ? 0 : count * Perimeter - Width;
-    public long BigSeconds(long count = 1) => count == 0 ? 0 : count * Perimeter - count * Width;
+    public long WholeSeconds(long count = 1) => count == 0 ? 0 : count * Perimeter - count * Width;
 
     public override string ToString() => $"Deposits: {Deposits.Count}, X: {X}, Perimeter: {Perimeter}";
 }
@@ -378,30 +378,31 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
     void Collect(int end, ref long[] cyclesVisited, ref long seconds,
             List<(SulphurCycle value, int i, long count)> cycles) {
         long collected = cycles.Sum(it => it.value.Deposits.Count * it.count);
-        if (collected != required) {
+        if (collected < required) {
             return;
         }
         long newSeconds = 0;
         var x = 0;
-        (SulphurCycle cycle, long count) previous = (default, -1);
+        (SulphurCycle cycle, long count, bool whole) previous = (default, -1, false);
         var log = new StringBuilder();
         log.AppendLine("new");
         foreach ((var cycle, int _, long count) in cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min)) {
             if (cycle.X.max == x) {
                 newSeconds -= previous.cycle.Seconds(previous.count);
-                newSeconds += previous.cycle.BigSeconds(previous.count);
-                newSeconds += cycle.BigSeconds(count);
+                newSeconds += previous.cycle.WholeSeconds(previous.count);
+                newSeconds += cycle.WholeSeconds(count);
                 x = previous.count == count ? cycle.X.min : cycle.X.max;
-                log.AppendLine("  big cycle");
+                log.AppendLine("  whole cycle");
+                previous = (cycle, count, true);
             } else {
                 newSeconds += Math.Abs(x - cycle.X.min) + cycle.Seconds(count);
-                if (previous.count > 1 && cycle.X.min < x) {
+                if (previous.count > 1 && cycle.X.min < x && !previous.whole) {
                     newSeconds -= 2 * Math.Abs(cycle.X.min - x);
                 }
                 x = cycle.X.max;
+                previous = (cycle, count, false);
             }
             log.AppendLine($"  seconds: {newSeconds}, x: {x}, count: {count}, {cycle}");
-            previous = (cycle, count);
         }
         newSeconds += end - x;
         log.Append($"  seconds: {newSeconds}");
