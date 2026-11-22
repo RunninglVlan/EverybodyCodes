@@ -257,7 +257,7 @@ readonly record struct SulphurCycle {
         Perimeter = 2 * (Height + Width);
     }
 
-    public long Seconds(long count = 1) => count == 0 ? 0 : count * Perimeter - Width;
+    public long HalfSeconds(long count = 1) => count == 0 ? 0 : count * Perimeter - Width;
     public long WholeSeconds(long count = 1) => count == 0 ? 0 : count * Perimeter - count * Width;
 
     public override string ToString() {
@@ -439,11 +439,11 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
             }
             foreach (var cycle in sulphurCycles) {
                 if (cycle.Min != x) {
-                    long newSeconds = seconds + Math.Abs(x - cycle.Min) + cycle.Seconds();
+                    long newSeconds = seconds + Math.Abs(x - cycle.Min) + cycle.HalfSeconds();
                     return Find(cycle.Max, sulphurCollected + cycle.Deposits.Count, newSeconds);
                 }
                 if (cycle.Max != x) {
-                    long newSeconds = seconds + Math.Abs(x - cycle.Max) + cycle.Seconds();
+                    long newSeconds = seconds + Math.Abs(x - cycle.Max) + cycle.HalfSeconds();
                     return Find(cycle.Min, sulphurCollected + cycle.Deposits.Count, newSeconds);
                 }
             }
@@ -539,7 +539,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
                 i++;
             } else {
                 (int cycleStart, int cycleEnd) = x < cycle.Min ? (cycle.Min, cycle.Max) : (cycle.Max, cycle.Min);
-                newSeconds += Math.Abs(x - cycleStart) + cycle.Seconds(count);
+                newSeconds += Math.Abs(x - cycleStart) + cycle.HalfSeconds(count);
                 x = cycleEnd;
                 previous = (cycle, count, false);
             }
@@ -587,12 +587,12 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
                 var cycle = sulphurCycles[i];
                 (int xStart, int xEnd) = (cycle.Min, cycle.Max);
                 if (xStart != current.X || i != current.I) {
-                    long distance = current.Distance(cycle, xStart);
+                    long distance = Math.Abs(current.X - xStart) + cycle.HalfSeconds();
                     yield return (current.From(cycle, i, xEnd), distance);
                 }
                 (xStart, xEnd) = (cycle.Max, cycle.Min);
                 if (xStart != current.X || i != current.I) {
-                    long distance = current.Distance(cycle, xStart);
+                    long distance = Math.Abs(current.X - xStart) + cycle.HalfSeconds();
                     yield return (current.From(cycle, i, xEnd), distance);
                 }
             }
@@ -633,10 +633,6 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
             var next = new State(nextX, i, [.. CyclesVisited], SulphurCollected + cycle.Deposits.Count);
             next.CyclesVisited[i]++;
             return next;
-        }
-
-        public long Distance(SulphurCycle cycle, int xStart) {
-            return Math.Abs(X - xStart) + cycle.Seconds();
         }
 
         public bool Equals(State other) => X == other.X && I == other.I && SulphurCollected == other.SulphurCollected;
