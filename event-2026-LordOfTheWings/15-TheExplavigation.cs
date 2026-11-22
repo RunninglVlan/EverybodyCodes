@@ -527,10 +527,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
                     Test.Log("unhandled");
                     return;
                 }
-                // todo: use one condition to understand if one cycle is inside another one
-                (int cycleStart, int cycleEnd) = previous.x > cycle.Max
-                        ? (cycle.Max, cycle.Min)
-                        : (cycle.Min, cycle.Max);
+                (int cycleStart, int cycleEnd) = x < cycle.Min ? (cycle.Min, cycle.Max) : (cycle.Max, cycle.Min);
                 newSeconds += Math.Abs(previous.x - cycleStart);
                 newSeconds += cycle.WholeSeconds(count) + cycle2.WholeSeconds(count2);
                 x = count == count2 ? cycleStart : cycleEnd;
