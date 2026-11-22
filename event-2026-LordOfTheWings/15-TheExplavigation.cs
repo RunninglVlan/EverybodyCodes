@@ -237,13 +237,45 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
 
     // todo: move best version inside, remove other versions
     public override long CollectSulphurAndReachEnd() {
+        long[] best = FindBestRects();
         // DoTest();
         if (false) {
             return Slow().seconds;
         }
         if (true) {
-            return Fast().seconds;
+            var fast = Fast(best);
+            int fastVisited = fast.rectsVisited.Count(it => it > 0);
+            string rectsVisited = string.Join(", ", fast.rectsVisited.Select(it => it.ToString().PadLeft(2)));
+            Test.Log(("fast\n" + rectsVisited, $"seconds: {fast.seconds}, visited: {fastVisited}"), 1);
+            return fast.seconds;
         }
+    }
+
+    long[] FindBestRects() {
+        var visit = new long[sulphurRects.Count];
+        // i don't really know when to start
+        // i guess we'll see
+        var begin = 220;
+        long requiredOriginal = required;
+        for (var i = 0; i < 10; i++) {
+            required = begin + i;
+            var slow = Slow();
+            // Test.Log($"required: {required}");
+            int slowVisited = slow.rectsVisited.Count(it => it > 0);
+            string rectsVisited = string.Join(", ", slow.rectsVisited.Select(it => it.ToString().PadLeft(2)));
+            // Test.Log(("slow\n" + rectsVisited, $"seconds: {slow.seconds}, visited: {slowVisited}"), 1);
+            long[] previous = [.. visit];
+            for (var j = 0; j < slow.rectsVisited.Length; j++) {
+                visit[j] = Math.Max(slow.rectsVisited[j], visit[j]);
+            }
+            if (!previous.SequenceEqual(visit)) {
+                string visited = string.Join(", ", visit.Select(it => it == 0 ? " _" : it.ToString().PadLeft(2)));
+                // Test.Log(($"{required}\n" + visited, slow.seconds));
+            }
+        }
+        required = requiredOriginal;
+        // Test.Step();
+        return visit;
     }
 
     void DoTest() {
@@ -267,7 +299,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
             var slow = Slow();
             long slowElapsed = stopwatch.ElapsedMilliseconds;
             stopwatch = Stopwatch.StartNew();
-            var fast = Fast();
+            var fast = Fast(new long[sulphurRects.Count]);
             long fastElapsed = stopwatch.ElapsedMilliseconds;
             Test.Log($"required [{min}-{max}): {required}, slow: {slowElapsed}, fast: {fastElapsed}");
             if (slow.seconds == fast.seconds) {
@@ -302,15 +334,16 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
                 : throw new UnreachableException();
     }
 
-    (long[] rectsVisited, long seconds) Fast() {
+    (long[] rectsVisited, long seconds) Fast(long[] best) {
         int end = endTargets.Last().X;
-        bool[] visit = [
-            .. " _,  _,  1,  _,  1,  _,  1,  1,  _,  1,  _,  _,  1,  _,  _,  _,  1,  1,  1,  1,  1,  _,  _,  _,  _,  _,  _,  _,  _,  1"
-                    .Split(", ").Select(it => it == " 1")
-        ];
-        var bestRects = sulphurRects.Select((rect, i) => (rect, i)).Where(it => visit[it.i]).ToList();
-        var mainRects = sulphurRects.Select((rect, i) => (rect, i)).Where(it => it.i is 2 or 29).ToList();
-        bestRects.RemoveAll(it => mainRects.Any(main => main.i == it.i));
+        // bool[] visit = [
+        //     .. " _,  _,  1,  _,  1,  _,  1,  1,  _,  1,  _,  _,  1,  _,  _,  _,  1,  1,  1,  1,  1,  _,  _,  _,  _,  _,  _,  _,  _,  1"
+        //             .Split(", ").Select(it => it == " 1")
+        // ];
+        const long maxCycles = 3;
+        var bestRects = sulphurRects.Select((rect, i) => (rect, i))
+                .Where(it => best[it.i] > 0 && best[it.i] < maxCycles).ToList();
+        var mainRects = sulphurRects.Select((rect, i) => (rect, i)).Where(it => best[it.i] > maxCycles).ToList();
         var mainCount = (long)Math.Ceiling(required / (double)mainRects.Select(it => it.rect.Deposits).Sum());
         long[] mainCycles = [mainCount, mainCount];
         var seconds = long.MaxValue;
@@ -318,7 +351,6 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
                 [.. mainRects.Select((tuple, i) => (tuple.rect, tuple.i, mainCycles[i]))];
         var rectsVisited = new long[sulphurRects.Count];
         Collect(end, ref rectsVisited, ref seconds, visited);
-        const long maxCycles = 3;
         long max = bestRects.Sum(it => it.rect.Deposits) / mainRects.Sum(it => it.rect.Deposits) * maxCycles;
         for (var _ = 0; _ <= max; _++) {
             mainCycles[0]--;
