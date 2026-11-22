@@ -29,11 +29,14 @@ public static class DepositRoute {
 
         int sr = -1, sc = -1;
         for (int r = 0; r < H; r++)
-            for (int c = 0; c < W; c++)
-                if (grid[r][c] == 'S') { sr = r; sc = c; }
+        for (int c = 0; c < W; c++)
+            if (grid[r][c] == 'S') {
+                sr = r;
+                sc = c;
+            }
         if (sr < 0) return -1;
 
-        int C = required + 1;                 // deposit counts 0..required
+        int C = required + 1; // deposit counts 0..required
         long total = (long)H * W * 4 * C;
         if (total > int.MaxValue) throw new InvalidOperationException("State space too large");
         int[] dist = new int[total];
