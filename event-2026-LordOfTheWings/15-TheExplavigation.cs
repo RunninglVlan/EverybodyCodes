@@ -260,18 +260,25 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
                 + string.Join(", ", sulphurCycles
                         .Select(it => it.X.max < endTargets[0].X ? " 0" : it.X.max < endTargets[1].X ? " 1" : " 2")));
         var visit = new long[sulphurCycles.Count];
-        var max = 0;
-        const int increment = 10_000;
+        var maxVisited = 0;
+        const long increment = 1_000;
+        const long begin = 2026;
         for (var i = 0; i < 10_000; i++) {
-            required = 2026 + i * increment;
+            (long min, long max) = (begin + i * increment, begin + (i + 1) * increment);
+            required = Random.Shared.NextInt64(min, max);
+            var stopwatch = Stopwatch.StartNew();
             var slow = Slow();
+            long slowElapsed = stopwatch.ElapsedMilliseconds;
+            stopwatch = Stopwatch.StartNew();
             var fast = Fast();
-            // if (slow.seconds == fast.seconds) {
-            //     continue;
-            // }
+            long fastElapsed = stopwatch.ElapsedMilliseconds;
+            Test.Log($"required [{min}-{max}): {required}, slow: {slowElapsed}, fast: {fastElapsed}");
+            if (slow.seconds == fast.seconds) {
+                continue;
+            }
             int slowVisited = slow.cyclesVisited.Count(it => it > 0);
             Test.Log(("slow\n" + string.Join(", ", slow.cyclesVisited.Select(it => it.ToString().PadLeft(2))),
-                    $"seconds: {slow.seconds}, visited: {slowVisited}, required: {required}"), 1);
+                    $"seconds: {slow.seconds}, visited: {slowVisited}"), 1);
             Test.Log($"difference: {slow.seconds - fast.seconds}");
             int fastVisited = fast.cyclesVisited.Count(it => it > 0);
             Test.Log(("fast\n" + string.Join(", ", fast.cyclesVisited.Select(it => it.ToString().PadLeft(2))),
@@ -280,12 +287,12 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
             for (var j = 0; j < slow.cyclesVisited.Length; j++) {
                 visit[j] = Math.Max(slow.cyclesVisited[j], visit[j]);
             }
-            max = Math.Max(max, slow.cyclesVisited.Count(it => it > 0));
+            maxVisited = Math.Max(maxVisited, slow.cyclesVisited.Count(it => it > 0));
             if (!previous.SequenceEqual(visit)) {
                 Test.Log((
                         $"{required}\n"
                         + string.Join(", ", visit.Select(it => it == 0 ? " _" : it.ToString().PadLeft(2))),
-                        slow.seconds, max));
+                        slow.seconds, maxVisited));
             }
             Test.Step();
         }
