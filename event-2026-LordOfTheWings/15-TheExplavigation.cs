@@ -5,7 +5,7 @@ using System.Text;
 Test.From = "Part III";
 // https://everybody.codes/event/2026/quests/15
 Test.Run((notes, part, expected) => {
-    Console.WriteLine(DepositRoute.Solve(notes.Split(Environment.NewLine)));
+    // Console.WriteLine(DepositRoute.Solve(notes.Split(Environment.NewLine)));
     Grid grid = part switch {
         1 => new FiniteDepositGrid(),
         2 => new InfiniteDepositGrid(2026),
