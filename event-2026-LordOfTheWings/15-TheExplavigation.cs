@@ -16,10 +16,10 @@ Test.Run((notes, part, expected) => {
 });
 
 abstract class Grid {
-    protected int width, height;
+    int width, height;
     protected Point start;
-    protected readonly Dictionary<Point, bool> walkableCells = [];
-    protected readonly HashSet<Point> sulphurDeposits = [];
+    readonly Dictionary<Point, bool> walkableCells = [];
+    readonly HashSet<Point> sulphurDeposits = [];
     protected readonly List<SulphurCycle> sulphurCycles = [];
     protected readonly List<Point> endTargets = [];
 
@@ -225,16 +225,14 @@ class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
     }
 }
 
-class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<InfiniteDepositGrid.MoveState> {
+class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
     readonly StateSearch<State> stateSearch;
-    readonly StateSearch<MoveState> moveStateSearch;
 
     // todo: should be readonly
     long required;
 
     public InfiniteDepositGrid(long required) {
         stateSearch = new StateSearch<State>(this);
-        moveStateSearch = new StateSearch<MoveState>(this);
         this.required = required;
     }
 
@@ -244,14 +242,8 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         if (false) {
             return Slow().seconds;
         }
-        if (false) {
-            return Backtracking();
-        }
         if (true) {
             return Fast().seconds;
-        }
-        if (false) {
-            return MoveVersion().seconds;
         }
     }
 
@@ -310,30 +302,6 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         return stateSearch.TryFindCheapest(new State(start.X, -1, new long[sulphurCycles.Count]), out var endState)
                 ? (endState.Item1.CyclesVisited, endState.cost)
                 : throw new UnreachableException();
-    }
-
-    [SuppressMessage("ReSharper", "InvertIf")]
-    long Backtracking() {
-        required = 2026;
-        return Find(start.X, 0, 0);
-
-        long Find(int x, long sulphurCollected, long seconds) {
-            // Test.Log($"{sulphurCollected}, {seconds}");
-            if (sulphurCollected >= required) {
-                return seconds + endTargets.Last().X - x;
-            }
-            foreach (var cycle in sulphurCycles) {
-                if (cycle.Min != x) {
-                    long newSeconds = seconds + Math.Abs(x - cycle.Min) + cycle.HalfSeconds();
-                    return Find(cycle.Max, sulphurCollected + cycle.Deposits.Count, newSeconds);
-                }
-                if (cycle.Max != x) {
-                    long newSeconds = seconds + Math.Abs(x - cycle.Max) + cycle.HalfSeconds();
-                    return Find(cycle.Min, sulphurCollected + cycle.Deposits.Count, newSeconds);
-                }
-            }
-            return 0;
-        }
     }
 
     (long[] cyclesVisited, long seconds) Fast() {
@@ -454,25 +422,6 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         Test.Log((fastVisited, newSeconds), 1);
     }
 
-    (MoveState, long seconds) MoveVersion() {
-        if (!moveStateSearch.TryFindCheapest(new MoveState(start, Point.RIGHT, []), out var endState)) {
-            throw new UnreachableException();
-        }
-        // Print(endState.Item1);
-        return endState;
-    }
-
-    void Print(MoveState state) {
-        var visited = state.Visited.ToHashSet();
-        for (var y = 0; y < height; y++) {
-            for (var x = 0; x < width; x++) {
-                var point = new Point(x, y);
-                Console.Write(visited.Contains(point) ? "X" : " ");
-            }
-            Console.WriteLine();
-        }
-    }
-
     [SuppressMessage("ReSharper", "InvertIf")]
     IEnumerable<(State, long)> IGame<State>.NextWithCost(State current) {
         if (current.SulphurCollected != required) {
@@ -497,29 +446,6 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
 
     bool IGame<State>.HasReachedEnd(State state) => state.X == endTargets.Last().X;
 
-    IEnumerable<(MoveState, long)> IGame<MoveState>.NextWithCost(MoveState current) {
-        var directions = new[] {
-            current.Direction, Screen.TurnLeft(current.Direction), Screen.TurnRight(current.Direction)
-        };
-        foreach (var direction in directions) {
-            var nextPoint = current.Point + direction;
-            if (nextPoint.X < 0 || nextPoint.X > width - 1 || !walkableCells[nextPoint]) {
-                continue;
-            }
-            var next = current with {
-                Point = nextPoint, Direction = direction, Visited = [.. current.Visited, nextPoint]
-            };
-            if (sulphurDeposits.Contains(nextPoint)) {
-                next.SulphurCollected++;
-            }
-            yield return (next, 1);
-        }
-    }
-
-    bool IGame<MoveState>.HasReachedEnd(MoveState state) {
-        return state.SulphurCollected >= required && state.Point == endTargets.Last();
-    }
-
     // todo: CyclesVisited is debug, remove custom equals too
     readonly record struct State(int X, int I, long[] CyclesVisited, int SulphurCollected = 0) : IState<State> {
         public State From(SulphurCycle cycle, int i, int nextX) {
@@ -531,16 +457,6 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         public bool Equals(State other) => X == other.X && I == other.I && SulphurCollected == other.SulphurCollected;
         public override int GetHashCode() => HashCode.Combine(X, I, SulphurCollected);
     }
-
-    record struct MoveState(Point Point, Point Direction, List<Point> Visited) : IState<MoveState> {
-        public int SulphurCollected { get; set; }
-
-        public bool Equals(MoveState other) => Point == other.Point
-                && Direction == other.Direction
-                && SulphurCollected == other.SulphurCollected;
-
-        public override int GetHashCode() => HashCode.Combine(Point, Direction, SulphurCollected);
-    }
 }
 
 readonly record struct Point(int X, int Y) {
@@ -551,21 +467,7 @@ readonly record struct Point(int X, int Y) {
 
     public static Point[] Directions4 { get; } = [RIGHT, LEFT, UP, DOWN];
 
-    public static char ToChar(Point direction) => direction switch {
-        _ when direction == UP => 'v',
-        _ when direction == DOWN => '^',
-        _ when direction == LEFT => '<',
-        _ when direction == RIGHT => '>',
-        _ => throw new ArgumentException($"Unsupported direction: {direction}")
-    };
-
     public static Point operator +(Point a, Point b) => new(a.X + b.X, a.Y + b.Y);
-    public static Point operator -(Point a, Point b) => new(a.X - b.X, a.Y - b.Y);
-    public static Point operator +(Point a, int value) => new(a.X + value, a.Y + value);
-    public static Point operator -(Point a, int value) => new(a.X - value, a.Y - value);
-    public static Point operator -(Point value) => new(-value.X, -value.Y);
-
-    public override string ToString() => $"({X}, {Y})";
 }
 
 static class Screen {
