@@ -310,7 +310,6 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         ];
         var bestCycles = sulphurCycles.Select((cycle, i) => (cycle, i)).Where(it => visit[it.i]).ToList();
         var mainCycles = sulphurCycles.Select((cycle, i) => (cycle, i)).Where(it => it.i is 2 or 29).ToList();
-        // mainCycles = [.. sulphurCycles.Select((cycle, i) => (cycle, i)).Where(it => it.i is 6 or 16)];
         bestCycles.RemoveAll(it => mainCycles.Any(main => main.i == it.i));
         var mainCount = (long)Math.Ceiling(required / (double)mainCycles.Select(it => it.cycle.Deposits).Sum());
         long[] mainCounts = [mainCount, mainCount];
