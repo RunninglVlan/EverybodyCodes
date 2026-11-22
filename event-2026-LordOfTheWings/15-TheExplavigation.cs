@@ -34,7 +34,8 @@ public static class DepositRoute {
         if (sr < 0) return -1;
 
         int C = required + 1;                 // deposit counts 0..required
-        int total = H * W * 4 * C;
+        long total = (long)H * W * 4 * C;
+        if (total > int.MaxValue) throw new InvalidOperationException("State space too large");
         int[] dist = new int[total];
         Array.Fill(dist, -1);
         int[] parent = new int[total];
