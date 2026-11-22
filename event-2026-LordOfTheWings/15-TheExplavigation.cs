@@ -232,7 +232,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         this.required = required;
     }
 
-    // todo: move best version inside
+    // todo: move best version inside, remove other versions
     public override long CollectSulphurAndReachEnd() {
         DoTest();
         if (false) {
