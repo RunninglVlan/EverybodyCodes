@@ -455,7 +455,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
 
     [SuppressMessage("ReSharper", "InvertIf")]
     IEnumerable<(State, long)> IGame<State>.NextWithCost(State current) {
-        if (current.SulphurCollected < required) {
+        if (current.SulphurCollected != required) {
             for (var i = 0; i < sulphurCycles.Count; i++) {
                 var cycle = sulphurCycles[i];
                 if (cycle.X.min != current.X || i != current.I) {
