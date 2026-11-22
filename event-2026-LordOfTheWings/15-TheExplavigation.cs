@@ -529,42 +529,46 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         }
         long newSeconds = 0;
         var x = 0;
-        // todo: refactor
-        (int previousX, int x, long seconds, SulphurCycle cycle, long previousCount, long count,
-                bool previousWhole, bool whole) previous = (0, 0, -1, default, -1, -1, false, false);
+        (int x, SulphurCycle cycle, long count, bool whole) previous = (0, default, -1, false);
         // var log = new StringBuilder();
         // log.AppendLine($"new, required: {required}");
         // var j = 1;
         // now i need to group cycles by zone
-        var visited = cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min);
-        foreach ((var cycle, int _, int _, long count) in visited) {
-            if (cycle.X == previous.cycle.X && Math.Abs(count - previous.count) <= 1) {
-                newSeconds -= previous.seconds;
+        var visited = cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min).ThenBy(it => it.count)
+                .Select(it => (it.value, it.count))
+                .ToArray();
+        for (var i = 0; i < visited.Length; i++) {
+            (var cycle, long count) = visited[i];
+            if (i + 1 < visited.Length && cycle.X == visited[i + 1].value.X) {
+                (var cycle2, long count2) = visited[i + 1];
+                if (count2 - count > 1) {
+                    Test.Log("unhandled");
+                    return;
+                }
                 // todo: use one condition to understand if one cycle is inside another one
-                (int cycleStart, int cycleEnd) = previous.previousX > cycle.X.max
+                (int cycleStart, int cycleEnd) = previous.x > cycle.X.max
                         ? (cycle.X.max, cycle.X.min)
                         : (cycle.X.min, cycle.X.max);
-                long cycleSeconds = Math.Abs(previous.previousX - cycleStart);
-                cycleSeconds += previous.cycle.WholeSeconds(previous.count) + cycle.WholeSeconds(count);
-                x = previous.count == count ? cycleStart : cycleEnd;
-                if (cycle.X.min < previous.previousX && previous is { previousCount: > 1, previousWhole: false }) {
-                    cycleSeconds -= previous.count == count
-                            ? 2 * Math.Abs(cycle.X.max - previous.previousX)
-                            : 2 * Math.Abs(cycle.X.min - previous.previousX);
-                    cycleSeconds += Math.Abs(cycleEnd - previous.previousX);
-                    x = previous.previousX;
+                newSeconds += Math.Abs(previous.x - cycleStart);
+                newSeconds += cycle.WholeSeconds(count) + cycle2.WholeSeconds(count2);
+                x = count == count2 ? cycleStart : cycleEnd;
+                if (cycle.X.min < previous.x && previous is { count: > 1, whole: false }) {
+                    newSeconds -= count == count2
+                            ? 2 * Math.Abs(cycle.X.max - previous.x)
+                            : 2 * Math.Abs(cycle.X.min - previous.x);
+                    newSeconds += Math.Abs(cycleEnd - previous.x);
+                    x = previous.x;
                 }
                 // log.AppendLine("  whole cycle");
-                newSeconds += cycleSeconds;
-                previous = (previous.x, x, cycleSeconds, cycle, previous.count, count, previous.whole, true);
+                previous = (x, cycle, count, true);
+                i++;
             } else {
                 (int cycleStart, int cycleEnd) = x < cycle.X.min
                         ? (cycle.X.min, cycle.X.max)
                         : (cycle.X.max, cycle.X.min);
-                long cycleSeconds = Math.Abs(x - cycleStart) + cycle.Seconds(count);
+                newSeconds += Math.Abs(x - cycleStart) + cycle.Seconds(count);
                 x = cycleEnd;
-                newSeconds += cycleSeconds;
-                previous = (previous.x, x, cycleSeconds, cycle, previous.count, count, previous.whole, false);
+                previous = (x, cycle, count, false);
             }
             // log.AppendLine($"  {j++}: seconds: {newSeconds}, x: {x}, count: {count}, {cycle}, ");
         }
