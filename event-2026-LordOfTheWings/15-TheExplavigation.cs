@@ -518,6 +518,28 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
                 long cycleSeconds = Math.Abs(previous.previousX - cycleStart);
                 cycleSeconds += previous.cycle.WholeSeconds(previous.count) + cycle.WholeSeconds(count);
                 x = previous.count == count ? cycleStart : cycleEnd;
+                // so if whole cycle is inside previous non-whole cycle
+                // hm, actually i'm ignoring if previous is whole or not whole, but ok
+                // so if whole cycle is inside previous cycle and that cycle's count is more than 1
+                // this optimization will only work, if whole counts are not equal, i think
+                // hm, let's test
+                // so without optimization: b.c = 2, s.c = 2
+                // do b.h+b.w+b.h +b.w+ b.h+b.w+b.h, end at b.max
+                // continue to s.max, do s.h+s.w+s.h + s.h+s.w+s.h, end at s.max
+                // result is: start at b.min, do 2*(b.h+b.w+b.h) +b.w, end at b.max, continue to s.max, do 2*(s.h+s.w+s.h), end at s.max
+                // 5+ 2*(6+10+6) +10+ 4+ 2*(2+2+2) = 75, end at s.max
+                // without optimization: b.c = 2, s.c = 3
+                // result is: start at b.min, do 2*(b.h+b.w+b.h) +b.w, end at b.max, continue to s.max, do 3*(s.h+s.w+s.h), end at s.min
+                // 5+ 2*(6+10+6) +10+ 4+ 3*(2+2+2) = 81, end at s.min, so to end at s.max +2 = 83
+                // with optimization: b.c = 2, s.c = 2
+                // result is: start at b.min, do b.h+b.w+b.h, end at b.max, continue to s.max, do 2*(s.h+s.w+s.h), end at s.max
+                // continue to b.min, do b.h+b.w+b.h, end at b.max
+                // 5+ 6+10+6 +4+ 2*(2+2+2) +6+ 6+10+6 = 71, end at b.max
+                // with optimization: b.c = 2, s.c = 3
+                // result is: start at b.min, do b.h+b.w+b.h, end at b.max, continue to s.max, do 3*(s.h+s.w+s.h), end at s.min
+                // continue to b.min, do b.h+b.w+b.h, end at b.max
+                // 5+ 6+10+6 +4+ 3*(2+2+2) +4+ 6+10+6 = 75, end at b.max
+                // so i found out that optimization will always work, will just provide different results
                 log.AppendLine("  whole cycle");
                 newSeconds += cycleSeconds;
                 previous = (previous.x, x, cycleSeconds, cycle, count, true);
