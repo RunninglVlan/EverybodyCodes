@@ -456,7 +456,6 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
             required = int.Parse(data.First());
             Test.Log($"required: {required}");
             Assert.ActualEqualsExpected(Fast().seconds, data.Last());
-            Test.Step();
         }
         Test.Log("ALL GOOD");
         Test.Step();
@@ -537,47 +536,37 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         // log.AppendLine($"new, required: {required}");
         // var j = 1;
         // now i need to group cycles by zone
-        Test.Log("new");
-        if (true) {
-            var visited = cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min).ThenBy(it => it.count);
-            foreach (var group in visited.GroupBy(it => it.zone)) {
-                var zoneCycles = group.Select(it => (it.value, it.count)).ToArray();
-                HandleCycles(ref newSeconds, ref x, zoneCycles);
-            }
-        }
-        if (false) {
-            var visited = cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min);
-            foreach ((var cycle, int _, int _, long count) in visited) {
-                if (cycle.X == previous.cycle.X && Math.Abs(count - previous.count) <= 1) {
-                    newSeconds -= previous.seconds;
-                    // todo: use one condition to understand if one cycle is inside another one
-                    (int cycleStart, int cycleEnd) = previous.previousX > cycle.X.max
-                            ? (cycle.X.max, cycle.X.min)
-                            : (cycle.X.min, cycle.X.max);
-                    long cycleSeconds = Math.Abs(previous.previousX - cycleStart);
-                    cycleSeconds += previous.cycle.WholeSeconds(previous.count) + cycle.WholeSeconds(count);
-                    x = previous.count == count ? cycleStart : cycleEnd;
-                    if (cycle.X.min < previous.previousX && previous is { previousCount: > 1, previousWhole: false }) {
-                        cycleSeconds -= previous.count == count
-                                ? 2 * Math.Abs(cycle.X.max - previous.previousX)
-                                : 2 * Math.Abs(cycle.X.min - previous.previousX);
-                        cycleSeconds += Math.Abs(cycleEnd - previous.previousX);
-                        x = previous.previousX;
-                    }
-                    // log.AppendLine("  whole cycle");
-                    newSeconds += cycleSeconds;
-                    previous = (previous.x, x, cycleSeconds, cycle, previous.count, count, previous.whole, true);
-                } else {
-                    (int cycleStart, int cycleEnd) = x < cycle.X.min
-                            ? (cycle.X.min, cycle.X.max)
-                            : (cycle.X.max, cycle.X.min);
-                    long cycleSeconds = Math.Abs(x - cycleStart) + cycle.Seconds(count);
-                    x = cycleEnd;
-                    newSeconds += cycleSeconds;
-                    previous = (previous.x, x, cycleSeconds, cycle, previous.count, count, previous.whole, false);
+        var visited = cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min);
+        foreach ((var cycle, int _, int _, long count) in visited) {
+            if (cycle.X == previous.cycle.X && Math.Abs(count - previous.count) <= 1) {
+                newSeconds -= previous.seconds;
+                // todo: use one condition to understand if one cycle is inside another one
+                (int cycleStart, int cycleEnd) = previous.previousX > cycle.X.max
+                        ? (cycle.X.max, cycle.X.min)
+                        : (cycle.X.min, cycle.X.max);
+                long cycleSeconds = Math.Abs(previous.previousX - cycleStart);
+                cycleSeconds += previous.cycle.WholeSeconds(previous.count) + cycle.WholeSeconds(count);
+                x = previous.count == count ? cycleStart : cycleEnd;
+                if (cycle.X.min < previous.previousX && previous is { previousCount: > 1, previousWhole: false }) {
+                    cycleSeconds -= previous.count == count
+                            ? 2 * Math.Abs(cycle.X.max - previous.previousX)
+                            : 2 * Math.Abs(cycle.X.min - previous.previousX);
+                    cycleSeconds += Math.Abs(cycleEnd - previous.previousX);
+                    x = previous.previousX;
                 }
-                // log.AppendLine($"  {j++}: seconds: {newSeconds}, x: {x}, count: {count}, {cycle}, ");
+                // log.AppendLine("  whole cycle");
+                newSeconds += cycleSeconds;
+                previous = (previous.x, x, cycleSeconds, cycle, previous.count, count, previous.whole, true);
+            } else {
+                (int cycleStart, int cycleEnd) = x < cycle.X.min
+                        ? (cycle.X.min, cycle.X.max)
+                        : (cycle.X.max, cycle.X.min);
+                long cycleSeconds = Math.Abs(x - cycleStart) + cycle.Seconds(count);
+                x = cycleEnd;
+                newSeconds += cycleSeconds;
+                previous = (previous.x, x, cycleSeconds, cycle, previous.count, count, previous.whole, false);
             }
+            // log.AppendLine($"  {j++}: seconds: {newSeconds}, x: {x}, count: {count}, {cycle}, ");
         }
         newSeconds += end - x;
         // Array.Fill(cyclesVisited, 0);
@@ -593,144 +582,6 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         seconds = Math.Min(newSeconds, seconds);
         // Test.Log(log);
         // Test.Log((fastVisited, newSeconds), 1);
-    }
-
-    static void HandleCycles(ref long newSeconds, ref int x, (SulphurCycle value, long count)[] zoneCycles) {
-        switch (zoneCycles.Length) {
-            case 0:
-                break;
-            case 1: {
-                HandleHalf(ref newSeconds, ref x, zoneCycles[0]);
-                break;
-            }
-            case 2: {
-                var (cycle1, cycle2) = (zoneCycles[0], zoneCycles[1]);
-                if (cycle1.value.X == cycle2.value.X) {
-                    HandleWhole(ref newSeconds, ref x, cycle1, cycle2);
-                } else {
-                    HandleHalves(ref newSeconds, ref x, zoneCycles);
-                }
-                break;
-            }
-            case 3: {
-                var (cycle1, cycle2, cycle3) = (zoneCycles[0], zoneCycles[1], zoneCycles[2]);
-                bool whole12 = cycle1.value.X == cycle2.value.X;
-                bool whole23 = cycle2.value.X == cycle3.value.X;
-                switch (whole12, whole23) {
-                    case (true, false):
-                        HandleWhole(ref newSeconds, ref x, cycle1, cycle2);
-                        HandleHalf(ref newSeconds, ref x, cycle3);
-                        break;
-                    case (false, true):
-                        HandleHalf(ref newSeconds, ref x, cycle1);
-                        HandleWhole(ref newSeconds, ref x, cycle2, cycle3);
-                        break;
-                    default:
-                        HandleHalves(ref newSeconds, ref x, zoneCycles);
-                        break;
-                }
-                break;
-            }
-            case 4: {
-                var (cycle1, cycle2, cycle3, cycle4) = (zoneCycles[0], zoneCycles[1], zoneCycles[2], zoneCycles[3]);
-                bool whole12 = cycle1.value.X == cycle2.value.X;
-                bool whole23 = cycle2.value.X == cycle3.value.X;
-                bool whole34 = cycle3.value.X == cycle4.value.X;
-                switch (whole12, whole23, whole34) {
-                    case (true, false, false):
-                        HandleWhole(ref newSeconds, ref x, cycle1, cycle2);
-                        HandleHalf(ref newSeconds, ref x, cycle3);
-                        HandleHalf(ref newSeconds, ref x, cycle4);
-                        break;
-                    case (true, false, true):
-                        HandleWhole(ref newSeconds, ref x, cycle1, cycle2);
-                        HandleWhole(ref newSeconds, ref x, cycle3, cycle4);
-                        break;
-                    case (false, false, true):
-                        HandleHalf(ref newSeconds, ref x, cycle1);
-                        HandleHalf(ref newSeconds, ref x, cycle2);
-                        HandleWhole(ref newSeconds, ref x, cycle3, cycle4);
-                        break;
-                    case (false, true, false):
-                        HandleHalf(ref newSeconds, ref x, cycle1);
-                        HandleWhole(ref newSeconds, ref x, cycle2, cycle3);
-                        HandleHalf(ref newSeconds, ref x, cycle4);
-                        break;
-                    default:
-                        Test.Log($"{zoneCycles.Length} unhandled");
-                        foreach (var cycle in zoneCycles) {
-                            Test.Log(cycle);
-                        }
-                        break;
-                }
-                break;
-            }
-            case 5: {
-                var (cycle1, cycle2, cycle3, cycle4, cycle5) =
-                        (zoneCycles[0], zoneCycles[1], zoneCycles[2], zoneCycles[3], zoneCycles[4]);
-                bool whole12 = cycle1.value.X == cycle2.value.X;
-                bool whole23 = cycle2.value.X == cycle3.value.X;
-                bool whole34 = cycle3.value.X == cycle4.value.X;
-                bool whole45 = cycle4.value.X == cycle5.value.X;
-                switch (whole12, whole23, whole34, whole45) {
-                    case (true, false, true, false):
-                        HandleWhole(ref newSeconds, ref x, cycle1, cycle2);
-                        HandleWhole(ref newSeconds, ref x, cycle3, cycle4);
-                        HandleHalf(ref newSeconds, ref x, cycle5);
-                        break;
-                    case (true, false, false, true):
-                        HandleWhole(ref newSeconds, ref x, cycle1, cycle2);
-                        HandleHalf(ref newSeconds, ref x, cycle3);
-                        HandleWhole(ref newSeconds, ref x, cycle4, cycle5);
-                        break;
-                    case (false, true, false, true):
-                        HandleHalf(ref newSeconds, ref x, cycle1);
-                        HandleWhole(ref newSeconds, ref x, cycle2, cycle3);
-                        HandleWhole(ref newSeconds, ref x, cycle4, cycle5);
-                        break;
-                    default:
-                        Test.Log($"{zoneCycles.Length} unhandled");
-                        foreach (var cycle in zoneCycles) {
-                            Test.Log(cycle);
-                        }
-                        break;
-                }
-                break;
-            }
-            default: {
-                Test.Log($"{zoneCycles.Length} unhandled");
-                foreach (var cycle in zoneCycles) {
-                    Test.Log(cycle);
-                }
-                break;
-            }
-        }
-    }
-
-    static void HandleHalves(ref long newSeconds, ref int x, (SulphurCycle value, long count)[] cycles) {
-        foreach (var cycle in cycles) {
-            HandleHalf(ref newSeconds, ref x, cycle);
-        }
-    }
-
-    static void HandleHalf(ref long newSeconds, ref int x, (SulphurCycle value, long count) zoneCycle) {
-        (var cycle, long count) = zoneCycle;
-        (int start, int end) = x < cycle.X.min ? (cycle.X.min, cycle.X.max) : (cycle.X.max, cycle.X.min);
-        newSeconds += Math.Abs(x - start) + cycle.Seconds(count);
-        x = end;
-    }
-
-    static void HandleWhole(ref long newSeconds, ref int x,
-            (SulphurCycle value, long count) zoneCycle1, (SulphurCycle value, long count) zoneCycle2) {
-        (var cycle1, long count1) = zoneCycle1;
-        (var cycle2, long count2) = zoneCycle2;
-        if (count2 - count1 > 1) {
-            Test.Log($"unhandled whole {count1}, {count2}");
-            return;
-        }
-        (int start, int end) = x < cycle1.X.min ? (cycle1.X.min, cycle1.X.max) : (cycle1.X.max, cycle1.X.min);
-        newSeconds += Math.Abs(x - start) + cycle1.WholeSeconds(count1) + cycle2.WholeSeconds(count2);
-        x = count1 == count2 ? start : end;
     }
 
     (MoveState, long seconds) MoveVersion() {
