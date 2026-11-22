@@ -20,7 +20,7 @@ abstract class Grid {
     protected Point start;
     readonly Dictionary<Point, bool> walkableCells = [];
     readonly HashSet<Point> sulphurDeposits = [];
-    protected readonly List<SulphurCycle> sulphurCycles = [];
+    protected readonly List<SulphurRect> sulphurRects = [];
     protected readonly List<Point> endTargets = [];
 
     public void Read(string notes) {
@@ -42,13 +42,13 @@ abstract class Grid {
                 }
             }
         }
-        FindCycles();
+        FindRects();
         FindEndTargets();
     }
 
-    void FindCycles() {
-        List<HashSet<Point>> cyclePaths = [];
-        foreach (var cell in sulphurDeposits.Where(cell => !cyclePaths.Any(it => it.Contains(cell)))) {
+    void FindRects() {
+        List<HashSet<Point>> rectPaths = [];
+        foreach (var cell in sulphurDeposits.Where(cell => !rectPaths.Any(it => it.Contains(cell)))) {
             foreach (var direction in Point.Directions4) {
                 var next = cell + direction;
                 if (!walkableCells[next]) {
@@ -58,9 +58,9 @@ abstract class Grid {
                 var path = Pathfinding<Move>.Shortest(startMove, new Move(cell), NextMove)!
                         .Select(it => it.Point)
                         .ToHashSet();
-                cyclePaths.Add(path);
-                HashSet<Point> cycleDeposits = [.. path.Where(it => sulphurDeposits.Contains(it))];
-                sulphurCycles.Add(new SulphurCycle(path, cycleDeposits));
+                rectPaths.Add(path);
+                HashSet<Point> rectDeposits = [.. path.Where(it => sulphurDeposits.Contains(it))];
+                sulphurRects.Add(new SulphurRect(path, rectDeposits));
                 break;
             }
         }
@@ -124,7 +124,7 @@ readonly record struct Move(Point Point, Point Direction = default) {
     public override int GetHashCode() => Point.GetHashCode();
 }
 
-readonly record struct SulphurCycle {
+readonly record struct SulphurRect {
     public int Deposits { get; }
     public int Min { get; }
     public int Max { get; }
@@ -132,7 +132,7 @@ readonly record struct SulphurCycle {
     public int Width { get; }
     public int Height { get; }
 
-    public SulphurCycle(HashSet<Point> path, HashSet<Point> deposits) {
+    public SulphurRect(HashSet<Point> path, HashSet<Point> deposits) {
         Deposits = deposits.Count;
         Min = path.Min(it => it.X);
         Max = path.Max(it => it.X);
@@ -141,8 +141,8 @@ readonly record struct SulphurCycle {
         Perimeter = 2 * (Height + Width);
     }
 
-    public long HalfSeconds(long count = 1) => count == 0 ? 0 : count * Perimeter - Width;
-    public long WholeSeconds(long count = 1) => count == 0 ? 0 : count * Perimeter - count * Width;
+    public long HalfSeconds(long cycles = 1) => cycles == 0 ? 0 : cycles * Perimeter - Width;
+    public long WholeSeconds(long cycles = 1) => cycles == 0 ? 0 : cycles * Perimeter - cycles * Width;
 
     public override string ToString() {
         return $"Deposits: {Deposits}, Min: {Min}, Max: {Max}, Width: {Width}, Height: {Height}";
@@ -157,18 +157,18 @@ class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
     }
 
     public override long CollectSulphurAndReachEnd() {
-        var startState = new State(start.X, new bool[sulphurCycles.Count]);
+        var startState = new State(start.X, new bool[sulphurRects.Count]);
         return stateSearch.TryFindBest(startState, out var endState)
                 ? endState.Seconds
                 : throw new UnreachableException();
     }
 
     IEnumerable<State> IGame<State>.Next(State current) {
-        var nextCycles = NextCycles(current);
-        if (nextCycles.Count > 0) {
-            foreach ((var cycle, int i) in nextCycles) {
-                yield return current.From(cycle, i, cycle.Min);
-                yield return current.From(cycle, i, cycle.Max);
+        var nextRects = NextRects(current);
+        if (nextRects.Count > 0) {
+            foreach ((var rect, int i) in nextRects) {
+                yield return current.From(rect, i, rect.Min);
+                yield return current.From(rect, i, rect.Max);
             }
         } else {
             int nextX = endTargets.Last().X;
@@ -177,45 +177,45 @@ class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
         }
     }
 
-    List<(SulphurCycle, int)> NextCycles(State state) {
-        List<(SulphurCycle, int)> cycles = [];
+    List<(SulphurRect, int)> NextRects(State state) {
+        List<(SulphurRect, int)> rects = [];
         foreach (var endTarget in endTargets) {
-            for (var i = 0; i < sulphurCycles.Count; i++) {
-                var cycle = sulphurCycles[i];
-                if (state.CyclesVisited[i] || cycle.Max > endTarget.X) {
+            for (var i = 0; i < sulphurRects.Count; i++) {
+                var rect = sulphurRects[i];
+                if (state.RectsVisited[i] || rect.Max > endTarget.X) {
                     continue;
                 }
-                cycles.Add((cycle, i));
+                rects.Add((rect, i));
             }
-            if (cycles.Count > 0) {
-                return cycles;
+            if (rects.Count > 0) {
+                return rects;
             }
         }
-        return cycles;
+        return rects;
     }
 
     bool IGame<State>.HasReachedEnd(State state) => state.X == endTargets.Last().X;
 
-    readonly record struct State(int X, bool[] CyclesVisited, int Seconds = 0) : IState<State> {
+    readonly record struct State(int X, bool[] RectsVisited, int Seconds = 0) : IState<State> {
         [SuppressMessage("ReSharper", "UseObjectOrCollectionInitializer")]
-        public State From(SulphurCycle cycle, int i, int x) {
-            int nextX = cycle.Min == x ? cycle.Max : cycle.Min;
-            int distance = Math.Abs(X - x) + cycle.Perimeter - cycle.Width;
-            var next = new State(nextX, [.. CyclesVisited], Seconds + distance);
-            next.CyclesVisited[i] = true;
+        public State From(SulphurRect rect, int i, int x) {
+            int nextX = rect.Min == x ? rect.Max : rect.Min;
+            int distance = Math.Abs(X - x) + rect.Perimeter - rect.Width;
+            var next = new State(nextX, [.. RectsVisited], Seconds + distance);
+            next.RectsVisited[i] = true;
             return next;
         }
 
         public bool IsBetterThan(State other) => Seconds < other.Seconds;
 
         public bool Equals(State other) {
-            return X == other.X && CyclesVisited.SequenceEqual(other.CyclesVisited) && Seconds == other.Seconds;
+            return X == other.X && RectsVisited.SequenceEqual(other.RectsVisited) && Seconds == other.Seconds;
         }
 
         public override int GetHashCode() {
             var hash = new HashCode();
             hash.Add(X);
-            foreach (bool item in CyclesVisited) {
+            foreach (bool item in RectsVisited) {
                 hash.Add(item);
             }
             hash.Add(Seconds);
@@ -247,15 +247,15 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
     }
 
     void DoTest() {
-        Test.Log("Deposits:\n" + string.Join(", ", sulphurCycles.Select(it => it.Deposits.ToString().PadLeft(2))));
-        Test.Log("Perimeter:\n" + string.Join(", ", sulphurCycles.Select(it => it.Perimeter.ToString().PadLeft(2))));
+        Test.Log("Deposits:\n" + string.Join(", ", sulphurRects.Select(it => it.Deposits.ToString().PadLeft(2))));
+        Test.Log("Perimeter:\n" + string.Join(", ", sulphurRects.Select(it => it.Perimeter.ToString().PadLeft(2))));
         Test.Log("gain:\n"
                 + string.Join(", ",
-                        sulphurCycles.Select(it => (it.Deposits / (float)it.Perimeter).ToString("F")[2..])));
+                        sulphurRects.Select(it => (it.Deposits / (float)it.Perimeter).ToString("F")[2..])));
         Test.Log("zone:\n"
-                + string.Join(", ", sulphurCycles
+                + string.Join(", ", sulphurRects
                         .Select(it => it.Max < endTargets[0].X ? " 0" : it.Max < endTargets[1].X ? " 1" : " 2")));
-        var visit = new long[sulphurCycles.Count];
+        var visit = new long[sulphurRects.Count];
         var maxVisited = 0;
         const long increment = 1_000;
         const long begin = 2026;
@@ -273,18 +273,18 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
             if (slow.seconds == fast.seconds) {
                 continue;
             }
-            int slowVisited = slow.cyclesVisited.Count(it => it > 0);
-            Test.Log(("slow\n" + string.Join(", ", slow.cyclesVisited.Select(it => it.ToString().PadLeft(2))),
+            int slowVisited = slow.rectsVisited.Count(it => it > 0);
+            Test.Log(("slow\n" + string.Join(", ", slow.rectsVisited.Select(it => it.ToString().PadLeft(2))),
                     $"seconds: {slow.seconds}, visited: {slowVisited}"), 1);
             Test.Log($"difference: {slow.seconds - fast.seconds}");
-            int fastVisited = fast.cyclesVisited.Count(it => it > 0);
-            Test.Log(("fast\n" + string.Join(", ", fast.cyclesVisited.Select(it => it.ToString().PadLeft(2))),
+            int fastVisited = fast.rectsVisited.Count(it => it > 0);
+            Test.Log(("fast\n" + string.Join(", ", fast.rectsVisited.Select(it => it.ToString().PadLeft(2))),
                     $"seconds: {fast.seconds}, visited: {fastVisited}"), 1);
             long[] previous = [.. visit];
-            for (var j = 0; j < slow.cyclesVisited.Length; j++) {
-                visit[j] = Math.Max(slow.cyclesVisited[j], visit[j]);
+            for (var j = 0; j < slow.rectsVisited.Length; j++) {
+                visit[j] = Math.Max(slow.rectsVisited[j], visit[j]);
             }
-            maxVisited = Math.Max(maxVisited, slow.cyclesVisited.Count(it => it > 0));
+            maxVisited = Math.Max(maxVisited, slow.rectsVisited.Count(it => it > 0));
             if (!previous.SequenceEqual(visit)) {
                 Test.Log((
                         $"{required}\n"
@@ -296,119 +296,122 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         // Test.Step();
     }
 
-    (long[] cyclesVisited, long seconds) Slow() {
-        return stateSearch.TryFindCheapest(new State(start.X, -1, new long[sulphurCycles.Count]), out var endState)
-                ? (endState.Item1.CyclesVisited, endState.cost)
+    (long[] rectsVisited, long seconds) Slow() {
+        return stateSearch.TryFindCheapest(new State(start.X, -1, new long[sulphurRects.Count]), out var endState)
+                ? (endState.Item1.RectsVisited, endState.cost)
                 : throw new UnreachableException();
     }
 
-    (long[] cyclesVisited, long seconds) Fast() {
+    (long[] rectsVisited, long seconds) Fast() {
         int end = endTargets.Last().X;
         bool[] visit = [
             .. " _,  _,  1,  _,  1,  _,  1,  1,  _,  1,  _,  _,  1,  _,  _,  _,  1,  1,  1,  1,  1,  _,  _,  _,  _,  _,  _,  _,  _,  1"
                     .Split(", ").Select(it => it == " 1")
         ];
-        var bestCycles = sulphurCycles.Select((cycle, i) => (cycle, i)).Where(it => visit[it.i]).ToList();
-        var mainCycles = sulphurCycles.Select((cycle, i) => (cycle, i)).Where(it => it.i is 2 or 29).ToList();
-        bestCycles.RemoveAll(it => mainCycles.Any(main => main.i == it.i));
-        var mainCount = (long)Math.Ceiling(required / (double)mainCycles.Select(it => it.cycle.Deposits).Sum());
-        long[] mainCounts = [mainCount, mainCount];
+        var bestRects = sulphurRects.Select((rect, i) => (rect, i)).Where(it => visit[it.i]).ToList();
+        var mainRects = sulphurRects.Select((rect, i) => (rect, i)).Where(it => it.i is 2 or 29).ToList();
+        bestRects.RemoveAll(it => mainRects.Any(main => main.i == it.i));
+        var mainCount = (long)Math.Ceiling(required / (double)mainRects.Select(it => it.rect.Deposits).Sum());
+        long[] mainCycles = [mainCount, mainCount];
         var seconds = long.MaxValue;
-        List<(SulphurCycle value, int i, long count)> visited =
-                [.. mainCycles.Select((tuple, i) => (tuple.cycle, tuple.i, mainCounts[i]))];
-        var cyclesVisited = new long[sulphurCycles.Count];
-        Collect(end, ref cyclesVisited, ref seconds, visited);
-        const long maxCount = 3;
-        long max = bestCycles.Sum(it => it.cycle.Deposits) / mainCycles.Sum(it => it.cycle.Deposits) * maxCount;
+        List<(SulphurRect value, int i, long cycles)> visited =
+                [.. mainRects.Select((tuple, i) => (tuple.rect, tuple.i, mainCycles[i]))];
+        var rectsVisited = new long[sulphurRects.Count];
+        Collect(end, ref rectsVisited, ref seconds, visited);
+        const long maxCycles = 3;
+        long max = bestRects.Sum(it => it.rect.Deposits) / mainRects.Sum(it => it.rect.Deposits) * maxCycles;
         for (var _ = 0; _ <= max; _++) {
-            mainCounts[0]--;
+            mainCycles[0]--;
             visited.Clear();
-            visited.AddRange(mainCycles.Select((tuple, i) => (tuple.cycle, tuple.i, mainCounts[i])));
+            visited.AddRange(mainRects.Select((tuple, i) => (tuple.rect, tuple.i, mainCycles[i])));
             Visit(0);
-            mainCounts[0]++;
-            mainCounts[1]--;
+            mainCycles[0]++;
+            mainCycles[1]--;
             visited.Clear();
-            visited.AddRange(mainCycles.Select((tuple, i) => (tuple.cycle, tuple.i, mainCounts[i])));
+            visited.AddRange(mainRects.Select((tuple, i) => (tuple.rect, tuple.i, mainCycles[i])));
             Visit(0);
-            mainCounts[0]--;
+            mainCycles[0]--;
             visited.Clear();
-            visited.AddRange(mainCycles.Select((tuple, i) => (tuple.cycle, tuple.i, mainCounts[i])));
+            visited.AddRange(mainRects.Select((tuple, i) => (tuple.rect, tuple.i, mainCycles[i])));
             Visit(0);
         }
-        return (cyclesVisited, seconds);
+        return (rectsVisited, seconds);
 
         void Visit(int i) {
-            if (i >= bestCycles.Count) {
-                Collect(end, ref cyclesVisited, ref seconds, visited);
+            if (i >= bestRects.Count) {
+                Collect(end, ref rectsVisited, ref seconds, visited);
                 return;
             }
-            for (var count = 0; count <= maxCount; count++) {
-                var tuple = bestCycles[i];
-                visited.Add((tuple.cycle, tuple.i, count));
+            for (var cycles = 0; cycles <= maxCycles; cycles++) {
+                var tuple = bestRects[i];
+                visited.Add((tuple.rect, tuple.i, cycles));
                 Visit(i + 1);
                 visited.RemoveAt(visited.Count - 1);
             }
         }
     }
 
-    void Collect(int end, ref long[] cyclesVisited, ref long seconds,
-            List<(SulphurCycle value, int i, long count)> cycles) {
-        long collected = cycles.Sum(it => it.value.Deposits * it.count);
+    void Collect(int end, ref long[] rectsVisited, ref long seconds,
+            List<(SulphurRect value, int i, long cycles)> rects) {
+        long collected = rects.Sum(it => it.value.Deposits * it.cycles);
         if (collected != required) {
             return;
         }
         long newSeconds = 0;
         var x = 0;
-        (SulphurCycle cycle, long count, bool whole) previous = (default, -1, false);
+        (SulphurRect rect, long cycles, bool whole) previous = (default, -1, false);
         var log = new StringBuilder();
         log.AppendLine($"new, required: {required}");
         var j = 1;
-        var visited = cycles.Where(it => it.count > 0).OrderBy(it => it.value.Min).ThenBy(it => it.count)
-                .Select(it => (it.value, it.count))
+        var visited = rects.Where(it => it.cycles > 0).OrderBy(it => it.value.Min).ThenBy(it => it.cycles)
+                .Select(it => (it.value, it.cycles))
                 .ToArray();
         for (var i = 0; i < visited.Length; i++) {
-            (var cycle, long count) = visited[i];
-            if (i + 1 < visited.Length && cycle.Min == visited[i + 1].value.Min) {
-                (var cycle2, long count2) = visited[i + 1];
-                if (count2 - count == 2) {
-                    count2--;
-                    newSeconds += cycle2.Perimeter;
+            (var rect, long cycles) = visited[i];
+            if (i + 1 < visited.Length && rect.Min == visited[i + 1].value.Min) {
+                (var rect2, long cycles2) = visited[i + 1];
+                if (cycles2 - cycles == 2) {
+                    cycles2--;
+                    newSeconds += rect2.Perimeter;
                 }
-                (int cycleStart, int cycleEnd) = x < cycle.Min ? (cycle.Min, cycle.Max) : (cycle.Max, cycle.Min);
-                newSeconds += Math.Abs(x - cycleStart) + cycle.WholeSeconds(count) + cycle2.WholeSeconds(count2);
-                if (cycle.Min < x && previous is { count: > 1, whole: false }) {
-                    newSeconds -= count == count2 ? 2 * Math.Abs(cycle.Max - x) : 2 * Math.Abs(cycle.Min - x);
-                    newSeconds += Math.Abs(cycleEnd - x);
+                (int rectStart, int rectEnd) = x < rect.Min ? (rect.Min, rect.Max) : (rect.Max, rect.Min);
+                newSeconds += Math.Abs(x - rectStart) + rect.WholeSeconds(cycles) + rect2.WholeSeconds(cycles2);
+                if (rect.Min < x && previous is { cycles: > 1, whole: false }) {
+                    newSeconds -= cycles == cycles2 ? 2 * Math.Abs(rect.Max - x) : 2 * Math.Abs(rect.Min - x);
+                    newSeconds += Math.Abs(rectEnd - x);
                 } else {
-                    x = count == count2 ? cycleStart : cycleEnd;
+                    x = cycles == cycles2 ? rectStart : rectEnd;
                 }
-                previous = (cycle2, visited[i + 1].count, true);
-                log.AppendLine("  whole cycle");
-                log.AppendLine($"  count: {count}, {cycle}");
-                log.AppendLine($"  count: {visited[i + 1].count}, {cycle2}");
+                previous = (rect2, visited[i + 1].cycles, true);
+                log.AppendLine("  whole rect");
+                log.AppendLine($"  cycles: {cycles}, {rect}");
+                log.AppendLine($"  cycles: {visited[i + 1].cycles}, {rect2}");
                 log.AppendLine($"  {j++}: seconds: {newSeconds}, x: {x}, ");
                 i++;
             } else {
-                (int cycleStart, int cycleEnd) = x < cycle.Min ? (cycle.Min, cycle.Max) : (cycle.Max, cycle.Min);
+                (int rectStart, int rectEnd) = x < rect.Min ? (rect.Min, rect.Max) : (rect.Max, rect.Min);
                 // todo: refactor
-                if (cycle.Min < x && count == 1 && previous.whole && visited[i - 1].count - visited[i - 2].count == 2) {
-                    newSeconds += 2 * cycle.Height;
+                if (rect.Min < x
+                        && cycles == 1
+                        && previous.whole
+                        && visited[i - 1].cycles - visited[i - 2].cycles == 2) {
+                    newSeconds += 2 * rect.Height;
                 } else {
-                    newSeconds += Math.Abs(x - cycleStart) + cycle.HalfSeconds(count);
-                    x = cycleEnd;
+                    newSeconds += Math.Abs(x - rectStart) + rect.HalfSeconds(cycles);
+                    x = rectEnd;
                 }
-                previous = (cycle, count, false);
-                log.AppendLine($"  {j++}: seconds: {newSeconds}, x: {x}, count: {count}, {cycle}, ");
+                previous = (rect, cycles, false);
+                log.AppendLine($"  {j++}: seconds: {newSeconds}, x: {x}, cycles: {cycles}, {rect}, ");
             }
         }
         newSeconds += end - x;
-        Array.Fill(cyclesVisited, 0);
-        foreach ((_, int i, long count) in cycles) {
-            cyclesVisited[i] = count;
+        Array.Fill(rectsVisited, 0);
+        foreach ((_, int i, long cycles) in rects) {
+            rectsVisited[i] = cycles;
         }
         const string slowVisited =
                 " 0,  0, 217,  0,  0,  0,  1,  0,  0,  1,  0,  0,  0,  0,  0,  0,  3,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0, 216";
-        string fastVisited = string.Join(", ", cyclesVisited.Select(it => it.ToString().PadLeft(2)));
+        string fastVisited = string.Join(", ", rectsVisited.Select(it => it.ToString().PadLeft(2)));
         if (newSeconds >= seconds && fastVisited != slowVisited) {
             return;
         }
@@ -420,17 +423,17 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
     [SuppressMessage("ReSharper", "InvertIf")]
     IEnumerable<(State, long)> IGame<State>.NextWithCost(State current) {
         if (current.SulphurCollected != required) {
-            for (var i = 0; i < sulphurCycles.Count; i++) {
-                var cycle = sulphurCycles[i];
-                (int xStart, int xEnd) = (cycle.Min, cycle.Max);
+            for (var i = 0; i < sulphurRects.Count; i++) {
+                var rect = sulphurRects[i];
+                (int xStart, int xEnd) = (rect.Min, rect.Max);
                 if (xStart != current.X || i != current.I) {
-                    long distance = Math.Abs(current.X - xStart) + cycle.HalfSeconds();
-                    yield return (current.From(cycle, i, xEnd), distance);
+                    long distance = Math.Abs(current.X - xStart) + rect.HalfSeconds();
+                    yield return (current.From(rect, i, xEnd), distance);
                 }
-                (xStart, xEnd) = (cycle.Max, cycle.Min);
+                (xStart, xEnd) = (rect.Max, rect.Min);
                 if (xStart != current.X || i != current.I) {
-                    long distance = Math.Abs(current.X - xStart) + cycle.HalfSeconds();
-                    yield return (current.From(cycle, i, xEnd), distance);
+                    long distance = Math.Abs(current.X - xStart) + rect.HalfSeconds();
+                    yield return (current.From(rect, i, xEnd), distance);
                 }
             }
         } else {
@@ -441,11 +444,11 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
 
     bool IGame<State>.HasReachedEnd(State state) => state.X == endTargets.Last().X;
 
-    // todo: CyclesVisited is debug, remove custom equals too
-    readonly record struct State(int X, int I, long[] CyclesVisited, int SulphurCollected = 0) : IState<State> {
-        public State From(SulphurCycle cycle, int i, int nextX) {
-            var next = new State(nextX, i, [.. CyclesVisited], SulphurCollected + cycle.Deposits);
-            next.CyclesVisited[i]++;
+    // todo: RectsVisited is debug, remove custom equals too
+    readonly record struct State(int X, int I, long[] RectsVisited, int SulphurCollected = 0) : IState<State> {
+        public State From(SulphurRect rect, int i, int nextX) {
+            var next = new State(nextX, i, [.. RectsVisited], SulphurCollected + rect.Deposits);
+            next.RectsVisited[i]++;
             return next;
         }
 
