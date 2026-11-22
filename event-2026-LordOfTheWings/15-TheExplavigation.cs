@@ -129,19 +129,21 @@ readonly record struct SulphurCycle {
     public HashSet<Point> Deposits { get; }
     public (int min, int max) X { get; }
     public int Perimeter { get; }
-    public int Width => X.max - X.min;
+    public int Width { get; }
+    int Height { get; }
 
     public SulphurCycle(HashSet<Point> path, HashSet<Point> deposits) {
         Deposits = deposits;
-        int height = path.Max(it => it.Y) - path.Min(it => it.Y);
         X = (path.Min(it => it.X), path.Max(it => it.X));
-        Perimeter = 2 * (height + Width);
+        Width = X.max - X.min;
+        Height = path.Max(it => it.Y) - path.Min(it => it.Y);
+        Perimeter = 2 * (Height + Width);
     }
 
     public long Seconds(long count = 1) => count == 0 ? 0 : count * Perimeter - Width;
     public long WholeSeconds(long count = 1) => count == 0 ? 0 : count * Perimeter - count * Width;
 
-    public override string ToString() => $"Deposits: {Deposits.Count}, X: {X}, Perimeter: {Perimeter}";
+    public override string ToString() => $"Deposits: {Deposits.Count}, X: {X}, Width: {Width}, Height: {Height}";
 }
 
 class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
