@@ -5,7 +5,6 @@ using System.Text;
 Test.From = "Part III";
 // https://everybody.codes/event/2026/quests/15
 Test.Run((notes, part, expected) => {
-    // Console.WriteLine(DepositRoute.Solve(notes.Split(Environment.NewLine)));
     Grid grid = part switch {
         1 => new FiniteDepositGrid(),
         2 => new InfiniteDepositGrid(2026),
@@ -15,120 +14,6 @@ Test.Run((notes, part, expected) => {
     long seconds = grid.CollectSulphurAndReachEnd();
     Assert.ActualEqualsExpected(seconds, expected);
 });
-
-public static class DepositRoute {
-    // Headings: 0 = up, 1 = right, 2 = down, 3 = left (clockwise order)
-    static readonly int[] DR = { -1, 0, 1, 0 };
-    static readonly int[] DC = { 0, 1, 0, -1 };
-    static readonly char[] ARROW = { '^', '>', 'v', '<' };
-
-    public static int Solve(string[] grid, int required = 12624) {
-        int H = grid.Length;
-        if (H == 0) return -1;
-        int W = grid[0].Length;
-
-        int sr = -1, sc = -1;
-        for (int r = 0; r < H; r++)
-        for (int c = 0; c < W; c++)
-            if (grid[r][c] == 'S') {
-                sr = r;
-                sc = c;
-            }
-        if (sr < 0) return -1;
-
-        int C = required + 1; // deposit counts 0..required
-        long total = (long)H * W * 4 * C;
-        if (total > int.MaxValue) throw new InvalidOperationException("State space too large");
-        int[] dist = new int[total];
-        Array.Fill(dist, -1);
-        int[] parent = new int[total];
-        Array.Fill(parent, -1);
-        byte[] moveHeading = new byte[total];
-        int[] queue = new int[total];
-        int head = 0, tail = 0;
-
-        // Start facing every direction with zero deposits.
-        for (int h = 0; h < 4; h++) {
-            int idx = ((sr * W + sc) * 4 + h) * C;
-            dist[idx] = 0;
-            queue[tail++] = idx;
-        }
-
-        int goal = -1;
-        while (head < tail) {
-            int cur = queue[head++];
-            int cnt = cur % C;
-            int rest = cur / C;
-            int h = rest % 4;
-            int cell = rest / 4;
-            int r = cell / W;
-            int c = cell % W;
-
-            if (grid[r][c] == 'E' && cnt == required) {
-                goal = cur;
-                break;
-            }
-
-            // Forward, turn left and step, turn right and step.
-            int[] nextHeadings = { h, (h + 3) % 4, (h + 1) % 4 };
-            foreach (int nh in nextHeadings) {
-                int nr = r + DR[nh];
-                int nc = c + DC[nh];
-                if (nr < 0 || nr >= H || nc < 0 || nc >= W) continue;
-                char ch = grid[nr][nc];
-                if (ch == '#') continue;
-                int ncnt = ch == '@' ? cnt + 1 : cnt;
-                if (ncnt > required) continue;
-                int ni = ((nr * W + nc) * 4 + nh) * C + ncnt;
-                if (dist[ni] != -1) continue;
-                dist[ni] = dist[cur] + 1;
-                parent[ni] = cur;
-                moveHeading[ni] = (byte)nh;
-                queue[tail++] = ni;
-            }
-        }
-
-        if (goal < 0) {
-            Console.WriteLine("No path found.");
-            return -1;
-        }
-
-        // Walk back from the goal to the start to collect the route.
-        var chain = new List<int>();
-        for (int i = goal; i != -1; i = parent[i])
-            chain.Add(i);
-        chain.Reverse();
-
-        // Draw the arrow for each step on a copy of the grid.
-        char[][] outGrid = grid.Select(l => l.ToCharArray()).ToArray();
-        for (int k = 1; k < chain.Count; k++) {
-            int idx = chain[k];
-            int from = parent[idx];
-            int fcell = (from / C) / 4;
-            int fr = fcell / W;
-            int fc = fcell % W;
-            char mark = grid[fr][fc];
-            if (mark == 'S' || mark == 'E') continue;
-            outGrid[fr][fc] = ARROW[moveHeading[idx]];
-        }
-
-        // Print the grid with arrows in red.
-        foreach (char[] row in outGrid) {
-            foreach (char ch in row) {
-                if ("^>v<".IndexOf(ch) >= 0) {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Write(ch);
-                    Console.ResetColor();
-                } else {
-                    Console.Write(ch);
-                }
-            }
-            Console.WriteLine();
-        }
-
-        return dist[goal];
-    }
-}
 
 abstract class Grid {
     protected int width, height;
@@ -355,7 +240,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
 
     // todo: move best version inside, remove other versions
     public override long CollectSulphurAndReachEnd() {
-        DoTest();
+        // DoTest();
         if (false) {
             return Slow().seconds;
         }
