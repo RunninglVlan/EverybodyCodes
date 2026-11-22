@@ -259,43 +259,37 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         Test.Log("zone:\n"
                 + string.Join(", ", sulphurCycles
                         .Select(it => it.X.max < endTargets[0].X ? " 0" : it.X.max < endTargets[1].X ? " 1" : " 2")));
-        var visit = new int[sulphurCycles.Count];
+        var visit = new long[sulphurCycles.Count];
         var max = 0;
-        const int increment = 10;
-        for (var i = 0; i < 100; i++) {
-            required = 280 + i * increment;
+        const int increment = 10_000;
+        for (var i = 0; i < 10_000; i++) {
+            required = 2026 + i * increment;
             var slow = Slow();
-            // var fast = Fast();
+            var fast = Fast();
             // if (slow.seconds == fast.seconds) {
             //     continue;
             // }
             int slowVisited = slow.cyclesVisited.Count(it => it > 0);
             Test.Log(("slow\n" + string.Join(", ", slow.cyclesVisited.Select(it => it.ToString().PadLeft(2))),
                     $"seconds: {slow.seconds}, visited: {slowVisited}, required: {required}"), 1);
-            // Test.Log($"required: {required}, difference: {slow.seconds - fast.seconds}");
-            // int fastVisited = fast.cyclesVisited.Count(it => it > 0);
-            // Test.Log(("fast\n" + string.Join(", ", fast.cyclesVisited.Select(it => it.ToString().PadLeft(2))),
-            //         $"seconds: {fast.seconds}, visited: {fastVisited}"), 1);
-            int[] previous = [.. visit];
+            Test.Log($"difference: {slow.seconds - fast.seconds}");
+            int fastVisited = fast.cyclesVisited.Count(it => it > 0);
+            Test.Log(("fast\n" + string.Join(", ", fast.cyclesVisited.Select(it => it.ToString().PadLeft(2))),
+                    $"seconds: {fast.seconds}, visited: {fastVisited}"), 1);
+            long[] previous = [.. visit];
             for (var j = 0; j < slow.cyclesVisited.Length; j++) {
-                visit[j] = slow.cyclesVisited[j] switch {
-                    > 3 => 2,
-                    > 0 => 1,
-                    _ => visit[j]
-                };
+                visit[j] = Math.Max(slow.cyclesVisited[j], visit[j]);
             }
             max = Math.Max(max, slow.cyclesVisited.Count(it => it > 0));
             if (!previous.SequenceEqual(visit)) {
-                Test.Log(($"{required}\n" + string.Join(", ", visit.Select(it => it switch {
-                            2 => " 2",
-                            1 => " 1",
-                            _ => " _"
-                        })), slow.seconds,
-                        max));
+                Test.Log((
+                        $"{required}\n"
+                        + string.Join(", ", visit.Select(it => it == 0 ? " _" : it.ToString().PadLeft(2))),
+                        slow.seconds, max));
             }
-            // Test.Step();
+            Test.Step();
         }
-        Test.Step();
+        // Test.Step();
     }
 
     (long[] cyclesVisited, long seconds) Slow() {
@@ -331,7 +325,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
     (long[] cyclesVisited, long seconds) Fast() {
         int end = endTargets.Last().X;
         bool[] visit = [
-            .. " 1,  _,  1,  _,  1,  _,  1,  1,  _,  1,  _,  _,  1,  _,  _,  _,  1,  _,  1,  1,  1,  _,  _,  _,  _,  _,  _,  _,  _,  1"
+            .. " _,  _,  1,  _,  1,  _,  1,  1,  _,  1,  _,  _,  1,  _,  _,  _,  1,  _,  1,  1,  1,  _,  _,  _,  _,  _,  _,  _,  _,  1"
                     .Split(", ").Select(it => it == " 1")
         ];
         var bestCycles = sulphurCycles.Select((cycle, i) => (cycle, i))
