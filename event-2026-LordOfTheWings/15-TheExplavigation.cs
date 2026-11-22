@@ -447,7 +447,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
     (long[] cyclesVisited, long seconds) Fast() {
         int end = endTargets.Last().X;
         bool[] visit = [
-            .. " _,  _,  1,  _,  1,  _,  1,  1,  _,  1,  _,  _,  1,  _,  _,  _,  1,  _,  1,  1,  1,  _,  _,  _,  _,  _,  _,  _,  _,  1"
+            .. " _,  _,  1,  _,  1,  _,  1,  1,  _,  1,  _,  _,  1,  _,  _,  _,  1,  1,  1,  1,  1,  _,  _,  _,  _,  _,  _,  _,  _,  1"
                     .Split(", ").Select(it => it == " 1")
         ];
         var bestCycles = sulphurCycles.Select((cycle, i) => (cycle, i)).Where(it => visit[it.i]).ToList();
