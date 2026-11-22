@@ -22,7 +22,7 @@ public static class DepositRoute {
     static readonly int[] DC = { 0, 1, 0, -1 };
     static readonly char[] ARROW = { '^', '>', 'v', '<' };
 
-    public static int Solve(string[] grid, int required = 6225) {
+    public static int Solve(string[] grid, int required = 12624) {
         int H = grid.Length;
         if (H == 0) return -1;
         int W = grid[0].Length;
@@ -380,9 +380,10 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         for (var i = 0; i < 10_000; i++) {
             (long min, long max) = (begin + i * increment, begin + (i + 1) * increment);
             required = Random.Shared.NextInt64(min, max);
-            required = 6225;
+            required = 12624;
             var stopwatch = Stopwatch.StartNew();
-            var slow = Slow();
+            // var slow = Slow();
+            (long[] cyclesVisited, long seconds) slow = (new long[sulphurCycles.Count], 0);
             long slowElapsed = stopwatch.ElapsedMilliseconds;
             stopwatch = Stopwatch.StartNew();
             var fast = Fast();
