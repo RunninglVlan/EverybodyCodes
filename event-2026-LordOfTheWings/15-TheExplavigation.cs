@@ -355,7 +355,6 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
 
     // todo: move best version inside, remove other versions
     public override long CollectSulphurAndReachEnd() {
-        DoFastTest();
         DoTest();
         if (false) {
             return Slow().seconds;
@@ -451,22 +450,6 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
             }
             return 0;
         }
-    }
-
-    void DoFastTest() {
-        string[] tests = File.ReadAllText("../FastTest.txt").Split(Environment.NewLine);
-        foreach (string test in tests) {
-            string[] data = test[1..^1].Split(", ");
-            required = int.Parse(data.First());
-            Test.Log($"required: {required}");
-            Assert.ActualEqualsExpected(Fast().seconds, data.Last());
-        }
-        Test.Log("ALL GOOD");
-        Test.Step();
-        // for (var i = 1; i <= 100; i++) {
-        //     required = i;
-        //     Test.Log((required, Fast().seconds));
-        // }
     }
 
     (long[] cyclesVisited, long seconds) Fast() {
