@@ -635,8 +635,8 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
             return Math.Abs(X - xStart) + cycle.Seconds();
         }
 
-        public bool Equals(State other) => X == other.X && SulphurCollected == other.SulphurCollected;
-        public override int GetHashCode() => HashCode.Combine(X, SulphurCollected);
+        public bool Equals(State other) => X == other.X && I == other.I && SulphurCollected == other.SulphurCollected;
+        public override int GetHashCode() => HashCode.Combine(X, I, SulphurCollected);
     }
 
     record struct MoveState(Point Point, Point Direction, List<Point> Visited) : IState<MoveState> {
