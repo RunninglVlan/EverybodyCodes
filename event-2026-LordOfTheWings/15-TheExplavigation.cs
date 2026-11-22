@@ -534,16 +534,19 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
                 } else {
                     x = count == count2 ? cycleStart : cycleEnd;
                 }
+                previous = (cycle2, visited[i + 1].count, true);
                 log.AppendLine("  whole cycle");
-                previous = (cycle, count, true);
+                log.AppendLine($"  count: {count}, {cycle}");
+                log.AppendLine($"  count: {visited[i + 1].count}, {cycle2}");
+                log.AppendLine($"  {j++}: seconds: {newSeconds}, x: {x}, ");
                 i++;
             } else {
                 (int cycleStart, int cycleEnd) = x < cycle.Min ? (cycle.Min, cycle.Max) : (cycle.Max, cycle.Min);
                 newSeconds += Math.Abs(x - cycleStart) + cycle.HalfSeconds(count);
                 x = cycleEnd;
                 previous = (cycle, count, false);
+                log.AppendLine($"  {j++}: seconds: {newSeconds}, x: {x}, count: {count}, {cycle}, ");
             }
-            log.AppendLine($"  {j++}: seconds: {newSeconds}, x: {x}, count: {count}, {cycle}, ");
         }
         newSeconds += end - x;
         Array.Fill(cyclesVisited, 0);
