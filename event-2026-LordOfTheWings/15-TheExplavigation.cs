@@ -380,7 +380,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
     void Collect(int end, ref long[] cyclesVisited, ref long seconds,
             List<(SulphurCycle value, int i, long count)> cycles) {
         long collected = cycles.Sum(it => it.value.Deposits.Count * it.count);
-        if (collected < required) {
+        if (collected != required) {
             return;
         }
         long newSeconds = 0;
