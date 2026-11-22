@@ -246,7 +246,7 @@ readonly record struct SulphurCycle {
     public int Max { get; }
     public int Perimeter { get; }
     public int Width { get; }
-    int Height { get; }
+    public int Height { get; }
 
     public SulphurCycle(HashSet<Point> path, HashSet<Point> deposits) {
         Deposits = deposits;
@@ -522,9 +522,9 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
             (var cycle, long count) = visited[i];
             if (i + 1 < visited.Length && cycle.Min == visited[i + 1].value.Min) {
                 (var cycle2, long count2) = visited[i + 1];
-                if (count2 - count > 1) {
-                    Test.Log("unhandled");
-                    return;
+                if (count2 - count == 2) {
+                    count2--;
+                    newSeconds += cycle2.Perimeter;
                 }
                 (int cycleStart, int cycleEnd) = x < cycle.Min ? (cycle.Min, cycle.Max) : (cycle.Max, cycle.Min);
                 newSeconds += Math.Abs(x - cycleStart) + cycle.WholeSeconds(count) + cycle2.WholeSeconds(count2);
@@ -542,8 +542,13 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
                 i++;
             } else {
                 (int cycleStart, int cycleEnd) = x < cycle.Min ? (cycle.Min, cycle.Max) : (cycle.Max, cycle.Min);
-                newSeconds += Math.Abs(x - cycleStart) + cycle.HalfSeconds(count);
-                x = cycleEnd;
+                // todo: refactor
+                if (cycle.Min < x && count == 1 && previous.whole && visited[i - 1].count - visited[i - 2].count == 2) {
+                    newSeconds += 2 * cycle.Height;
+                } else {
+                    newSeconds += Math.Abs(x - cycleStart) + cycle.HalfSeconds(count);
+                    x = cycleEnd;
+                }
                 previous = (cycle, count, false);
                 log.AppendLine($"  {j++}: seconds: {newSeconds}, x: {x}, count: {count}, {cycle}, ");
             }
