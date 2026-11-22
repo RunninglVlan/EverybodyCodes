@@ -125,8 +125,7 @@ readonly record struct Move(Point Point, Point Direction = default) {
 }
 
 readonly record struct SulphurCycle {
-    // todo: need only count
-    public HashSet<Point> Deposits { get; }
+    public int Deposits { get; }
     public int Min { get; }
     public int Max { get; }
     public int Perimeter { get; }
@@ -134,7 +133,7 @@ readonly record struct SulphurCycle {
     public int Height { get; }
 
     public SulphurCycle(HashSet<Point> path, HashSet<Point> deposits) {
-        Deposits = deposits;
+        Deposits = deposits.Count;
         Min = path.Min(it => it.X);
         Max = path.Max(it => it.X);
         Width = Max - Min;
@@ -146,7 +145,7 @@ readonly record struct SulphurCycle {
     public long WholeSeconds(long count = 1) => count == 0 ? 0 : count * Perimeter - count * Width;
 
     public override string ToString() {
-        return $"Deposits: {Deposits.Count}, Min: {Min}, Max: {Max}, Width: {Width}, Height: {Height}";
+        return $"Deposits: {Deposits}, Min: {Min}, Max: {Max}, Width: {Width}, Height: {Height}";
     }
 }
 
@@ -248,12 +247,11 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
     }
 
     void DoTest() {
-        Test.Log("Deposits:\n"
-                + string.Join(", ", sulphurCycles.Select(it => it.Deposits.Count.ToString().PadLeft(2))));
+        Test.Log("Deposits:\n" + string.Join(", ", sulphurCycles.Select(it => it.Deposits.ToString().PadLeft(2))));
         Test.Log("Perimeter:\n" + string.Join(", ", sulphurCycles.Select(it => it.Perimeter.ToString().PadLeft(2))));
         Test.Log("gain:\n"
                 + string.Join(", ",
-                        sulphurCycles.Select(it => (it.Deposits.Count / (float)it.Perimeter).ToString("F")[2..])));
+                        sulphurCycles.Select(it => (it.Deposits / (float)it.Perimeter).ToString("F")[2..])));
         Test.Log("zone:\n"
                 + string.Join(", ", sulphurCycles
                         .Select(it => it.Max < endTargets[0].X ? " 0" : it.Max < endTargets[1].X ? " 1" : " 2")));
@@ -314,7 +312,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         var mainCycles = sulphurCycles.Select((cycle, i) => (cycle, i)).Where(it => it.i is 2 or 29).ToList();
         // mainCycles = [.. sulphurCycles.Select((cycle, i) => (cycle, i)).Where(it => it.i is 6 or 16)];
         bestCycles.RemoveAll(it => mainCycles.Any(main => main.i == it.i));
-        var mainCount = (long)Math.Ceiling(required / (double)mainCycles.Select(it => it.cycle.Deposits.Count).Sum());
+        var mainCount = (long)Math.Ceiling(required / (double)mainCycles.Select(it => it.cycle.Deposits).Sum());
         long[] mainCounts = [mainCount, mainCount];
         var seconds = long.MaxValue;
         List<(SulphurCycle value, int i, long count)> visited =
@@ -322,9 +320,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         var cyclesVisited = new long[sulphurCycles.Count];
         Collect(end, ref cyclesVisited, ref seconds, visited);
         const long maxCount = 3;
-        long max = bestCycles.Sum(it => it.cycle.Deposits.Count)
-                / mainCycles.Sum(it => it.cycle.Deposits.Count)
-                * maxCount;
+        long max = bestCycles.Sum(it => it.cycle.Deposits) / mainCycles.Sum(it => it.cycle.Deposits) * maxCount;
         for (var _ = 0; _ <= max; _++) {
             mainCounts[0]--;
             visited.Clear();
@@ -358,7 +354,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
 
     void Collect(int end, ref long[] cyclesVisited, ref long seconds,
             List<(SulphurCycle value, int i, long count)> cycles) {
-        long collected = cycles.Sum(it => it.value.Deposits.Count * it.count);
+        long collected = cycles.Sum(it => it.value.Deposits * it.count);
         if (collected != required) {
             return;
         }
@@ -449,7 +445,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
     // todo: CyclesVisited is debug, remove custom equals too
     readonly record struct State(int X, int I, long[] CyclesVisited, int SulphurCollected = 0) : IState<State> {
         public State From(SulphurCycle cycle, int i, int nextX) {
-            var next = new State(nextX, i, [.. CyclesVisited], SulphurCollected + cycle.Deposits.Count);
+            var next = new State(nextX, i, [.. CyclesVisited], SulphurCollected + cycle.Deposits);
             next.CyclesVisited[i]++;
             return next;
         }
