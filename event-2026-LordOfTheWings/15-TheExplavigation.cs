@@ -471,15 +471,17 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
             .. " _,  _,  1,  _,  1,  _,  1,  1,  _,  1,  _,  _,  1,  _,  _,  _,  1,  1,  1,  1,  1,  _,  _,  _,  _,  _,  _,  _,  _,  1"
                     .Split(", ").Select(it => it == " 1")
         ];
-        var bestCycles = sulphurCycles.Select((cycle, i) => (cycle, i)).Where(it => visit[it.i]).ToList();
-        var mainCycles = sulphurCycles.Select((cycle, i) => (cycle, i)).Where(it => it.i is 2 or 29).ToList();
-        // mainCycles = [.. sulphurCycles.Select((cycle, i) => (cycle, i)).Where(it => it.i is 6 or 16)];
+        var bestCycles = sulphurCycles.Select((cycle, i) => (cycle, i, zone: Zone(cycle))).Where(it => visit[it.i])
+                .ToList();
+        var mainCycles = sulphurCycles.Select((cycle, i) => (cycle, i, zone: Zone(cycle))).Where(it => it.i is 2 or 29)
+                .ToList();
+        // mainCycles = [.. sulphurCycles.Select((cycle, i) => (cycle, i, zone: Zone(cycle))).Where(it => it.i is 6 or 16)];
         bestCycles.RemoveAll(it => mainCycles.Any(main => main.i == it.i));
         var mainCount = (long)Math.Ceiling(required / (double)mainCycles.Select(it => it.cycle.Deposits.Count).Sum());
         long[] mainCounts = [mainCount, mainCount];
         var seconds = long.MaxValue;
-        List<(SulphurCycle value, int i, long count)> visited =
-                [.. mainCycles.Select((tuple, i) => (tuple.cycle, tuple.i, mainCounts[i]))];
+        List<(SulphurCycle value, int i, int zone, long count)> visited =
+                [.. mainCycles.Select((tuple, i) => (tuple.cycle, tuple.i, tuple.zone, mainCounts[i]))];
         var cyclesVisited = new long[sulphurCycles.Count];
         Collect(end, ref cyclesVisited, ref seconds, visited);
         const long maxCount = 2;
@@ -489,19 +491,21 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         for (var _ = 0; _ <= max; _++) {
             mainCounts[0]--;
             visited.Clear();
-            visited.AddRange(mainCycles.Select((tuple, i) => (tuple.cycle, tuple.i, mainCounts[i])));
+            visited.AddRange(mainCycles.Select((tuple, i) => (tuple.cycle, tuple.i, tuple.zone, mainCounts[i])));
             Visit(0);
             mainCounts[0]++;
             mainCounts[1]--;
             visited.Clear();
-            visited.AddRange(mainCycles.Select((tuple, i) => (tuple.cycle, tuple.i, mainCounts[i])));
+            visited.AddRange(mainCycles.Select((tuple, i) => (tuple.cycle, tuple.i, tuple.zone, mainCounts[i])));
             Visit(0);
             mainCounts[0]--;
             visited.Clear();
-            visited.AddRange(mainCycles.Select((tuple, i) => (tuple.cycle, tuple.i, mainCounts[i])));
+            visited.AddRange(mainCycles.Select((tuple, i) => (tuple.cycle, tuple.i, tuple.zone, mainCounts[i])));
             Visit(0);
         }
         return (cyclesVisited, seconds);
+
+        int Zone(SulphurCycle cycle) => cycle.X.max < endTargets[0].X ? 0 : cycle.X.max < endTargets[1].X ? 1 : 2;
 
         void Visit(int i) {
             if (i >= bestCycles.Count) {
@@ -510,7 +514,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
             }
             for (var count = 0; count <= maxCount; count++) {
                 var tuple = bestCycles[i];
-                visited.Add((tuple.cycle, tuple.i, count));
+                visited.Add((tuple.cycle, tuple.i, tuple.zone, count));
                 Visit(i + 1);
                 visited.RemoveAt(visited.Count - 1);
             }
@@ -518,7 +522,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
     }
 
     void Collect(int end, ref long[] cyclesVisited, ref long seconds,
-            List<(SulphurCycle value, int i, long count)> cycles) {
+            List<(SulphurCycle value, int i, int zone, long count)> cycles) {
         long collected = cycles.Sum(it => it.value.Deposits.Count * it.count);
         if (collected != required) {
             return;
@@ -531,7 +535,8 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         // var log = new StringBuilder();
         // log.AppendLine($"new, required: {required}");
         // var j = 1;
-        foreach ((var cycle, int _, long count) in cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min)) {
+        var visited = cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min);
+        foreach ((var cycle, int _, int _, long count) in visited) {
             if (cycle.X == previous.cycle.X && Math.Abs(count - previous.count) <= 1) {
                 newSeconds -= previous.seconds;
                 // todo: use one condition to understand if one cycle is inside another one
@@ -570,7 +575,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         // const string slowVisited =
         //         " 0,  0, 107,  0,  1,  0,  0,  0,  0,  0,  0,  0,  2,  0,  0,  0,  2,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 106";
         // string fastVisited = string.Join(", ", cyclesVisited.Select(it => it.ToString().PadLeft(2)));
-        if (newSeconds >= seconds/* && fastVisited != slowVisited*/) {
+        if (newSeconds >= seconds /* && fastVisited != slowVisited*/) {
             return;
         }
         seconds = Math.Min(newSeconds, seconds);
