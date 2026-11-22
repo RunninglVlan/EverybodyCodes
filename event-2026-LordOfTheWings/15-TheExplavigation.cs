@@ -328,11 +328,8 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
             .. " _,  _,  1,  _,  1,  _,  1,  1,  _,  1,  _,  _,  1,  _,  _,  _,  1,  _,  1,  1,  1,  _,  _,  _,  _,  _,  _,  _,  _,  1"
                     .Split(", ").Select(it => it == " 1")
         ];
-        var bestCycles = sulphurCycles.Select((cycle, i) => (cycle, i))
-                .Where(it => visit[it.i])
-                .ToList();
-        var mainCycles = sulphurCycles.Select((cycle, i) => (cycle, i))
-                .Where(it => it.i == 2 || it.i == sulphurCycles.Count - 1).ToList();
+        var bestCycles = sulphurCycles.Select((cycle, i) => (cycle, i)).Where(it => visit[it.i]).ToList();
+        var mainCycles = sulphurCycles.Select((cycle, i) => (cycle, i)).Where(it => it.i is 2 or 29).ToList();
         // mainCycles = [.. sulphurCycles.Select((cycle, i) => (cycle, i)).Where(it => it.i is 6 or 16)];
         bestCycles.RemoveAll(it => mainCycles.Any(main => main.i == it.i));
         var mainCount = (long)Math.Ceiling(required / (double)mainCycles.Select(it => it.cycle.Deposits.Count).Sum());
