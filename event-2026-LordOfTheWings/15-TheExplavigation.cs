@@ -504,45 +504,32 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         }
         long newSeconds = 0;
         var x = 0;
-        (int previousX, int x, long seconds, SulphurCycle cycle, long count, bool whole) previous =
-                (0, 0, -1, default, -1, false);
+        // todo: refactor
+        (int previousX, int x, long seconds, SulphurCycle cycle, long previousCount, long count,
+                bool previousWhole, bool whole) previous = (0, 0, -1, default, -1, -1, false, false);
         var log = new StringBuilder();
         log.AppendLine($"new, required: {required}");
         var j = 1;
         foreach ((var cycle, int _, long count) in cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min)) {
-            if (cycle.X.max == x && Math.Abs(count - previous.count) <= 1) {
+            if (cycle.X == previous.cycle.X && Math.Abs(count - previous.count) <= 1) {
                 newSeconds -= previous.seconds;
+                // todo: use one condition to understand if one cycle is inside another one
                 (int cycleStart, int cycleEnd) = previous.previousX > cycle.X.max
                         ? (cycle.X.max, cycle.X.min)
                         : (cycle.X.min, cycle.X.max);
                 long cycleSeconds = Math.Abs(previous.previousX - cycleStart);
                 cycleSeconds += previous.cycle.WholeSeconds(previous.count) + cycle.WholeSeconds(count);
                 x = previous.count == count ? cycleStart : cycleEnd;
-                // so if whole cycle is inside previous non-whole cycle
-                // hm, actually i'm ignoring if previous is whole or not whole, but ok
-                // so if whole cycle is inside previous cycle and that cycle's count is more than 1
-                // this optimization will only work, if whole counts are not equal, i think
-                // hm, let's test
-                // so without optimization: b.c = 2, s.c = 2
-                // do b.h+b.w+b.h +b.w+ b.h+b.w+b.h, end at b.max
-                // continue to s.max, do s.h+s.w+s.h + s.h+s.w+s.h, end at s.max
-                // result is: start at b.min, do 2*(b.h+b.w+b.h) +b.w, end at b.max, continue to s.max, do 2*(s.h+s.w+s.h), end at s.max
-                // 5+ 2*(6+10+6) +10+ 4+ 2*(2+2+2) = 75, end at s.max
-                // without optimization: b.c = 2, s.c = 3
-                // result is: start at b.min, do 2*(b.h+b.w+b.h) +b.w, end at b.max, continue to s.max, do 3*(s.h+s.w+s.h), end at s.min
-                // 5+ 2*(6+10+6) +10+ 4+ 3*(2+2+2) = 81, end at s.min, so to end at s.max +2 = 83
-                // with optimization: b.c = 2, s.c = 2
-                // result is: start at b.min, do b.h+b.w+b.h, end at b.max, continue to s.max, do 2*(s.h+s.w+s.h), end at s.max
-                // continue to b.min, do b.h+b.w+b.h, end at b.max
-                // 5+ 6+10+6 +4+ 2*(2+2+2) +6+ 6+10+6 = 71, end at b.max
-                // with optimization: b.c = 2, s.c = 3
-                // result is: start at b.min, do b.h+b.w+b.h, end at b.max, continue to s.max, do 3*(s.h+s.w+s.h), end at s.min
-                // continue to b.min, do b.h+b.w+b.h, end at b.max
-                // 5+ 6+10+6 +4+ 3*(2+2+2) +4+ 6+10+6 = 75, end at b.max
-                // so i found out that optimization will always work, will just provide different results
+                if (cycle.X.min < previous.previousX && previous is { previousCount: > 1, previousWhole: false }) {
+                    cycleSeconds -= previous.count == count
+                            ? 2 * Math.Abs(cycle.X.max - previous.previousX)
+                            : 2 * Math.Abs(cycle.X.min - previous.previousX);
+                    cycleSeconds += Math.Abs(cycleEnd - previous.previousX);
+                    x = previous.previousX;
+                }
                 log.AppendLine("  whole cycle");
                 newSeconds += cycleSeconds;
-                previous = (previous.x, x, cycleSeconds, cycle, count, true);
+                previous = (previous.x, x, cycleSeconds, cycle, previous.count, count, previous.whole, true);
             } else {
                 (int cycleStart, int cycleEnd) = x < cycle.X.min
                         ? (cycle.X.min, cycle.X.max)
@@ -550,7 +537,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
                 long cycleSeconds = Math.Abs(x - cycleStart) + cycle.Seconds(count);
                 x = cycleEnd;
                 newSeconds += cycleSeconds;
-                previous = (previous.x, x, cycleSeconds, cycle, count, false);
+                previous = (previous.x, x, cycleSeconds, cycle, previous.count, count, previous.whole, false);
             }
             log.AppendLine($"  {j++}: seconds: {newSeconds}, x: {x}, count: {count}, {cycle}, ");
         }
@@ -560,7 +547,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
             cyclesVisited[i] = count;
         }
         const string slowVisited =
-                " 0,  0,  4,  0,  1,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  2,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  3";
+                " 0,  0, 107,  0,  1,  0,  0,  0,  0,  0,  0,  0,  2,  0,  0,  0,  2,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 106";
         string fastVisited = string.Join(", ", cyclesVisited.Select(it => it.ToString().PadLeft(2)));
         if (newSeconds >= seconds && fastVisited != slowVisited) {
             return;
