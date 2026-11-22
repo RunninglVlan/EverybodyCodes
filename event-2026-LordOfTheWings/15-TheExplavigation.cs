@@ -242,15 +242,17 @@ readonly record struct Move(Point Point, Point Direction = default) {
 readonly record struct SulphurCycle {
     // todo: need only count
     public HashSet<Point> Deposits { get; }
-    public (int min, int max) X { get; }
+    public int Min { get; }
+    public int Max { get; }
     public int Perimeter { get; }
     public int Width { get; }
     int Height { get; }
 
     public SulphurCycle(HashSet<Point> path, HashSet<Point> deposits) {
         Deposits = deposits;
-        X = (path.Min(it => it.X), path.Max(it => it.X));
-        Width = X.max - X.min;
+        Min = path.Min(it => it.X);
+        Max = path.Max(it => it.X);
+        Width = Max - Min;
         Height = path.Max(it => it.Y) - path.Min(it => it.Y);
         Perimeter = 2 * (Height + Width);
     }
@@ -258,7 +260,9 @@ readonly record struct SulphurCycle {
     public long Seconds(long count = 1) => count == 0 ? 0 : count * Perimeter - Width;
     public long WholeSeconds(long count = 1) => count == 0 ? 0 : count * Perimeter - count * Width;
 
-    public override string ToString() => $"Deposits: {Deposits.Count}, X: {X}, Width: {Width}, Height: {Height}";
+    public override string ToString() {
+        return $"Deposits: {Deposits.Count}, Min: {Min}, Max: {Max}, Width: {Width}, Height: {Height}";
+    }
 }
 
 class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
@@ -279,8 +283,8 @@ class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
         var nextCycles = NextCycles(current);
         if (nextCycles.Count > 0) {
             foreach ((var cycle, int i) in nextCycles) {
-                yield return current.From(cycle, i, cycle.X.min);
-                yield return current.From(cycle, i, cycle.X.max);
+                yield return current.From(cycle, i, cycle.Min);
+                yield return current.From(cycle, i, cycle.Max);
             }
         } else {
             int nextX = endTargets.Last().X;
@@ -294,7 +298,7 @@ class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
         foreach (var endTarget in endTargets) {
             for (var i = 0; i < sulphurCycles.Count; i++) {
                 var cycle = sulphurCycles[i];
-                if (state.CyclesVisited[i] || cycle.X.max > endTarget.X) {
+                if (state.CyclesVisited[i] || cycle.Max > endTarget.X) {
                     continue;
                 }
                 cycles.Add((cycle, i));
@@ -310,9 +314,9 @@ class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
 
     readonly record struct State(int X, bool[] CyclesVisited, int Seconds = 0) : IState<State> {
         [SuppressMessage("ReSharper", "UseObjectOrCollectionInitializer")]
-        public State From(SulphurCycle cycle, int i, int xStart) {
-            int nextX = cycle.X.min == xStart ? cycle.X.max : cycle.X.min;
-            int distance = Math.Abs(X - xStart) + cycle.Perimeter - cycle.Width;
+        public State From(SulphurCycle cycle, int i, int x) {
+            int nextX = cycle.Min == x ? cycle.Max : cycle.Min;
+            int distance = Math.Abs(X - x) + cycle.Perimeter - cycle.Width;
             var next = new State(nextX, [.. CyclesVisited], Seconds + distance);
             next.CyclesVisited[i] = true;
             return next;
@@ -376,7 +380,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
                         sulphurCycles.Select(it => (it.Deposits.Count / (float)it.Perimeter).ToString("F")[2..])));
         Test.Log("zone:\n"
                 + string.Join(", ", sulphurCycles
-                        .Select(it => it.X.max < endTargets[0].X ? " 0" : it.X.max < endTargets[1].X ? " 1" : " 2")));
+                        .Select(it => it.Max < endTargets[0].X ? " 0" : it.Max < endTargets[1].X ? " 1" : " 2")));
         var visit = new long[sulphurCycles.Count];
         var maxVisited = 0;
         const long increment = 1_000;
@@ -436,13 +440,13 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
                 return seconds + endTargets.Last().X - x;
             }
             foreach (var cycle in sulphurCycles) {
-                if (cycle.X.min != x) {
-                    long newSeconds = seconds + Math.Abs(x - cycle.X.min) + cycle.Seconds();
-                    return Find(cycle.X.max, sulphurCollected + cycle.Deposits.Count, newSeconds);
+                if (cycle.Min != x) {
+                    long newSeconds = seconds + Math.Abs(x - cycle.Min) + cycle.Seconds();
+                    return Find(cycle.Max, sulphurCollected + cycle.Deposits.Count, newSeconds);
                 }
-                if (cycle.X.max != x) {
-                    long newSeconds = seconds + Math.Abs(x - cycle.X.max) + cycle.Seconds();
-                    return Find(cycle.X.min, sulphurCollected + cycle.Deposits.Count, newSeconds);
+                if (cycle.Max != x) {
+                    long newSeconds = seconds + Math.Abs(x - cycle.Max) + cycle.Seconds();
+                    return Find(cycle.Min, sulphurCollected + cycle.Deposits.Count, newSeconds);
                 }
             }
             return 0;
@@ -505,7 +509,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         }
         return (cyclesVisited, seconds);
 
-        int Zone(SulphurCycle cycle) => cycle.X.max < endTargets[0].X ? 0 : cycle.X.max < endTargets[1].X ? 1 : 2;
+        int Zone(SulphurCycle cycle) => cycle.Max < endTargets[0].X ? 0 : cycle.Max < endTargets[1].X ? 1 : 2;
 
         void Visit(int i) {
             if (i >= bestCycles.Count) {
@@ -534,28 +538,28 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         // log.AppendLine($"new, required: {required}");
         // var j = 1;
         // now i need to group cycles by zone
-        var visited = cycles.Where(it => it.count > 0).OrderBy(it => it.value.X.min).ThenBy(it => it.count)
+        var visited = cycles.Where(it => it.count > 0).OrderBy(it => it.value.Min).ThenBy(it => it.count)
                 .Select(it => (it.value, it.count))
                 .ToArray();
         for (var i = 0; i < visited.Length; i++) {
             (var cycle, long count) = visited[i];
-            if (i + 1 < visited.Length && cycle.X == visited[i + 1].value.X) {
+            if (i + 1 < visited.Length && cycle.Min == visited[i + 1].value.Min) {
                 (var cycle2, long count2) = visited[i + 1];
                 if (count2 - count > 1) {
                     Test.Log("unhandled");
                     return;
                 }
                 // todo: use one condition to understand if one cycle is inside another one
-                (int cycleStart, int cycleEnd) = previous.x > cycle.X.max
-                        ? (cycle.X.max, cycle.X.min)
-                        : (cycle.X.min, cycle.X.max);
+                (int cycleStart, int cycleEnd) = previous.x > cycle.Max
+                        ? (cycle.Max, cycle.Min)
+                        : (cycle.Min, cycle.Max);
                 newSeconds += Math.Abs(previous.x - cycleStart);
                 newSeconds += cycle.WholeSeconds(count) + cycle2.WholeSeconds(count2);
                 x = count == count2 ? cycleStart : cycleEnd;
-                if (cycle.X.min < previous.x && previous is { count: > 1, whole: false }) {
+                if (cycle.Min < previous.x && previous is { count: > 1, whole: false }) {
                     newSeconds -= count == count2
-                            ? 2 * Math.Abs(cycle.X.max - previous.x)
-                            : 2 * Math.Abs(cycle.X.min - previous.x);
+                            ? 2 * Math.Abs(cycle.Max - previous.x)
+                            : 2 * Math.Abs(cycle.Min - previous.x);
                     newSeconds += Math.Abs(cycleEnd - previous.x);
                     x = previous.x;
                 }
@@ -563,9 +567,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
                 previous = (x, cycle, count, true);
                 i++;
             } else {
-                (int cycleStart, int cycleEnd) = x < cycle.X.min
-                        ? (cycle.X.min, cycle.X.max)
-                        : (cycle.X.max, cycle.X.min);
+                (int cycleStart, int cycleEnd) = x < cycle.Min ? (cycle.Min, cycle.Max) : (cycle.Max, cycle.Min);
                 newSeconds += Math.Abs(x - cycleStart) + cycle.Seconds(count);
                 x = cycleEnd;
                 previous = (x, cycle, count, false);
@@ -612,12 +614,12 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         if (current.SulphurCollected != required) {
             for (var i = 0; i < sulphurCycles.Count; i++) {
                 var cycle = sulphurCycles[i];
-                (int xStart, int xEnd) = (cycle.X.min, cycle.X.max);
+                (int xStart, int xEnd) = (cycle.Min, cycle.Max);
                 if (xStart != current.X || i != current.I) {
                     long distance = current.Distance(cycle, xStart);
                     yield return (current.From(cycle, i, xEnd), distance);
                 }
-                (xStart, xEnd) = (cycle.X.max, cycle.X.min);
+                (xStart, xEnd) = (cycle.Max, cycle.Min);
                 if (xStart != current.X || i != current.I) {
                     long distance = current.Distance(cycle, xStart);
                     yield return (current.From(cycle, i, xEnd), distance);
