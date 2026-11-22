@@ -570,13 +570,15 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         if (current.SulphurCollected != required) {
             for (var i = 0; i < sulphurCycles.Count; i++) {
                 var cycle = sulphurCycles[i];
-                if (cycle.X.min != current.X || i != current.I) {
-                    long distance = current.Distance(cycle, cycle.X.min);
-                    yield return (current.From(cycle, i, cycle.X.min), distance);
+                (int xStart, int xEnd) = (cycle.X.min, cycle.X.max);
+                if (xStart != current.X || i != current.I) {
+                    long distance = current.Distance(cycle, xStart);
+                    yield return (current.From(cycle, i, xEnd), distance);
                 }
-                if (cycle.X.max != current.X || i != current.I) {
-                    long distance = current.Distance(cycle, cycle.X.max);
-                    yield return (current.From(cycle, i, cycle.X.max), distance);
+                (xStart, xEnd) = (cycle.X.max, cycle.X.min);
+                if (xStart != current.X || i != current.I) {
+                    long distance = current.Distance(cycle, xStart);
+                    yield return (current.From(cycle, i, xEnd), distance);
                 }
             }
         } else {
@@ -612,8 +614,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
 
     // todo: CyclesVisited is debug, remove custom equals too
     readonly record struct State(int X, int I, long[] CyclesVisited, int SulphurCollected = 0) : IState<State> {
-        public State From(SulphurCycle cycle, int i, int xStart) {
-            int nextX = cycle.X.min == xStart ? cycle.X.max : cycle.X.min;
+        public State From(SulphurCycle cycle, int i, int nextX) {
             var next = new State(nextX, i, [.. CyclesVisited], SulphurCollected + cycle.Deposits.Count);
             next.CyclesVisited[i]++;
             return next;
