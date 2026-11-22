@@ -511,7 +511,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
         }
         long newSeconds = 0;
         var x = 0;
-        (int x, SulphurCycle cycle, long count, bool whole) previous = (0, default, -1, false);
+        (SulphurCycle cycle, long count, bool whole) previous = (default, -1, false);
         var log = new StringBuilder();
         log.AppendLine($"new, required: {required}");
         var j = 1;
@@ -527,24 +527,21 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State>, IGame<Infini
                     return;
                 }
                 (int cycleStart, int cycleEnd) = x < cycle.Min ? (cycle.Min, cycle.Max) : (cycle.Max, cycle.Min);
-                newSeconds += Math.Abs(previous.x - cycleStart);
-                newSeconds += cycle.WholeSeconds(count) + cycle2.WholeSeconds(count2);
-                x = count == count2 ? cycleStart : cycleEnd;
-                if (cycle.Min < previous.x && previous is { count: > 1, whole: false }) {
-                    newSeconds -= count == count2
-                            ? 2 * Math.Abs(cycle.Max - previous.x)
-                            : 2 * Math.Abs(cycle.Min - previous.x);
-                    newSeconds += Math.Abs(cycleEnd - previous.x);
-                    x = previous.x;
+                newSeconds += Math.Abs(x - cycleStart) + cycle.WholeSeconds(count) + cycle2.WholeSeconds(count2);
+                if (cycle.Min < x && previous is { count: > 1, whole: false }) {
+                    newSeconds -= count == count2 ? 2 * Math.Abs(cycle.Max - x) : 2 * Math.Abs(cycle.Min - x);
+                    newSeconds += Math.Abs(cycleEnd - x);
+                } else {
+                    x = count == count2 ? cycleStart : cycleEnd;
                 }
                 log.AppendLine("  whole cycle");
-                previous = (x, cycle, count, true);
+                previous = (cycle, count, true);
                 i++;
             } else {
                 (int cycleStart, int cycleEnd) = x < cycle.Min ? (cycle.Min, cycle.Max) : (cycle.Max, cycle.Min);
                 newSeconds += Math.Abs(x - cycleStart) + cycle.Seconds(count);
                 x = cycleEnd;
-                previous = (x, cycle, count, false);
+                previous = (cycle, count, false);
             }
             log.AppendLine($"  {j++}: seconds: {newSeconds}, x: {x}, count: {count}, {cycle}, ");
         }
