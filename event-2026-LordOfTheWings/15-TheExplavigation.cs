@@ -74,7 +74,8 @@ public static class DepositRoute {
                 if (nr < 0 || nr >= H || nc < 0 || nc >= W) continue;
                 char ch = grid[nr][nc];
                 if (ch == '#') continue;
-                int ncnt = ch == '@' ? Math.Min(cnt + 1, required) : cnt;
+                int ncnt = ch == '@' ? cnt + 1 : cnt;
+                if (ncnt > required) continue;
                 int ni = ((nr * W + nc) * 4 + nh) * C + ncnt;
                 if (dist[ni] != -1) continue;
                 dist[ni] = dist[cur] + 1;
