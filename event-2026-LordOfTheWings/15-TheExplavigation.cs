@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 
 // https://everybody.codes/event/2026/quests/15
 Test.Run((notes, part, expected) => {
@@ -226,7 +225,6 @@ class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
 class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
     readonly StateSearch<State> stateSearch;
 
-    // todo: should be readonly
     long required;
 
     public InfiniteDepositGrid(long required) {
@@ -234,122 +232,45 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         this.required = required;
     }
 
-    // todo: move best version inside, remove other versions
     public override long CollectSulphurAndReachEnd() {
-        long[] best = FindBestRects();
-        // DoTest(best);
-        if (false) {
-            var slow = Slow();
-            int slowVisited = slow.rectsVisited.Count(it => it > 0);
-            string rectsVisited = string.Join(", ", slow.rectsVisited.Select(it => it.ToString().PadLeft(2)));
-            Test.Log(("slow\n" + rectsVisited, $"seconds: {slow.seconds}, visited: {slowVisited}"), 1);
-            return slow.seconds;
-        }
-        if (true) {
-            var fast = Fast(best);
-            int fastVisited = fast.rectsVisited.Count(it => it > 0);
-            string rectsVisited = string.Join(", ", fast.rectsVisited.Select(it => it.ToString().PadLeft(2)));
-            Test.Log(("fast\n" + rectsVisited, $"seconds: {fast.seconds}, visited: {fastVisited}"), 1);
-            return fast.seconds;
-        }
+        long[] mask = FindRectMask(220, 230);
+        return Fast(mask);
     }
 
-    long[] FindBestRects() {
-        var visit = new long[sulphurRects.Count];
-        // i don't really know when to start
-        // i guess we'll see
-        var begin = 220;
+    /// Runs correct search several times to find potential rects to visit in optimized search.
+    /// Can't use it when required sulphur is too big, as it becomes too slow
+    long[] FindRectMask(int rangeMin, int rangeMax) {
+        var mask = new long[sulphurRects.Count];
         long requiredOriginal = required;
-        for (var i = 0; i < 10; i++) {
-            required = begin + i;
-            var slow = Slow();
-            // Test.Log($"required: {required}");
-            int slowVisited = slow.rectsVisited.Count(it => it > 0);
-            string rectsVisited = string.Join(", ", slow.rectsVisited.Select(it => it.ToString().PadLeft(2)));
-            // Test.Log(("slow\n" + rectsVisited, $"seconds: {slow.seconds}, visited: {slowVisited}"), 1);
-            long[] previous = [.. visit];
-            for (var j = 0; j < slow.rectsVisited.Length; j++) {
-                visit[j] = Math.Max(slow.rectsVisited[j], visit[j]);
+        for (int i = rangeMin; i < rangeMax; i++) {
+            required = i;
+            long[] rectsVisited;
+            var startState = new State(start.X, -1, new long[sulphurRects.Count]);
+            if (stateSearch.TryFindCheapest(startState, out var endState)) {
+                rectsVisited = endState.value.RectsVisited;
+            } else {
+                throw new UnreachableException();
             }
-            if (!previous.SequenceEqual(visit)) {
-                string visited = string.Join(", ", visit.Select(it => it == 0 ? " _" : it.ToString().PadLeft(2)));
-                // Test.Log(($"{required}\n" + visited, slow.seconds));
+            for (var j = 0; j < rectsVisited.Length; j++) {
+                mask[j] = Math.Max(rectsVisited[j], mask[j]);
             }
         }
         required = requiredOriginal;
-        // Test.Step();
-        return visit;
+        return mask;
     }
 
-    void DoTest(long[] best) {
-        Test.Log("Deposits:\n" + string.Join(", ", sulphurRects.Select(it => it.Deposits.ToString().PadLeft(2))));
-        Test.Log("Perimeter:\n" + string.Join(", ", sulphurRects.Select(it => it.Perimeter.ToString().PadLeft(2))));
-        Test.Log("gain:\n"
-                + string.Join(", ",
-                        sulphurRects.Select(it => (it.Deposits / (float)it.Perimeter).ToString("F")[2..])));
-        Test.Log("zone:\n"
-                + string.Join(", ", sulphurRects
-                        .Select(it => it.Max < endTargets[0].X ? " 0" : it.Max < endTargets[1].X ? " 1" : " 2")));
-        var visit = new long[sulphurRects.Count];
-        var maxVisited = 0;
-        const long increment = 1_00;
-        const long begin = 220;
-        for (var i = 0; i < 10_000; i++) {
-            (long min, long max) = (begin + i * increment, begin + (i + 1) * increment);
-            required = Random.Shared.NextInt64(min, max);
-            // required = 12624;
-            var stopwatch = Stopwatch.StartNew();
-            var slow = Slow();
-            long slowElapsed = stopwatch.ElapsedMilliseconds;
-            stopwatch = Stopwatch.StartNew();
-            var fast = Fast(best);
-            long fastElapsed = stopwatch.ElapsedMilliseconds;
-            Test.Log($"required [{min}-{max}): {required}, slow: {slowElapsed}, fast: {fastElapsed}");
-            if (slow.seconds == fast.seconds) {
-                continue;
-            }
-            int slowVisited = slow.rectsVisited.Count(it => it > 0);
-            Test.Log(("slow\n" + string.Join(", ", slow.rectsVisited.Select(it => it.ToString().PadLeft(2))),
-                    $"seconds: {slow.seconds}, visited: {slowVisited}"), 1);
-            Test.Log($"difference: {slow.seconds - fast.seconds}");
-            int fastVisited = fast.rectsVisited.Count(it => it > 0);
-            Test.Log(("fast\n" + string.Join(", ", fast.rectsVisited.Select(it => it.ToString().PadLeft(2))),
-                    $"seconds: {fast.seconds}, visited: {fastVisited}"), 1);
-            long[] previous = [.. visit];
-            for (var j = 0; j < slow.rectsVisited.Length; j++) {
-                visit[j] = Math.Max(slow.rectsVisited[j], visit[j]);
-            }
-            maxVisited = Math.Max(maxVisited, slow.rectsVisited.Count(it => it > 0));
-            if (!previous.SequenceEqual(visit)) {
-                Test.Log((
-                        $"{required}\n"
-                        + string.Join(", ", visit.Select(it => it == 0 ? " _" : it.ToString().PadLeft(2))),
-                        slow.seconds, maxVisited));
-            }
-            Test.Step();
-        }
-        // Test.Step();
-    }
-
-    (long[] rectsVisited, long seconds) Slow() {
-        return stateSearch.TryFindCheapest(new State(start.X, -1, new long[sulphurRects.Count]), out var endState)
-                ? (endState.Item1.RectsVisited, endState.cost)
-                : throw new UnreachableException();
-    }
-
-    (long[] rectsVisited, long seconds) Fast(long[] best) {
-        int end = endTargets.Last().X;
+    long Fast(long[] visit) {
         const long maxCycles = 3;
+        int end = endTargets.Last().X;
         var bestRects = sulphurRects.Select((rect, i) => (rect, i))
-                .Where(it => best[it.i] > 0 && best[it.i] < maxCycles).ToList();
-        var mainRects = sulphurRects.Select((rect, i) => (rect, i)).Where(it => best[it.i] > maxCycles).ToList();
+                .Where(it => visit[it.i] > 0 && visit[it.i] < maxCycles).ToList();
+        var mainRects = sulphurRects.Select((rect, i) => (rect, i)).Where(it => visit[it.i] > maxCycles).ToList();
         var mainCount = (long)Math.Ceiling(required / (double)mainRects.Select(it => it.rect.Deposits).Sum());
         long[] mainCycles = [mainCount, mainCount];
         var seconds = long.MaxValue;
         List<(SulphurRect value, int i, long cycles)> visited =
                 [.. mainRects.Select((tuple, i) => (tuple.rect, tuple.i, mainCycles[i]))];
-        var rectsVisited = new long[sulphurRects.Count];
-        Collect(end, ref rectsVisited, ref seconds, visited);
+        Collect(end, ref seconds, visited);
         long max = bestRects.Sum(it => it.rect.Deposits) / mainRects.Sum(it => it.rect.Deposits) * maxCycles;
         for (var _ = 0; _ <= max; _++) {
             mainCycles[0]--;
@@ -366,11 +287,11 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
             visited.AddRange(mainRects.Select((tuple, i) => (tuple.rect, tuple.i, mainCycles[i])));
             Visit(0);
         }
-        return (rectsVisited, seconds);
+        return seconds;
 
         void Visit(int i) {
             if (i >= bestRects.Count) {
-                Collect(end, ref rectsVisited, ref seconds, visited);
+                Collect(end, ref seconds, visited);
                 return;
             }
             for (var cycles = 0; cycles <= maxCycles; cycles++) {
@@ -382,8 +303,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         }
     }
 
-    void Collect(int end, ref long[] rectsVisited, ref long seconds,
-            List<(SulphurRect value, int i, long cycles)> rects) {
+    void Collect(int end, ref long seconds, List<(SulphurRect value, int i, long cycles)> rects) {
         long collected = rects.Sum(it => it.value.Deposits * it.cycles);
         if (collected != required) {
             return;
@@ -391,9 +311,6 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         long newSeconds = 0;
         var x = 0;
         (SulphurRect rect, long cycles, bool whole) previous = (default, -1, false);
-        var log = new StringBuilder();
-        log.AppendLine($"new, required: {required}");
-        var j = 1;
         var visited = rects.Where(it => it.cycles > 0).OrderBy(it => it.value.Min).ThenBy(it => it.cycles)
                 .Select(it => (it.value, it.cycles))
                 .ToArray();
@@ -414,10 +331,6 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
                     x = cycles == cycles2 ? rectStart : rectEnd;
                 }
                 previous = (rect2, visited[i + 1].cycles, true);
-                log.AppendLine("  whole rect");
-                log.AppendLine($"  cycles: {cycles}, {rect}");
-                log.AppendLine($"  cycles: {visited[i + 1].cycles}, {rect2}");
-                log.AppendLine($"  {j++}: seconds: {newSeconds}, x: {x}, ");
                 i++;
             } else {
                 (int rectStart, int rectEnd) = x < rect.Min ? (rect.Min, rect.Max) : (rect.Max, rect.Min);
@@ -438,23 +351,10 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
                     x = rectEnd;
                 }
                 previous = (rect, cycles, false);
-                log.AppendLine($"  {j++}: seconds: {newSeconds}, x: {x}, cycles: {cycles}, {rect}, ");
             }
         }
         newSeconds += end - x;
-        Array.Fill(rectsVisited, 0);
-        foreach ((_, int i, long cycles) in rects) {
-            rectsVisited[i] = cycles;
-        }
-        const string slowVisited =
-                " 2,  1,  0,  0,  0,  0, 2007,  0,  0,  0,  0,  0,  0,  1,  0";
-        string fastVisited = string.Join(", ", rectsVisited.Select(it => it.ToString().PadLeft(2)));
-        if (newSeconds >= seconds && fastVisited != slowVisited) {
-            return;
-        }
         seconds = Math.Min(newSeconds, seconds);
-        Test.Log(log);
-        Test.Log((fastVisited, newSeconds), 1);
     }
 
     IEnumerable<(State, long)> IGame<State>.NextWithCost(State current) {
@@ -579,7 +479,7 @@ class StateSearch<T>(IGame<T> game, int depthMax = 100) where T : IState<T>, IEq
     }
 
     /// Dijkstra
-    public bool TryFindCheapest(T start, out (T, long cost) end) {
+    public bool TryFindCheapest(T start, out (T value, long cost) end) {
         end = default!;
         PriorityQueue<T, long> queue = new();
         Dictionary<T, long> visited = [];
