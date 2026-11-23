@@ -233,7 +233,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
     }
 
     public override long CollectSulphurAndReachEnd() {
-        long[] mask = FindRectMask(220, 230);
+        long[] mask = FindRectMask(220, 224);
         return Fast(mask);
     }
 
