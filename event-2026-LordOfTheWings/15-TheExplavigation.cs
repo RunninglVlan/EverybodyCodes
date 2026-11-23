@@ -157,7 +157,7 @@ class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
 
     public override long CollectSulphurAndReachEnd() {
         var startState = new State(start.X, new bool[sulphurRects.Count]);
-        return stateSearch.TryFindBest(startState, out var endState)
+        return stateSearch.TryFind(startState, out var endState)
                 ? endState.Seconds
                 : throw new UnreachableException();
     }
@@ -203,7 +203,7 @@ class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
         return rects;
     }
 
-    bool IGame<State>.HasReachedEnd(State state) => state.X == End.X;
+    bool IGoal<State>.HasReachedEnd(State state) => state.X == End.X;
 
     readonly record struct State(int X, bool[] RectsVisited, int Seconds = 0) : IState<State> {
         public bool IsBetterThan(State other) => Seconds < other.Seconds;
@@ -224,13 +224,13 @@ class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
     }
 }
 
-class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
-    readonly StateSearch<State> stateSearch;
+class InfiniteDepositGrid : Grid, IGameWithCost<InfiniteDepositGrid.State> {
+    readonly StateSearchWithCost<State> stateSearch;
 
     long required;
 
     public InfiniteDepositGrid(long required) {
-        stateSearch = new StateSearch<State>(this);
+        stateSearch = new StateSearchWithCost<State>(this);
         this.required = required;
     }
 
@@ -282,7 +282,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
             required = i;
             long[] rectsVisited;
             var startState = new State(start.X, -1, new long[sulphurRects.Count]);
-            if (stateSearch.TryFindCheapest(startState, out var endState)) {
+            if (stateSearch.TryFind(startState, out var endState)) {
                 rectsVisited = endState.value.RectsVisited;
             } else {
                 throw new UnreachableException();
@@ -348,7 +348,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         }
     }
 
-    IEnumerable<(State, long)> IGame<State>.NextWithCost(State current) {
+    IEnumerable<(State, long)> IGameWithCost<State>.NextWithCost(State current) {
         if (current.SulphurCollected != required) {
             for (var i = 0; i < sulphurRects.Count; i++) {
                 var rect = sulphurRects[i];
@@ -376,9 +376,9 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         }
     }
 
-    bool IGame<State>.HasReachedEnd(State state) => state.X == End.X;
+    bool IGoal<State>.HasReachedEnd(State state) => state.X == End.X;
 
-    readonly record struct State(int X, int I, long[] RectsVisited, int SulphurCollected = 0) : IState<State> {
+    readonly record struct State(int X, int I, long[] RectsVisited, int SulphurCollected = 0) {
         public bool Equals(State other) => X == other.X && I == other.I && SulphurCollected == other.SulphurCollected;
         public override int GetHashCode() => HashCode.Combine(X, I, SulphurCollected);
     }
@@ -437,14 +437,17 @@ static class Pathfinding<T> where T : IEquatable<T> {
 }
 
 class StateSearch<T>(IGame<T> game, int depthMax = 100) where T : IState<T>, IEquatable<T> {
+    readonly HashSet<T> visited = [];
+
     /// DFS/Backtracking
-    public bool TryFindBest(T start, out T end) {
-        HashSet<T> visited = [start];
-        return TryFindBest(start, visited, 0, out end);
+    public bool TryFind(T start, out T end) {
+        visited.Clear();
+        visited.Add(start);
+        return TryFind(start, 0, out end);
     }
 
     [SuppressMessage("ReSharper", "InvertIf")]
-    bool TryFindBest(T current, HashSet<T> visited, int depth, out T end) {
+    bool TryFind(T current, int depth, out T end) {
         end = default!;
         if (game.HasReachedEnd(current)) {
             end = current;
@@ -458,7 +461,7 @@ class StateSearch<T>(IGame<T> game, int depthMax = 100) where T : IState<T>, IEq
             if (!visited.Add(next)) {
                 continue;
             }
-            if (!TryFindBest(next, visited, depth + 1, out var nextBest)) {
+            if (!TryFind(next, depth + 1, out var nextBest)) {
                 continue;
             }
             if (!found || nextBest.IsBetterThan(end)) {
@@ -468,13 +471,18 @@ class StateSearch<T>(IGame<T> game, int depthMax = 100) where T : IState<T>, IEq
         }
         return found;
     }
+}
+
+class StateSearchWithCost<T>(IGameWithCost<T> game) where T : IEquatable<T> {
+    readonly PriorityQueue<T, long> queue = new();
+    readonly Dictionary<T, long> visited = [];
 
     /// Dijkstra
-    public bool TryFindCheapest(T start, out (T value, long cost) end) {
+    public bool TryFind(T start, out (T value, long cost) end) {
         end = default!;
-        PriorityQueue<T, long> queue = new();
-        Dictionary<T, long> visited = [];
+        queue.Clear();
         queue.Enqueue(start, 0);
+        visited.Clear();
         visited.Add(start, 0);
         while (queue.TryDequeue(out var current, out long currentCost)) {
             if (game.HasReachedEnd(current)) {
@@ -494,22 +502,20 @@ class StateSearch<T>(IGame<T> game, int depthMax = 100) where T : IState<T>, IEq
     }
 }
 
-interface IGame<TState> {
-    IEnumerable<TState> Next(TState current) {
-        throw new NotSupportedException("Implement Next");
-    }
-
-    IEnumerable<(TState, long)> NextWithCost(TState current) {
-        throw new NotSupportedException("Implement NextWithCost");
-    }
-
+interface IGoal<in TState> {
     bool HasReachedEnd(TState state);
 }
 
+interface IGame<TState> : IGoal<TState> {
+    IEnumerable<TState> Next(TState current);
+}
+
+interface IGameWithCost<TState> : IGoal<TState> {
+    IEnumerable<(TState, long cost)> NextWithCost(TState current);
+}
+
 interface IState<in T> where T : IState<T> {
-    bool IsBetterThan(T other) {
-        throw new NotSupportedException("Implement IsBetterThan");
-    }
+    bool IsBetterThan(T other);
 }
 
 static class Test {
