@@ -277,18 +277,16 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
             visited.Clear();
             visited.AddRange(bestRects.Select((tuple, i) => (tuple.rect, tuple.i, bestCycles[i])));
             Visit(0);
-            bestCycles[0]++;
             bestCycles[1]--;
-            visited.Clear();
-            visited.AddRange(bestRects.Select((tuple, i) => (tuple.rect, tuple.i, bestCycles[i])));
-            Visit(0);
-            bestCycles[0]--;
         }
         return seconds;
 
         void Visit(int i) {
+            long collected = visited.Sum(it => it.value.Deposits * it.cycles);
+            if (collected > required) {
+                return;
+            }
             if (i >= rectsToVisit.Count) {
-                long collected = visited.Sum(it => it.value.Deposits * it.cycles);
                 if (collected == required) {
                     seconds = Math.Min(Seconds(visited), seconds);
                 }
