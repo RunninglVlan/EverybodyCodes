@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-Test.From = "Part III";
+Test.From = "Part III Example";
 // https://everybody.codes/event/2026/quests/15
 Test.Run((notes, part, expected) => {
     Grid grid = part switch {
