@@ -233,8 +233,45 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
     }
 
     public override long CollectSulphurAndReachEnd() {
+        const long maxCycles = 3;
         long[] mask = FindRectMask(220, 224);
-        return Fast(mask);
+        var visit = sulphurRects.Select((rect, i) => (rect, i))
+                .Where(it => mask[it.i] > 0 && mask[it.i] < maxCycles).ToList();
+        var best = sulphurRects.Select((rect, i) => (rect, i)).Where(it => mask[it.i] > maxCycles).ToList();
+        var bestCount = (long)Math.Ceiling(required / (double)best.Sum(it => it.rect.Deposits));
+        long[] bestCycles = [.. best.Select(_ => bestCount)];
+        var seconds = long.MaxValue;
+        List<(SulphurRect value, long cycles)> visited = [];
+        long max = visit.Sum(it => it.rect.Deposits) / best.Sum(it => it.rect.Deposits) * maxCycles;
+        for (var _ = 0; _ <= max; _++) {
+            for (var j = 0; j < best.Count; j++) {
+                visited.Clear();
+                visited.AddRange(best.Select((tuple, i) => (tuple.rect, bestCycles[i])));
+                Visit(0);
+                bestCycles[j]--;
+            }
+        }
+        return seconds;
+
+        // Backtracking
+        void Visit(int i) {
+            long collected = visited.Sum(it => it.value.Deposits * it.cycles);
+            if (collected > required) {
+                return;
+            }
+            if (i >= visit.Count) {
+                if (collected == required) {
+                    seconds = Math.Min(VisitRects(visited), seconds);
+                }
+                return;
+            }
+            var tuple = visit[i];
+            for (var cycles = 0; cycles <= maxCycles; cycles++) {
+                visited.Add((tuple.rect, cycles));
+                Visit(i + 1);
+                visited.RemoveAt(visited.Count - 1);
+            }
+        }
     }
 
     /// Runs correct search several times to find potential rects to visit in optimized search.
@@ -259,49 +296,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         return mask;
     }
 
-    long Fast(long[] visit) {
-        const long maxCycles = 3;
-        var rectsToVisit = sulphurRects.Select((rect, i) => (rect, i))
-                .Where(it => visit[it.i] > 0 && visit[it.i] < maxCycles).ToList();
-        var bestRects = sulphurRects.Select((rect, i) => (rect, i)).Where(it => visit[it.i] > maxCycles).ToList();
-        var bestCount = (long)Math.Ceiling(required / (double)bestRects.Sum(it => it.rect.Deposits));
-        long[] bestCycles = [bestCount, bestCount];
-        var seconds = long.MaxValue;
-        List<(SulphurRect value, int i, long cycles)> visited = [];
-        long max = rectsToVisit.Sum(it => it.rect.Deposits) / bestRects.Sum(it => it.rect.Deposits) * maxCycles;
-        for (var _ = 0; _ <= max; _++) {
-            visited.Clear();
-            visited.AddRange(bestRects.Select((tuple, i) => (tuple.rect, tuple.i, bestCycles[i])));
-            Visit(0);
-            bestCycles[0]--;
-            visited.Clear();
-            visited.AddRange(bestRects.Select((tuple, i) => (tuple.rect, tuple.i, bestCycles[i])));
-            Visit(0);
-            bestCycles[1]--;
-        }
-        return seconds;
-
-        void Visit(int i) {
-            long collected = visited.Sum(it => it.value.Deposits * it.cycles);
-            if (collected > required) {
-                return;
-            }
-            if (i >= rectsToVisit.Count) {
-                if (collected == required) {
-                    seconds = Math.Min(Seconds(visited), seconds);
-                }
-                return;
-            }
-            for (var cycles = 0; cycles <= maxCycles; cycles++) {
-                var tuple = rectsToVisit[i];
-                visited.Add((tuple.rect, tuple.i, cycles));
-                Visit(i + 1);
-                visited.RemoveAt(visited.Count - 1);
-            }
-        }
-    }
-
-    long Seconds(List<(SulphurRect value, int i, long cycles)> rects) {
+    long VisitRects(List<(SulphurRect value, long cycles)> rects) {
         long seconds = 0;
         var x = 0;
         (SulphurRect rect, long cycles, bool whole) previous = (default, -1, false);
