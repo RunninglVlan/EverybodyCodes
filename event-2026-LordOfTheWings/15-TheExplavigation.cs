@@ -255,11 +255,8 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
 
         // Backtracking
         void Visit(int i) {
-            long collected = visited.Sum(it => it.value.Deposits * it.cycles);
-            if (collected > required) {
-                return;
-            }
             if (i >= visit.Count) {
+                long collected = visited.Sum(it => it.value.Deposits * it.cycles);
                 if (collected == required) {
                     seconds = Math.Min(VisitRects(visited), seconds);
                 }
