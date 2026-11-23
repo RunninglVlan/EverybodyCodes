@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-Test.From = "Part III Example";
 // https://everybody.codes/event/2026/quests/15
 Test.Run((notes, part, expected) => {
     Grid grid = part switch {
@@ -238,7 +237,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
     // todo: move best version inside, remove other versions
     public override long CollectSulphurAndReachEnd() {
         long[] best = FindBestRects();
-        // DoTest();
+        // DoTest(best);
         if (false) {
             var slow = Slow();
             int slowVisited = slow.rectsVisited.Count(it => it > 0);
@@ -282,7 +281,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         return visit;
     }
 
-    void DoTest() {
+    void DoTest(long[] best) {
         Test.Log("Deposits:\n" + string.Join(", ", sulphurRects.Select(it => it.Deposits.ToString().PadLeft(2))));
         Test.Log("Perimeter:\n" + string.Join(", ", sulphurRects.Select(it => it.Perimeter.ToString().PadLeft(2))));
         Test.Log("gain:\n"
@@ -293,17 +292,17 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
                         .Select(it => it.Max < endTargets[0].X ? " 0" : it.Max < endTargets[1].X ? " 1" : " 2")));
         var visit = new long[sulphurRects.Count];
         var maxVisited = 0;
-        const long increment = 1_000;
-        const long begin = 2026;
+        const long increment = 1_00;
+        const long begin = 220;
         for (var i = 0; i < 10_000; i++) {
             (long min, long max) = (begin + i * increment, begin + (i + 1) * increment);
             required = Random.Shared.NextInt64(min, max);
-            required = 12624;
+            // required = 12624;
             var stopwatch = Stopwatch.StartNew();
             var slow = Slow();
             long slowElapsed = stopwatch.ElapsedMilliseconds;
             stopwatch = Stopwatch.StartNew();
-            var fast = Fast(new long[sulphurRects.Count]);
+            var fast = Fast(best);
             long fastElapsed = stopwatch.ElapsedMilliseconds;
             Test.Log($"required [{min}-{max}): {required}, slow: {slowElapsed}, fast: {fastElapsed}");
             if (slow.seconds == fast.seconds) {
