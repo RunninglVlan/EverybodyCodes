@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text;
 
 static class Test {
     const string CASE_FILE = "../Test.Cases.txt";
@@ -12,6 +13,7 @@ static class Test {
     public static string? ExpectedSeparator { get; set; }
 
     public static void Run(Action<string, int, string> action) {
+        Console.OutputEncoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
         File.WriteAllText(LOG_FILE, null);
         string cases = ReadCases();
         Console.SetIn(new StringReader(cases));
