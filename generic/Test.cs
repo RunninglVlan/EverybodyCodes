@@ -3,6 +3,7 @@
 static class Test {
     const string CASE_FILE = "../Test.Cases.txt";
     const string LOG_FILE = "../Test.Log.txt";
+    const int TAB_LENGTH = 2;
 
     public static bool StepEnabled { get; set; } = true;
     public static string? From { get; set; }
@@ -77,11 +78,12 @@ static class Test {
         Console.ReadKey();
     }
 
-    public static void Log(object? line = null, bool console = true, ConsoleColor? color = null) {
+    public static void Log(object? line = null, int tab = 0, bool console = true, ConsoleColor? color = null) {
         if (!LogEnabled) {
             return;
         }
-        LogInternal(line, console, color ?? ConsoleColor.Red);
+        var padding = new string(' ', tab * TAB_LENGTH);
+        LogInternal($"{padding}{line}", console, color ?? ConsoleColor.Red);
     }
 
     static void LogInternal(object? line = null, bool console = false, ConsoleColor? color = null) {

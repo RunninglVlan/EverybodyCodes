@@ -47,6 +47,7 @@ static class Screen {
         return direction != default;
     }
 
+    public static Point TurnLeft(Point direction) => new(direction.Y, -direction.X);
     public static Point TurnRight(Point direction) => new(-direction.Y, direction.X);
 }
 
