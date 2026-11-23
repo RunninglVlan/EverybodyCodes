@@ -432,6 +432,12 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
                         && previous.whole
                         && visited[i - 1].cycles - visited[i - 2].cycles == 2) {
                     newSeconds += 2 * rect.Height;
+                } else if (i - 1 >= 0
+                        && rect.Min < visited[i - 1].value.Max
+                        && previous is { whole: false, cycles: > 1 }) {
+                    newSeconds += Math.Abs(x - rect.Min) + rect.HalfSeconds(cycles);
+                    newSeconds -= 2 * Math.Abs(rect.Min - x);
+                    x = rect.Max;
                 } else {
                     newSeconds += Math.Abs(x - rectStart) + rect.HalfSeconds(cycles);
                     x = rectEnd;
