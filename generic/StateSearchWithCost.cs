@@ -27,10 +27,6 @@
     }
 }
 
-interface IGoal<in TState> {
-    bool HasReachedEnd(TState state);
-}
-
 interface IGameWithCost<TState> : IGoal<TState> {
     IEnumerable<(TState, long cost)> NextWithCost(TState current);
 }

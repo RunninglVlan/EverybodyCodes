@@ -1,5 +1,9 @@
 ﻿#!/usr/bin/env dotnet
 #:include ../generic/Test.cs
+#:include ../generic/Geometry.cs
+#:include ../generic/Pathfinding.cs
+#:include ../generic/StateSearch.cs
+#:include ../generic/StateSearchWithCost.cs
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -390,138 +394,4 @@ class InfiniteDepositGrid : Grid, IGameWithCost<InfiniteDepositGrid.State> {
         public bool Equals(State other) => X == other.X && I == other.I && SulphurCollected == other.SulphurCollected;
         public override int GetHashCode() => HashCode.Combine(X, I, SulphurCollected);
     }
-}
-
-readonly record struct Point(int X, int Y) {
-    static readonly Point UP = new(0, 1);
-    static readonly Point DOWN = new(0, -1);
-    static readonly Point LEFT = new(-1, 0);
-    static readonly Point RIGHT = new(1, 0);
-
-    public static Point[] Directions4 { get; } = [RIGHT, LEFT, UP, DOWN];
-
-    public static Point operator +(Point a, Point b) => new(a.X + b.X, a.Y + b.Y);
-}
-
-static class Screen {
-    public static Point TurnLeft(Point direction) => new(direction.Y, -direction.X);
-    public static Point TurnRight(Point direction) => new(-direction.Y, direction.X);
-}
-
-static class Pathfinding<T> where T : IEquatable<T> {
-    /// BFS
-    public static List<T>? Shortest(T start, T end, Func<T, IEnumerable<T>> getNext) {
-        Dictionary<T, T> parents = [];
-        Queue<T> queue = [];
-        HashSet<T> visited = [];
-        queue.Enqueue(start);
-        visited.Add(start);
-        while (queue.TryDequeue(out var current)) {
-            if (current.Equals(end)) {
-                return Reconstruct(parents, start, current);
-            }
-            foreach (var next in getNext(current)) {
-                if (!visited.Add(next)) {
-                    continue;
-                }
-                queue.Enqueue(next);
-                parents[next] = current;
-            }
-        }
-        return null;
-    }
-
-    static List<T> Reconstruct(Dictionary<T, T> parents, T start, T end) {
-        var path = new List<T>();
-        var current = end;
-        while (!current.Equals(start)) {
-            path.Add(current);
-            current = parents[current];
-        }
-        path.Add(start);
-        path.Reverse();
-        return path;
-    }
-}
-
-class StateSearch<T>(IGame<T> game, int depthMax = 100) where T : IState<T>, IEquatable<T> {
-    readonly HashSet<T> visited = [];
-
-    /// DFS/Backtracking
-    public bool TryFind(T start, out T end) {
-        visited.Clear();
-        visited.Add(start);
-        return TryFind(start, 0, out end);
-    }
-
-    [SuppressMessage("ReSharper", "InvertIf")]
-    bool TryFind(T current, int depth, out T end) {
-        end = default!;
-        if (game.HasReachedEnd(current)) {
-            end = current;
-            return true;
-        }
-        if (depth > depthMax) {
-            return false;
-        }
-        var found = false;
-        foreach (var next in game.Next(current)) {
-            if (!visited.Add(next)) {
-                continue;
-            }
-            if (!TryFind(next, depth + 1, out var nextBest)) {
-                continue;
-            }
-            if (!found || nextBest.IsBetterThan(end)) {
-                end = nextBest;
-                found = true;
-            }
-        }
-        return found;
-    }
-}
-
-class StateSearchWithCost<T>(IGameWithCost<T> game) where T : IEquatable<T> {
-    readonly PriorityQueue<T, long> queue = new();
-    readonly Dictionary<T, long> visited = [];
-
-    /// Dijkstra
-    public bool TryFind(T start, out (T value, long cost) end) {
-        end = default!;
-        queue.Clear();
-        queue.Enqueue(start, 0);
-        visited.Clear();
-        visited.Add(start, 0);
-        while (queue.TryDequeue(out var current, out long currentCost)) {
-            if (game.HasReachedEnd(current)) {
-                end = (current, currentCost);
-                return true;
-            }
-            foreach ((var next, long cost) in game.NextWithCost(current)) {
-                long newCost = currentCost + cost;
-                if (newCost >= visited.GetValueOrDefault(next, long.MaxValue)) {
-                    continue;
-                }
-                queue.Enqueue(next, newCost);
-                visited[next] = newCost;
-            }
-        }
-        return false;
-    }
-}
-
-interface IGoal<in TState> {
-    bool HasReachedEnd(TState state);
-}
-
-interface IGame<TState> : IGoal<TState> {
-    IEnumerable<TState> Next(TState current);
-}
-
-interface IGameWithCost<TState> : IGoal<TState> {
-    IEnumerable<(TState, long cost)> NextWithCost(TState current);
-}
-
-interface IState<in T> where T : IState<T> {
-    bool IsBetterThan(T other);
 }
