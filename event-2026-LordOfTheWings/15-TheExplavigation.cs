@@ -16,6 +16,7 @@ Test.Run((notes, part, expected) => {
 abstract class Grid {
     int width, height;
     protected Point start;
+    protected Point End => endTargets.Last();
     readonly Dictionary<Point, bool> walkableCells = [];
     readonly HashSet<Point> sulphurDeposits = [];
     protected readonly List<SulphurRect> sulphurRects = [];
@@ -85,7 +86,7 @@ abstract class Grid {
             if (!TryFindPass(x, out var pass)) {
                 continue;
             }
-            if (endTargets.Count > 0 && endTargets.Last().X == pass.X - 1) {
+            if (endTargets.Count > 0 && End.X == pass.X - 1) {
                 endTargets.RemoveAt(endTargets.Count - 1);
             }
             endTargets.Add(pass);
@@ -161,17 +162,27 @@ class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
                 : throw new UnreachableException();
     }
 
+    [SuppressMessage("ReSharper", "UseObjectOrCollectionInitializer")]
     IEnumerable<State> IGame<State>.Next(State current) {
         var nextRects = NextRects(current);
         if (nextRects.Count > 0) {
             foreach ((var rect, int i) in nextRects) {
-                yield return current.From(rect, i, rect.Min);
-                yield return current.From(rect, i, rect.Max);
+                yield return NextState(rect, i, rect.Min);
+                yield return NextState(rect, i, rect.Max);
             }
         } else {
-            int nextX = endTargets.Last().X;
+            int nextX = End.X;
             int distance = nextX - current.X;
             yield return current with { X = nextX, Seconds = current.Seconds + distance };
+        }
+        yield break;
+
+        State NextState(SulphurRect rect, int i, int x) {
+            int nextX = rect.Min == x ? rect.Max : rect.Min;
+            int distance = Math.Abs(current.X - x) + rect.Perimeter - rect.Width;
+            var next = new State(nextX, [.. current.RectsVisited], current.Seconds + distance);
+            next.RectsVisited[i] = true;
+            return next;
         }
     }
 
@@ -192,18 +203,9 @@ class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
         return rects;
     }
 
-    bool IGame<State>.HasReachedEnd(State state) => state.X == endTargets.Last().X;
+    bool IGame<State>.HasReachedEnd(State state) => state.X == End.X;
 
     readonly record struct State(int X, bool[] RectsVisited, int Seconds = 0) : IState<State> {
-        [SuppressMessage("ReSharper", "UseObjectOrCollectionInitializer")]
-        public State From(SulphurRect rect, int i, int x) {
-            int nextX = rect.Min == x ? rect.Max : rect.Min;
-            int distance = Math.Abs(X - x) + rect.Perimeter - rect.Width;
-            var next = new State(nextX, [.. RectsVisited], Seconds + distance);
-            next.RectsVisited[i] = true;
-            return next;
-        }
-
         public bool IsBetterThan(State other) => Seconds < other.Seconds;
 
         public bool Equals(State other) {
@@ -293,53 +295,57 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         return mask;
     }
 
+    [SuppressMessage("ReSharper", "ConvertIfStatementToSwitchStatement")]
     long VisitRects(List<(SulphurRect value, long cycles)> rects) {
         long seconds = 0;
         var x = 0;
-        (SulphurRect rect, long cycles, bool whole) previous = (default, -1, false);
+        (long cycles, bool whole) previous = (-1, false);
         var visited = rects.Where(it => it.cycles > 0).OrderBy(it => it.value.Min).ThenBy(it => it.cycles)
                 .Select(it => (it.value, it.cycles))
                 .ToArray();
         for (var i = 0; i < visited.Length; i++) {
             (var rect, long cycles) = visited[i];
-            if (i + 1 < visited.Length && rect.Min == visited[i + 1].value.Min && visited[i + 1].cycles - cycles <= 2) {
-                (var rect2, long cycles2) = visited[i + 1];
+            bool insideRect = rect.Min < x;
+            (int start, int end) way = insideRect ? (rect.Max, rect.Min) : (rect.Min, rect.Max);
+            if (IsWhole(i, out var tuple2) && tuple2.cycles - cycles <= 2) {
+                (var rect2, long cycles2) = tuple2;
                 if (cycles2 - cycles == 2) {
                     cycles2--;
                     seconds += rect2.Perimeter;
                 }
-                (int rectStart, int rectEnd) = x < rect.Min ? (rect.Min, rect.Max) : (rect.Max, rect.Min);
-                seconds += Math.Abs(x - rectStart) + rect.WholeSeconds(cycles) + rect2.WholeSeconds(cycles2);
-                if (rect.Min < x && previous is { cycles: > 1, whole: false }) {
+                seconds += Math.Abs(x - way.start) + rect.WholeSeconds(cycles) + rect2.WholeSeconds(cycles2);
+                if (insideRect && previous is { cycles: > 1, whole: false }) {
                     seconds -= cycles == cycles2 ? 2 * Math.Abs(rect.Max - x) : 2 * Math.Abs(rect.Min - x);
-                    seconds += Math.Abs(rectEnd - x);
+                    seconds += Math.Abs(way.end - x);
                 } else {
-                    x = cycles == cycles2 ? rectStart : rectEnd;
+                    x = cycles == cycles2 ? way.start : way.end;
                 }
-                previous = (rect2, visited[i + 1].cycles, true);
+                previous = (tuple2.cycles, true);
                 i++;
             } else {
-                (int rectStart, int rectEnd) = x < rect.Min ? (rect.Min, rect.Max) : (rect.Max, rect.Min);
-                // todo: refactor
-                if (rect.Min < x
-                        && cycles == 1
-                        && previous.whole
-                        && visited[i - 1].cycles - visited[i - 2].cycles == 2) {
+                if (insideRect && cycles == 1 && previous.whole && visited[i - 1].cycles - visited[i - 2].cycles == 2) {
                     seconds += 2 * rect.Height;
-                } else if (i - 1 >= 0
-                        && rect.Min < visited[i - 1].value.Max
-                        && previous is { whole: false, cycles: > 1 }) {
+                } else if (insideRect && previous is { cycles: > 1, whole: false }) {
                     seconds += Math.Abs(x - rect.Min) + rect.HalfSeconds(cycles);
                     seconds -= 2 * Math.Abs(rect.Min - x);
                     x = rect.Max;
                 } else {
-                    seconds += Math.Abs(x - rectStart) + rect.HalfSeconds(cycles);
-                    x = rectEnd;
+                    seconds += Math.Abs(x - way.start) + rect.HalfSeconds(cycles);
+                    x = way.end;
                 }
-                previous = (rect, cycles, false);
+                previous = (cycles, false);
             }
         }
-        return seconds + endTargets.Last().X - x;
+        return seconds + End.X - x;
+
+        bool IsWhole(int i, out (SulphurRect value, long cycles) rect2) {
+            rect2 = default;
+            if (i + 1 >= visited.Length) {
+                return false;
+            }
+            rect2 = visited[i + 1];
+            return visited[i].value.Min == rect2.value.Min;
+        }
     }
 
     IEnumerable<(State, long)> IGame<State>.NextWithCost(State current) {
@@ -356,7 +362,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
                 }
             }
         } else {
-            int end = endTargets.Last().X;
+            int end = End.X;
             yield return (current with { X = end }, end - current.X);
         }
         yield break;
@@ -370,7 +376,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         }
     }
 
-    bool IGame<State>.HasReachedEnd(State state) => state.X == endTargets.Last().X;
+    bool IGame<State>.HasReachedEnd(State state) => state.X == End.X;
 
     readonly record struct State(int X, int I, long[] RectsVisited, int SulphurCollected = 0) : IState<State> {
         public bool Equals(State other) => X == other.X && I == other.I && SulphurCollected == other.SulphurCollected;
