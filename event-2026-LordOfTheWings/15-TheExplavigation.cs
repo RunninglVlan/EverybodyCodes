@@ -240,7 +240,11 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         long[] best = FindBestRects();
         // DoTest();
         if (false) {
-            return Slow().seconds;
+            var slow = Slow();
+            int slowVisited = slow.rectsVisited.Count(it => it > 0);
+            string rectsVisited = string.Join(", ", slow.rectsVisited.Select(it => it.ToString().PadLeft(2)));
+            Test.Log(("slow\n" + rectsVisited, $"seconds: {slow.seconds}, visited: {slowVisited}"), 1);
+            return slow.seconds;
         }
         if (true) {
             var fast = Fast(best);
@@ -442,7 +446,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
             rectsVisited[i] = cycles;
         }
         const string slowVisited =
-                " 0,  0, 217,  0,  0,  0,  1,  0,  0,  1,  0,  0,  0,  0,  0,  0,  3,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0, 216";
+                " 2,  1,  0,  0,  0,  0, 2007,  0,  0,  0,  0,  0,  0,  1,  0";
         string fastVisited = string.Join(", ", rectsVisited.Select(it => it.ToString().PadLeft(2)));
         if (newSeconds >= seconds && fastVisited != slowVisited) {
             return;
