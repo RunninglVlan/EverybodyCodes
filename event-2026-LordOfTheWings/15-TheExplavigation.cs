@@ -404,7 +404,7 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
                 .ToArray();
         for (var i = 0; i < visited.Length; i++) {
             (var rect, long cycles) = visited[i];
-            if (i + 1 < visited.Length && rect.Min == visited[i + 1].value.Min) {
+            if (i + 1 < visited.Length && rect.Min == visited[i + 1].value.Min && visited[i + 1].cycles - cycles <= 2) {
                 (var rect2, long cycles2) = visited[i + 1];
                 if (cycles2 - cycles == 2) {
                     cycles2--;
