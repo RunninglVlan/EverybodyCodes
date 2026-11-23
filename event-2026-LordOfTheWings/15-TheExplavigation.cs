@@ -339,10 +339,6 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
 
     (long[] rectsVisited, long seconds) Fast(long[] best) {
         int end = endTargets.Last().X;
-        // bool[] visit = [
-        //     .. " _,  _,  1,  _,  1,  _,  1,  1,  _,  1,  _,  _,  1,  _,  _,  _,  1,  1,  1,  1,  1,  _,  _,  _,  _,  _,  _,  _,  _,  1"
-        //             .Split(", ").Select(it => it == " 1")
-        // ];
         const long maxCycles = 3;
         var bestRects = sulphurRects.Select((rect, i) => (rect, i))
                 .Where(it => best[it.i] > 0 && best[it.i] < maxCycles).ToList();
@@ -461,38 +457,37 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         Test.Log((fastVisited, newSeconds), 1);
     }
 
-    [SuppressMessage("ReSharper", "InvertIf")]
     IEnumerable<(State, long)> IGame<State>.NextWithCost(State current) {
         if (current.SulphurCollected != required) {
             for (var i = 0; i < sulphurRects.Count; i++) {
                 var rect = sulphurRects[i];
                 (int xStart, int xEnd) = (rect.Min, rect.Max);
                 if (xStart != current.X || i != current.I) {
-                    long distance = Math.Abs(current.X - xStart) + rect.HalfSeconds();
-                    yield return (current.From(rect, i, xEnd), distance);
+                    yield return Next(xStart, xEnd, i);
                 }
                 (xStart, xEnd) = (rect.Max, rect.Min);
                 if (xStart != current.X || i != current.I) {
-                    long distance = Math.Abs(current.X - xStart) + rect.HalfSeconds();
-                    yield return (current.From(rect, i, xEnd), distance);
+                    yield return Next(xStart, xEnd, i);
                 }
             }
         } else {
             int end = endTargets.Last().X;
             yield return (current with { X = end }, end - current.X);
         }
+        yield break;
+
+        (State, long) Next(int xStart, int xEnd, int i) {
+            var rect = sulphurRects[i];
+            var next = new State(xEnd, i, [.. current.RectsVisited], current.SulphurCollected + rect.Deposits);
+            next.RectsVisited[i]++;
+            long distance = Math.Abs(current.X - xStart) + rect.HalfSeconds();
+            return (next, distance);
+        }
     }
 
     bool IGame<State>.HasReachedEnd(State state) => state.X == endTargets.Last().X;
 
-    // todo: RectsVisited is debug, remove custom equals too
     readonly record struct State(int X, int I, long[] RectsVisited, int SulphurCollected = 0) : IState<State> {
-        public State From(SulphurRect rect, int i, int nextX) {
-            var next = new State(nextX, i, [.. RectsVisited], SulphurCollected + rect.Deposits);
-            next.RectsVisited[i]++;
-            return next;
-        }
-
         public bool Equals(State other) => X == other.X && I == other.I && SulphurCollected == other.SulphurCollected;
         public override int GetHashCode() => HashCode.Combine(X, I, SulphurCollected);
     }
@@ -502,7 +497,7 @@ readonly record struct Point(int X, int Y) {
     static readonly Point UP = new(0, 1);
     static readonly Point DOWN = new(0, -1);
     static readonly Point LEFT = new(-1, 0);
-    public static readonly Point RIGHT = new(1, 0);
+    static readonly Point RIGHT = new(1, 0);
 
     public static Point[] Directions4 { get; } = [RIGHT, LEFT, UP, DOWN];
 
