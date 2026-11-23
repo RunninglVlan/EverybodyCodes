@@ -142,10 +142,6 @@ readonly record struct SulphurRect {
 
     public long HalfSeconds(long cycles = 1) => cycles == 0 ? 0 : cycles * Perimeter - Width;
     public long WholeSeconds(long cycles = 1) => cycles == 0 ? 0 : cycles * Perimeter - cycles * Width;
-
-    public override string ToString() {
-        return $"Deposits: {Deposits}, Min: {Min}, Max: {Max}, Width: {Width}, Height: {Height}";
-    }
 }
 
 class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
@@ -227,7 +223,8 @@ class FiniteDepositGrid : Grid, IGame<FiniteDepositGrid.State> {
 class InfiniteDepositGrid : Grid, IGameWithCost<InfiniteDepositGrid.State> {
     readonly StateSearchWithCost<State> stateSearch;
 
-    long required;
+    readonly long required;
+    long currentRequired;
 
     public InfiniteDepositGrid(long required) {
         stateSearch = new StateSearchWithCost<State>(this);
@@ -277,9 +274,8 @@ class InfiniteDepositGrid : Grid, IGameWithCost<InfiniteDepositGrid.State> {
     /// Can't use it when required sulphur is too big, as it becomes too slow
     long[] FindRectMask(int rangeMin, int rangeMax) {
         var mask = new long[sulphurRects.Count];
-        long requiredOriginal = required;
         for (int i = rangeMin; i < rangeMax; i++) {
-            required = i;
+            currentRequired = i;
             long[] rectsVisited;
             var startState = new State(start.X, -1, new long[sulphurRects.Count]);
             if (stateSearch.TryFind(startState, out var endState)) {
@@ -291,11 +287,9 @@ class InfiniteDepositGrid : Grid, IGameWithCost<InfiniteDepositGrid.State> {
                 mask[j] = Math.Max(rectsVisited[j], mask[j]);
             }
         }
-        required = requiredOriginal;
         return mask;
     }
 
-    [SuppressMessage("ReSharper", "ConvertIfStatementToSwitchStatement")]
     long VisitRects(List<(SulphurRect value, long cycles)> rects) {
         long seconds = 0;
         var x = 0;
@@ -304,52 +298,63 @@ class InfiniteDepositGrid : Grid, IGameWithCost<InfiniteDepositGrid.State> {
                 .Select(it => (it.value, it.cycles))
                 .ToArray();
         for (var i = 0; i < visited.Length; i++) {
-            (var rect, long cycles) = visited[i];
-            bool insideRect = rect.Min < x;
-            (int start, int end) way = insideRect ? (rect.Max, rect.Min) : (rect.Min, rect.Max);
-            if (IsWhole(i, out var tuple2) && tuple2.cycles - cycles <= 2) {
-                (var rect2, long cycles2) = tuple2;
-                if (cycles2 - cycles == 2) {
-                    cycles2--;
-                    seconds += rect2.Perimeter;
-                }
-                seconds += Math.Abs(x - way.start) + rect.WholeSeconds(cycles) + rect2.WholeSeconds(cycles2);
-                if (insideRect && previous is { cycles: > 1, whole: false }) {
-                    seconds -= cycles == cycles2 ? 2 * Math.Abs(rect.Max - x) : 2 * Math.Abs(rect.Min - x);
-                    seconds += Math.Abs(way.end - x);
-                } else {
-                    x = cycles == cycles2 ? way.start : way.end;
-                }
-                previous = (tuple2.cycles, true);
+            var rect = visited[i].value;
+            (int start, int end) way = IsInner(rect) ? (rect.Max, rect.Min) : (rect.Min, rect.Max);
+            if (IsWhole(i)) {
+                VisitWhole(i, way);
                 i++;
             } else {
-                if (insideRect && cycles == 1 && previous.whole && visited[i - 1].cycles - visited[i - 2].cycles == 2) {
-                    seconds += 2 * rect.Height;
-                } else if (insideRect && previous is { cycles: > 1, whole: false }) {
-                    seconds += Math.Abs(x - rect.Min) + rect.HalfSeconds(cycles);
-                    seconds -= 2 * Math.Abs(rect.Min - x);
-                    x = rect.Max;
-                } else {
-                    seconds += Math.Abs(x - way.start) + rect.HalfSeconds(cycles);
-                    x = way.end;
-                }
-                previous = (cycles, false);
+                VisitHalf(i, way);
             }
         }
         return seconds + End.X - x;
 
-        bool IsWhole(int i, out (SulphurRect value, long cycles) rect2) {
-            rect2 = default;
+        bool IsInner(SulphurRect rect) => rect.Min < x;
+
+        bool IsWhole(int i) {
             if (i + 1 >= visited.Length) {
                 return false;
             }
-            rect2 = visited[i + 1];
-            return visited[i].value.Min == rect2.value.Min;
+            (var rect, long cycles) = visited[i];
+            (var rect2, long cycles2) = visited[i + 1];
+            return rect.Min == rect2.Min && cycles2 - cycles <= 2;
+        }
+
+        void VisitWhole(int i, (int start, int end) way) {
+            (var rect, long cycles) = visited[i];
+            (var rect2, long cycles2) = visited[i + 1];
+            if (cycles2 - cycles == 2) {
+                cycles2--;
+                seconds += rect2.Perimeter;
+            }
+            seconds += Math.Abs(x - way.start) + rect.WholeSeconds(cycles) + rect2.WholeSeconds(cycles2);
+            if (IsInner(rect) && previous is { cycles: > 1, whole: false }) {
+                seconds -= cycles == cycles2 ? 2 * Math.Abs(rect.Max - x) : 2 * Math.Abs(rect.Min - x);
+                seconds += Math.Abs(way.end - x);
+            } else {
+                x = cycles == cycles2 ? way.start : way.end;
+            }
+            previous = (visited[i + 1].cycles, true);
+        }
+
+        void VisitHalf(int i, (int start, int end) way) {
+            (var rect, long cycles) = visited[i];
+            if (IsInner(rect) && cycles == 1 && previous.whole && visited[i - 1].cycles - visited[i - 2].cycles == 2) {
+                seconds += 2 * rect.Height;
+            } else if (IsInner(rect) && previous is { cycles: > 1, whole: false }) {
+                seconds += Math.Abs(x - rect.Min) + rect.HalfSeconds(cycles);
+                seconds -= 2 * Math.Abs(rect.Min - x);
+                x = rect.Max;
+            } else {
+                seconds += Math.Abs(x - way.start) + rect.HalfSeconds(cycles);
+                x = way.end;
+            }
+            previous = (cycles, false);
         }
     }
 
     IEnumerable<(State, long)> IGameWithCost<State>.NextWithCost(State current) {
-        if (current.SulphurCollected != required) {
+        if (current.SulphurCollected != currentRequired) {
             for (var i = 0; i < sulphurRects.Count; i++) {
                 var rect = sulphurRects[i];
                 (int xStart, int xEnd) = (rect.Min, rect.Max);
