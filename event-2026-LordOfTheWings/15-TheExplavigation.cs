@@ -261,41 +261,41 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
 
     long Fast(long[] visit) {
         const long maxCycles = 3;
-        int end = endTargets.Last().X;
-        var bestRects = sulphurRects.Select((rect, i) => (rect, i))
+        var rectsToVisit = sulphurRects.Select((rect, i) => (rect, i))
                 .Where(it => visit[it.i] > 0 && visit[it.i] < maxCycles).ToList();
-        var mainRects = sulphurRects.Select((rect, i) => (rect, i)).Where(it => visit[it.i] > maxCycles).ToList();
-        var mainCount = (long)Math.Ceiling(required / (double)mainRects.Select(it => it.rect.Deposits).Sum());
-        long[] mainCycles = [mainCount, mainCount];
+        var bestRects = sulphurRects.Select((rect, i) => (rect, i)).Where(it => visit[it.i] > maxCycles).ToList();
+        var bestCount = (long)Math.Ceiling(required / (double)bestRects.Sum(it => it.rect.Deposits));
+        long[] bestCycles = [bestCount, bestCount];
         var seconds = long.MaxValue;
-        List<(SulphurRect value, int i, long cycles)> visited =
-                [.. mainRects.Select((tuple, i) => (tuple.rect, tuple.i, mainCycles[i]))];
-        Collect(end, ref seconds, visited);
-        long max = bestRects.Sum(it => it.rect.Deposits) / mainRects.Sum(it => it.rect.Deposits) * maxCycles;
+        List<(SulphurRect value, int i, long cycles)> visited = [];
+        long max = rectsToVisit.Sum(it => it.rect.Deposits) / bestRects.Sum(it => it.rect.Deposits) * maxCycles;
         for (var _ = 0; _ <= max; _++) {
-            mainCycles[0]--;
             visited.Clear();
-            visited.AddRange(mainRects.Select((tuple, i) => (tuple.rect, tuple.i, mainCycles[i])));
+            visited.AddRange(bestRects.Select((tuple, i) => (tuple.rect, tuple.i, bestCycles[i])));
             Visit(0);
-            mainCycles[0]++;
-            mainCycles[1]--;
+            bestCycles[0]--;
             visited.Clear();
-            visited.AddRange(mainRects.Select((tuple, i) => (tuple.rect, tuple.i, mainCycles[i])));
+            visited.AddRange(bestRects.Select((tuple, i) => (tuple.rect, tuple.i, bestCycles[i])));
             Visit(0);
-            mainCycles[0]--;
+            bestCycles[0]++;
+            bestCycles[1]--;
             visited.Clear();
-            visited.AddRange(mainRects.Select((tuple, i) => (tuple.rect, tuple.i, mainCycles[i])));
+            visited.AddRange(bestRects.Select((tuple, i) => (tuple.rect, tuple.i, bestCycles[i])));
             Visit(0);
+            bestCycles[0]--;
         }
         return seconds;
 
         void Visit(int i) {
-            if (i >= bestRects.Count) {
-                Collect(end, ref seconds, visited);
+            if (i >= rectsToVisit.Count) {
+                long collected = visited.Sum(it => it.value.Deposits * it.cycles);
+                if (collected == required) {
+                    seconds = Math.Min(Seconds(visited), seconds);
+                }
                 return;
             }
             for (var cycles = 0; cycles <= maxCycles; cycles++) {
-                var tuple = bestRects[i];
+                var tuple = rectsToVisit[i];
                 visited.Add((tuple.rect, tuple.i, cycles));
                 Visit(i + 1);
                 visited.RemoveAt(visited.Count - 1);
@@ -303,12 +303,8 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
         }
     }
 
-    void Collect(int end, ref long seconds, List<(SulphurRect value, int i, long cycles)> rects) {
-        long collected = rects.Sum(it => it.value.Deposits * it.cycles);
-        if (collected != required) {
-            return;
-        }
-        long newSeconds = 0;
+    long Seconds(List<(SulphurRect value, int i, long cycles)> rects) {
+        long seconds = 0;
         var x = 0;
         (SulphurRect rect, long cycles, bool whole) previous = (default, -1, false);
         var visited = rects.Where(it => it.cycles > 0).OrderBy(it => it.value.Min).ThenBy(it => it.cycles)
@@ -320,13 +316,13 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
                 (var rect2, long cycles2) = visited[i + 1];
                 if (cycles2 - cycles == 2) {
                     cycles2--;
-                    newSeconds += rect2.Perimeter;
+                    seconds += rect2.Perimeter;
                 }
                 (int rectStart, int rectEnd) = x < rect.Min ? (rect.Min, rect.Max) : (rect.Max, rect.Min);
-                newSeconds += Math.Abs(x - rectStart) + rect.WholeSeconds(cycles) + rect2.WholeSeconds(cycles2);
+                seconds += Math.Abs(x - rectStart) + rect.WholeSeconds(cycles) + rect2.WholeSeconds(cycles2);
                 if (rect.Min < x && previous is { cycles: > 1, whole: false }) {
-                    newSeconds -= cycles == cycles2 ? 2 * Math.Abs(rect.Max - x) : 2 * Math.Abs(rect.Min - x);
-                    newSeconds += Math.Abs(rectEnd - x);
+                    seconds -= cycles == cycles2 ? 2 * Math.Abs(rect.Max - x) : 2 * Math.Abs(rect.Min - x);
+                    seconds += Math.Abs(rectEnd - x);
                 } else {
                     x = cycles == cycles2 ? rectStart : rectEnd;
                 }
@@ -339,22 +335,21 @@ class InfiniteDepositGrid : Grid, IGame<InfiniteDepositGrid.State> {
                         && cycles == 1
                         && previous.whole
                         && visited[i - 1].cycles - visited[i - 2].cycles == 2) {
-                    newSeconds += 2 * rect.Height;
+                    seconds += 2 * rect.Height;
                 } else if (i - 1 >= 0
                         && rect.Min < visited[i - 1].value.Max
                         && previous is { whole: false, cycles: > 1 }) {
-                    newSeconds += Math.Abs(x - rect.Min) + rect.HalfSeconds(cycles);
-                    newSeconds -= 2 * Math.Abs(rect.Min - x);
+                    seconds += Math.Abs(x - rect.Min) + rect.HalfSeconds(cycles);
+                    seconds -= 2 * Math.Abs(rect.Min - x);
                     x = rect.Max;
                 } else {
-                    newSeconds += Math.Abs(x - rectStart) + rect.HalfSeconds(cycles);
+                    seconds += Math.Abs(x - rectStart) + rect.HalfSeconds(cycles);
                     x = rectEnd;
                 }
                 previous = (rect, cycles, false);
             }
         }
-        newSeconds += end - x;
-        seconds = Math.Min(newSeconds, seconds);
+        return seconds + endTargets.Last().X - x;
     }
 
     IEnumerable<(State, long)> IGame<State>.NextWithCost(State current) {
