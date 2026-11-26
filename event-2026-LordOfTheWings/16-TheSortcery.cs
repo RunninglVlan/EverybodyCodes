@@ -1,6 +1,8 @@
 ﻿#!/usr/bin/env dotnet
 #:include ../generic/Test.cs
 
+Test.From = "Part II";
+Test.Until = "Part III Example";
 // https://everybody.codes/event/2026/quests/16
 Test.Run((notes, part, expected) => {
     int copies = part switch {
