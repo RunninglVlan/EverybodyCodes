@@ -19,7 +19,7 @@ Test.Run((notes, part, expected) => {
 });
 
 class Tablets(string notes) {
-    readonly char[] shades = notes.ToCharArray();
+    readonly List<char> shades = [.. notes];
     int shadeIndex, first, last;
     public int Flips { get; private set; }
     public long Flipped { get; private set; }
@@ -42,28 +42,67 @@ class Tablets(string notes) {
 
     bool TryGroup() {
         first++;
-        last = shades.Length - 1;
+        last = shades.Count - 1;
         while (true) {
             FindFirstAndLast();
-            if (first == shades.Length) {
+            if (first == shades.Count) {
                 return false;
             }
             if (first > last) {
                 break;
             }
-            Flip();
+            if (!TrySkip()) {
+                Flip();
+            }
         }
         return true;
 
         void FindFirstAndLast() {
             char shade = shades[shadeIndex];
-            while (first < shades.Length && shades[first] == shade) {
+            while (first < shades.Count && shades[first] == shade) {
                 first++;
             }
             while (shades[last] != shade) {
                 last--;
             }
         }
+    }
+
+    bool TrySkip() {
+        char shade = shades[shadeIndex];
+        int next = first;
+        while (next < shades.Count && shades[next] != shade) {
+            next++;
+        }
+        if (next >= last) {
+            return false;
+        }
+        List<char> shadeGroup = [];
+        for (int i = last; shades[i] == shade; i--) {
+            shadeGroup.Add(shades[i]);
+        }
+        int groupStart = last - shadeGroup.Count + 1;
+        if (next >= groupStart) {
+            return false;
+        }
+        int length = last + 1 - first;
+        Flipped += length;
+        List<char> toFlip = [];
+        for (int i = first; i < next; i++) {
+            toFlip.Add(shades[i]);
+        }
+        shades.RemoveRange(groupStart, shadeGroup.Count);
+        length = groupStart - next;
+        Flipped += length;
+        for (int i = toFlip.Count - 1, j = groupStart; i >= 0; i--, j++) {
+            char flipped = toFlip[i];
+            shades.Insert(j, flipped);
+        }
+        shades.RemoveRange(first, toFlip.Count);
+        shades.InsertRange(first, shadeGroup);
+        first += shadeGroup.Count;
+        Flips += 2;
+        return true;
     }
 
     void Flip() {
