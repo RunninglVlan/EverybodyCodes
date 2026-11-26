@@ -44,65 +44,72 @@ class Tablets(string notes) {
         first++;
         last = shades.Count - 1;
         while (true) {
-            FindFirstAndLast();
+            FindEdges();
             if (first == shades.Count) {
                 return false;
             }
             if (first > last) {
                 break;
             }
-            if (!TrySkip()) {
+            if (CanSkip(out int next, out var lastGroup)) {
+                Skip(next, lastGroup);
+            } else {
                 Flip();
             }
         }
         return true;
+    }
 
-        void FindFirstAndLast() {
-            char shade = shades[shadeIndex];
-            while (first < shades.Count && shades[first] == shade) {
-                first++;
-            }
-            while (shades[last] != shade) {
-                last--;
-            }
+    /// Find edges of the range that will be flipped
+    void FindEdges() {
+        char shade = shades[shadeIndex];
+        while (first < shades.Count && shades[first] == shade) {
+            first++;
+        }
+        while (shades[last] != shade) {
+            last--;
         }
     }
 
-    bool TrySkip() {
+    /// We can skip big flip if next group isn't last group
+    bool CanSkip(out int next, out List<char> lastGroup) {
+        next = first;
+        lastGroup = null!;
         char shade = shades[shadeIndex];
-        int next = first;
         while (next < shades.Count && shades[next] != shade) {
             next++;
         }
         if (next >= last) {
             return false;
         }
-        List<char> shadeGroup = [];
+        lastGroup = [];
         for (int i = last; shades[i] == shade; i--) {
-            shadeGroup.Add(shades[i]);
+            lastGroup.Add(shades[i]);
         }
-        int groupStart = last - shadeGroup.Count + 1;
-        if (next >= groupStart) {
-            return false;
-        }
-        int length = last + 1 - first;
-        Flipped += length;
+        int groupStart = last - lastGroup.Count + 1;
+        return next < groupStart;
+    }
+
+    /// Skip big flip and instead do small flip, and move some elements
+    void Skip(int next, List<char> lastGroup) {
         List<char> toFlip = [];
         for (int i = first; i < next; i++) {
             toFlip.Add(shades[i]);
         }
-        shades.RemoveRange(groupStart, shadeGroup.Count);
-        length = groupStart - next;
-        Flipped += length;
+        int groupStart = last - lastGroup.Count + 1;
+        shades.RemoveRange(groupStart, lastGroup.Count);
         for (int i = toFlip.Count - 1, j = groupStart; i >= 0; i--, j++) {
             char flipped = toFlip[i];
             shades.Insert(j, flipped);
         }
         shades.RemoveRange(first, toFlip.Count);
-        shades.InsertRange(first, shadeGroup);
-        first += shadeGroup.Count;
+        shades.InsertRange(first, lastGroup);
+        int length = last + 1 - first;
+        Flipped += length;
+        length = groupStart - next;
+        Flipped += length;
         Flips += 2;
-        return true;
+        first += lastGroup.Count;
     }
 
     void Flip() {
