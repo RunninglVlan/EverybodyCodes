@@ -26,7 +26,6 @@ class Tablets(string notes) {
 
     public void GroupByShade() {
         var shadeIndex = 0;
-        first = 1;
         while (true) {
             if (!TryGroup(shadeIndex)) {
                 return;
@@ -42,6 +41,7 @@ class Tablets(string notes) {
 
     bool TryGroup(int shadeIndex) {
         char shade = shades[shadeIndex];
+        first++;
         last = shades.Length - 1;
         while (true) {
             FindFirstAndLast();
