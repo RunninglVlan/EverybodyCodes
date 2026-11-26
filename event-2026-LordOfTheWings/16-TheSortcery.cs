@@ -35,7 +35,9 @@ class Tablets(string notes) {
 
         void FindNextShade() {
             char shade = shades[shadeIndex];
-            for (; shades[shadeIndex] == shade; shadeIndex++) { }
+            while (shades[shadeIndex] == shade) {
+                shadeIndex++;
+            }
         }
     }
 
@@ -56,17 +58,21 @@ class Tablets(string notes) {
         return true;
 
         void FindFirstAndLast() {
-            for (; first < shades.Length && shades[first] == shade; first++) { }
-            for (; shades[last] != shade; last--) { }
-        }
-
-        void Flip() {
-            for (int f = first, l = last; f < l; f++, l--) {
-                (shades[f], shades[l]) = (shades[l], shades[f]);
+            while (first < shades.Length && shades[first] == shade) {
+                first++;
             }
-            Flips++;
-            int length = last + 1 - first;
-            Flipped += length;
+            while (shades[last] != shade) {
+                last--;
+            }
         }
+    }
+
+    void Flip() {
+        for (int f = first, l = last; f < l; f++, l--) {
+            (shades[f], shades[l]) = (shades[l], shades[f]);
+        }
+        Flips++;
+        int length = last + 1 - first;
+        Flipped += length;
     }
 }
