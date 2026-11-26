@@ -3,14 +3,19 @@
 
 // https://everybody.codes/event/2026/quests/16
 Test.Run((notes, part, expected) => {
-    char[] shades = notes.ToCharArray();
+    int flips = GroupTablets(notes.ToCharArray());
+    Assert.ActualEqualsExpected(flips, expected);
+});
+return;
+
+int GroupTablets(char[] shades) {
     int shadeIndex = 0, first, last, flips = 0;
     char shade = shades[shadeIndex];
     while (true) {
         while (true) {
             FindFirstAndLast();
             if (first == shades.Length) {
-                goto end;
+                return flips;
             }
             if (first > last) {
                 break;
@@ -21,9 +26,6 @@ Test.Run((notes, part, expected) => {
         FindNextShade();
         shade = shades[shadeIndex];
     }
-    end:
-    Assert.ActualEqualsExpected(flips, expected);
-    return;
 
     void FindFirstAndLast() {
         for (first = shadeIndex + 1; first < shades.Length && shades[first] == shade; first++) { }
@@ -39,4 +41,4 @@ Test.Run((notes, part, expected) => {
     void FindNextShade() {
         for (; shades[shadeIndex] == shade; shadeIndex++) { }
     }
-});
+}
