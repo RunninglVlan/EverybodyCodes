@@ -8,9 +8,8 @@ Test.Run((notes, part, expected) => {
     char shade = shades[shadeIndex];
     while (true) {
         while (true) {
-            try {
-                FindFirstAndLast();
-            } catch {
+            FindFirstAndLast();
+            if (first == shades.Length) {
                 goto end;
             }
             if (first > last) {
@@ -27,7 +26,7 @@ Test.Run((notes, part, expected) => {
     return;
 
     void FindFirstAndLast() {
-        for (first = shadeIndex + 1; shades[first] == shade; first++) { }
+        for (first = shadeIndex + 1; first < shades.Length && shades[first] == shade; first++) { }
         for (last = shades.Length - 1; shades[last] != shade; last--) { }
     }
 
