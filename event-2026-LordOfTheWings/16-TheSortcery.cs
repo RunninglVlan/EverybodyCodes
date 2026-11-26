@@ -3,14 +3,24 @@
 
 // https://everybody.codes/event/2026/quests/16
 Test.Run((notes, part, expected) => {
-    var tablets = new Tablets(notes);
+    string shelf = part switch {
+        1 => notes,
+        _ => Enumerable.Range(0, 10).Aggregate(string.Empty, (it, _) => it + notes)
+    };
+    var tablets = new Tablets(shelf);
     tablets.GroupByShade();
-    Assert.ActualEqualsExpected(tablets.Flips, expected);
+    int result = part switch {
+        1 => tablets.Flips,
+        _ => tablets.Flipped
+    };
+    Test.Log(tablets.Flips);
+    Assert.ActualEqualsExpected(result, expected);
 });
 
 class Tablets(string notes) {
     readonly char[] shades = notes.ToCharArray();
     public int Flips { get; private set; }
+    public int Flipped { get; private set; }
 
     public void GroupByShade() {
         var shadeIndex = 0;
@@ -52,6 +62,8 @@ class Tablets(string notes) {
                 (shades[f], shades[l]) = (shades[l], shades[f]);
             }
             Flips++;
+            int length = last + 1 - first;
+            Flipped += length;
         }
     }
 }
