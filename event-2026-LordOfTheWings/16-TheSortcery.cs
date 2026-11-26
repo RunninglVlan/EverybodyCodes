@@ -3,17 +3,16 @@
 
 // https://everybody.codes/event/2026/quests/16
 Test.Run((notes, part, expected) => {
-    string shelf = part switch {
-        1 => notes,
-        _ => Enumerable.Range(0, 10).Aggregate(string.Empty, (it, _) => it + notes)
+    int copies = part switch {
+        1 => 1,
+        _ => 10
     };
-    var tablets = new Tablets(shelf);
+    var tablets = new Tablets(string.Concat(Enumerable.Repeat(notes, copies)));
     tablets.GroupByShade();
     int result = part switch {
         1 => tablets.Flips,
         _ => tablets.Flipped
     };
-    Test.Log(tablets.Flips);
     Assert.ActualEqualsExpected(result, expected);
 });
 
