@@ -11,7 +11,7 @@ Test.Run((notes, part, expected) => {
     };
     var tablets = new Tablets(string.Concat(Enumerable.Repeat(notes, copies)));
     tablets.GroupByShade();
-    int result = part switch {
+    long result = part switch {
         1 => tablets.Flips,
         _ => tablets.Flipped
     };
@@ -22,7 +22,7 @@ class Tablets(string notes) {
     readonly char[] shades = notes.ToCharArray();
     int first, last;
     public int Flips { get; private set; }
-    public int Flipped { get; private set; }
+    public long Flipped { get; private set; }
 
     public void GroupByShade() {
         var shadeIndex = 0;
