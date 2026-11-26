@@ -5,7 +5,8 @@
 Test.Run((notes, part, expected) => {
     int copies = part switch {
         1 => 1,
-        _ => 10
+        2 => 10,
+        _ => 100
     };
     var tablets = new Tablets(string.Concat(Enumerable.Repeat(notes, copies)));
     tablets.GroupByShade();
