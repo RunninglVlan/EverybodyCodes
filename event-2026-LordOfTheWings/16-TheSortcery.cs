@@ -21,7 +21,7 @@ Test.Run((notes, part, expected) => {
 
 class Tablets(string notes) {
     readonly char[] shades = notes.ToCharArray();
-    int first;
+    int first, last;
     public int Flips { get; private set; }
     public int Flipped { get; private set; }
 
@@ -43,7 +43,7 @@ class Tablets(string notes) {
 
     bool TryGroup(int shadeIndex) {
         char shade = shades[shadeIndex];
-        int last;
+        last = shades.Length - 1;
         while (true) {
             FindFirstAndLast();
             if (first == shades.Length) {
@@ -58,7 +58,7 @@ class Tablets(string notes) {
 
         void FindFirstAndLast() {
             for (; first < shades.Length && shades[first] == shade; first++) { }
-            for (last = shades.Length - 1; shades[last] != shade; last--) { }
+            for (; shades[last] != shade; last--) { }
         }
 
         void Flip() {
