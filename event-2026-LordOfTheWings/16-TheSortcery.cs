@@ -21,12 +21,12 @@ Test.Run((notes, part, expected) => {
 });
 
 class Tablets(string notes) {
-    readonly List<char> shades = [.. notes];
-    int shadeIndex, first, last;
+    readonly char[] shades = [.. notes];
+    readonly char[] temp = new char[notes.Length];
+    int shadeIndex, first;
+    (int start, int end, int length) lastGroup;
     public int Flips { get; private set; }
     public long Flipped { get; private set; }
-    readonly List<char> toFlip = [];
-    readonly List<char> lastGroup = [];
 
     public void GroupByShade() {
         while (true) {
@@ -54,13 +54,13 @@ class Tablets(string notes) {
 
     bool TryGroup() {
         first++;
-        last = shades.Count - 1;
+        lastGroup.end = shades.Length - 1;
         while (true) {
             FindEdges();
-            if (first == shades.Count) {
+            if (first == shades.Length) {
                 return false;
             }
-            if (first > last) {
+            if (first > lastGroup.end) {
                 break;
             }
             if (CanSkip(out int next)) {
@@ -68,7 +68,7 @@ class Tablets(string notes) {
             } else {
                 Flip();
             }
-            // Test.Log($"{first / (float)shades.Count * 100:F}%");
+            // Test.Log($"{first / (float)shades.Length * 100:F}%");
         }
         return true;
     }
@@ -78,11 +78,11 @@ class Tablets(string notes) {
         char shade = shades[shadeIndex];
         // Log();
         // LogFL("before");
-        while (first < shades.Count && shades[first] == shade) {
+        while (first < shades.Length && shades[first] == shade) {
             first++;
         }
-        while (shades[last] != shade) {
-            last--;
+        while (shades[lastGroup.end] != shade) {
+            lastGroup.end--;
         }
         // LogFL("after");
     }
@@ -91,37 +91,37 @@ class Tablets(string notes) {
     bool CanSkip(out int next) {
         next = first;
         char shade = shades[shadeIndex];
-        while (next < shades.Count && shades[next] != shade) {
+        while (next < shades.Length && shades[next] != shade) {
             next++;
         }
-        if (next >= last) {
+        if (next >= lastGroup.end) {
             return false;
         }
-        lastGroup.Clear();
-        for (int i = last; shades[i] == shade; i--) {
-            lastGroup.Add(shades[i]);
+        lastGroup.length = 0;
+        for (int i = lastGroup.end; shades[i] == shade; i--) {
+            lastGroup.length++;
         }
-        int groupStart = last - lastGroup.Count + 1;
-        return next < groupStart;
+        lastGroup.start = lastGroup.end - lastGroup.length + 1;
+        return next < lastGroup.start;
     }
 
     /// Skip big flip and instead do small flip, and move some elements
     void Skip(int next) {
-        toFlip.Clear();
-        for (int i = next - 1; i >= first; i--) {
-            toFlip.Add(shades[i]);
-        }
-        int groupStart = last - lastGroup.Count + 1;
-        shades.RemoveRange(groupStart, lastGroup.Count);
-        shades.InsertRange(groupStart, toFlip);
-        shades.RemoveRange(first, toFlip.Count);
-        shades.InsertRange(first, lastGroup);
-        int length = last + 1 - first;
+        int flipLength = next - first;
+        Array.Copy(shades, first, temp, 0, flipLength);
+        Array.Reverse(temp, 0, flipLength);
+        // 1. check, maybe i don't even need this, maybe i can just move it right away
+        Array.Copy(shades, lastGroup.start, temp, flipLength, lastGroup.length);
+        int middleLength = lastGroup.start - next;
+        Array.Copy(shades, next, shades, first + lastGroup.length, middleLength);
+        // 2.
+        Array.Copy(temp, flipLength, shades, first, lastGroup.length);
+        Array.Copy(temp, 0, shades, lastGroup.end + 1 - flipLength, flipLength);
+        int length = lastGroup.end + 1 - first;
         Flipped += length;
-        length = groupStart - next;
-        Flipped += length;
+        Flipped += middleLength;
         Flips += 2;
-        first += lastGroup.Count;
+        first += lastGroup.length;
         // Test.Log((Flips, Flipped, "skipped"));
     }
 
@@ -129,7 +129,7 @@ class Tablets(string notes) {
         char s = shades[0];
         Console.ForegroundColor = colors[s];
         Console.Write(s);
-        for (var i = 1; i < shades.Count; i++) {
+        for (var i = 1; i < shades.Length; i++) {
             if (shades[i] != s) {
                 s = shades[i];
                 Console.ForegroundColor = colors[s];
@@ -145,24 +145,24 @@ class Tablets(string notes) {
             Console.CursorLeft = first;
             Console.ForegroundColor = colors[shades[first]];
             Console.Write("f");
-            Console.CursorLeft = last;
-            Console.ForegroundColor = colors[shades[last]];
+            Console.CursorLeft = lastGroup.end;
+            Console.ForegroundColor = colors[shades[lastGroup.end]];
             Console.Write("l");
-            Console.CursorLeft = shades.Count;
+            Console.CursorLeft = shades.Length;
             Console.ResetColor();
-            message = $"f: {first}, l: {last}, {message}";
+            message = $"f: {first}, l: {lastGroup.end}, {message}";
             Console.WriteLine($" {message}");
-            var log = new char[shades.Count + 1];
+            var log = new char[shades.Length + 1];
             Array.Fill(log, ' ');
             log[first] = 'f';
-            log[last] = 'l';
+            log[lastGroup.end] = 'l';
             Test.Log(new string(log) + message, console: false);
         } catch { }
     }
 
     void Flip() {
-        int length = last + 1 - first;
-        shades.Reverse(first, length);
+        int length = lastGroup.end + 1 - first;
+        Array.Reverse(shades, first, length);
         Flips++;
         Flipped += length;
         // Test.Log((Flips, Flipped, "flipped"));
