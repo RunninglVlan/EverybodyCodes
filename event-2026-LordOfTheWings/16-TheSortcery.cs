@@ -1,14 +1,16 @@
 ﻿#!/usr/bin/env dotnet
 #:include ../generic/Test.cs
 
-Test.Until = "Part III";
+Test.From = "Part III";
 // https://everybody.codes/event/2026/quests/16
 Test.Run((notes, part, expected) => {
+    // Console.Clear();
     int copies = part switch {
         1 => 1,
         2 => 10,
         _ => 100
     };
+    copies = 3;
     var tablets = new Tablets(string.Concat(Enumerable.Repeat(notes, copies)));
     tablets.GroupByShade();
     long result = part switch {
@@ -31,6 +33,7 @@ class Tablets(string notes) {
             if (!TryGroup()) {
                 return;
             }
+            // Test.Log($"grouped {shades[shadeIndex]}");
             FindNextShade();
         }
 
@@ -41,6 +44,13 @@ class Tablets(string notes) {
             }
         }
     }
+
+    readonly Dictionary<char, ConsoleColor> colors = new() {
+        { 'R', ConsoleColor.Red },
+        { 'G', ConsoleColor.Green },
+        { 'B', ConsoleColor.Blue },
+        { 'Y', ConsoleColor.Yellow }
+    };
 
     bool TryGroup() {
         first++;
@@ -58,7 +68,7 @@ class Tablets(string notes) {
             } else {
                 Flip();
             }
-            Test.Log($"{first / (float)shades.Count * 100:F}%");
+            // Test.Log($"{first / (float)shades.Count * 100:F}%");
         }
         return true;
     }
@@ -66,12 +76,15 @@ class Tablets(string notes) {
     /// Find edges of the range that will be flipped
     void FindEdges() {
         char shade = shades[shadeIndex];
+        // Log();
+        // LogFL("before");
         while (first < shades.Count && shades[first] == shade) {
             first++;
         }
         while (shades[last] != shade) {
             last--;
         }
+        // LogFL("after");
     }
 
     /// We can skip big flip if next group isn't last group
@@ -109,6 +122,42 @@ class Tablets(string notes) {
         Flipped += length;
         Flips += 2;
         first += lastGroup.Count;
+        // Test.Log((Flips, Flipped, "skipped"));
+    }
+
+    void Log() {
+        char s = shades[0];
+        Console.ForegroundColor = colors[s];
+        Console.Write(s);
+        for (var i = 1; i < shades.Count; i++) {
+            if (shades[i] != s) {
+                s = shades[i];
+                Console.ForegroundColor = colors[s];
+            }
+            Console.Write(s);
+        }
+        Console.WriteLine();
+        Test.Log(new string(shades.ToArray()), console: false);
+    }
+
+    void LogFL(string message) {
+        try {
+            Console.CursorLeft = first;
+            Console.ForegroundColor = colors[shades[first]];
+            Console.Write("f");
+            Console.CursorLeft = last;
+            Console.ForegroundColor = colors[shades[last]];
+            Console.Write("l");
+            Console.CursorLeft = shades.Count;
+            Console.ResetColor();
+            message = $"f: {first}, l: {last}, {message}";
+            Console.WriteLine($" {message}");
+            var log = new char[shades.Count + 1];
+            Array.Fill(log, ' ');
+            log[first] = 'f';
+            log[last] = 'l';
+            Test.Log(new string(log) + message, console: false);
+        } catch { }
     }
 
     void Flip() {
@@ -118,5 +167,6 @@ class Tablets(string notes) {
         Flips++;
         int length = last + 1 - first;
         Flipped += length;
+        // Test.Log((Flips, Flipped, "flipped"));
     }
 }
