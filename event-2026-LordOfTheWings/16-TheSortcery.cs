@@ -1,7 +1,10 @@
 ﻿#!/usr/bin/env dotnet
 #:include ../generic/Test.cs
 
+using System.Diagnostics;
+
 Test.From = "Part III";
+// Test.Until = "Part III";
 // https://everybody.codes/event/2026/quests/16
 Test.Run((notes, part, expected) => {
     // Console.Clear();
@@ -28,7 +31,10 @@ class Tablets(string notes) {
     public int Flips { get; private set; }
     public long Flipped { get; private set; }
 
+    Stopwatch stopwatch = null!;
+
     public void GroupByShade() {
+        stopwatch = Stopwatch.StartNew();
         while (true) {
             if (!TryGroup()) {
                 return;
@@ -52,6 +58,9 @@ class Tablets(string notes) {
         { 'Y', ConsoleColor.Yellow }
     };
 
+    float progressLimit;
+    const float progressIncrement = 0.01f;
+
     bool TryGroup() {
         first++;
         lastGroup.end = shades.Length - 1;
@@ -68,7 +77,12 @@ class Tablets(string notes) {
             } else {
                 Flip();
             }
-            // Test.Log($"{first / (float)shades.Length * 100:F}%");
+            float progress = first / (float)shades.Length;
+            if (progress > progressLimit) {
+                Console.WriteLine($"{progress * 100:F}%, took: {stopwatch.Elapsed}");
+                progressLimit += progressIncrement;
+                stopwatch = Stopwatch.StartNew();
+            }
         }
         return true;
     }
