@@ -110,11 +110,9 @@ class Tablets(string notes) {
         int flipLength = next - first;
         Array.Copy(shades, first, temp, 0, flipLength);
         Array.Reverse(temp, 0, flipLength);
-        // 1. check, maybe i don't even need this, maybe i can just move it right away
         Array.Copy(shades, lastGroup.start, temp, flipLength, lastGroup.length);
         int middleLength = lastGroup.start - next;
         Array.Copy(shades, next, shades, first + lastGroup.length, middleLength);
-        // 2.
         Array.Copy(temp, flipLength, shades, first, lastGroup.length);
         Array.Copy(temp, 0, shades, lastGroup.end + 1 - flipLength, flipLength);
         int length = lastGroup.end + 1 - first;
