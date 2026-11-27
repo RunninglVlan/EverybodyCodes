@@ -161,11 +161,9 @@ class Tablets(string notes) {
     }
 
     void Flip() {
-        for (int f = first, l = last; f < l; f++, l--) {
-            (shades[f], shades[l]) = (shades[l], shades[f]);
-        }
-        Flips++;
         int length = last + 1 - first;
+        shades.Reverse(first, length);
+        Flips++;
         Flipped += length;
         // Test.Log((Flips, Flipped, "flipped"));
     }
