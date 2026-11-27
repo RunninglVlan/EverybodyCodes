@@ -23,6 +23,8 @@ class Tablets(string notes) {
     int shadeIndex, first, last;
     public int Flips { get; private set; }
     public long Flipped { get; private set; }
+    readonly List<char> toFlip = [];
+    readonly List<char> lastGroup = [];
 
     public void GroupByShade() {
         while (true) {
@@ -51,8 +53,8 @@ class Tablets(string notes) {
             if (first > last) {
                 break;
             }
-            if (CanSkip(out int next, out var lastGroup)) {
-                Skip(next, lastGroup);
+            if (CanSkip(out int next)) {
+                Skip(next);
             } else {
                 Flip();
             }
@@ -72,9 +74,8 @@ class Tablets(string notes) {
     }
 
     /// We can skip big flip if next group isn't last group
-    bool CanSkip(out int next, out List<char> lastGroup) {
+    bool CanSkip(out int next) {
         next = first;
-        lastGroup = null!;
         char shade = shades[shadeIndex];
         while (next < shades.Count && shades[next] != shade) {
             next++;
@@ -82,7 +83,7 @@ class Tablets(string notes) {
         if (next >= last) {
             return false;
         }
-        lastGroup = [];
+        lastGroup.Clear();
         for (int i = last; shades[i] == shade; i--) {
             lastGroup.Add(shades[i]);
         }
@@ -91,17 +92,14 @@ class Tablets(string notes) {
     }
 
     /// Skip big flip and instead do small flip, and move some elements
-    void Skip(int next, List<char> lastGroup) {
-        List<char> toFlip = [];
-        for (int i = first; i < next; i++) {
+    void Skip(int next) {
+        toFlip.Clear();
+        for (int i = next - 1; i >= first; i--) {
             toFlip.Add(shades[i]);
         }
         int groupStart = last - lastGroup.Count + 1;
         shades.RemoveRange(groupStart, lastGroup.Count);
-        for (int i = toFlip.Count - 1, j = groupStart; i >= 0; i--, j++) {
-            char flipped = toFlip[i];
-            shades.Insert(j, flipped);
-        }
+        shades.InsertRange(groupStart, toFlip);
         shades.RemoveRange(first, toFlip.Count);
         shades.InsertRange(first, lastGroup);
         int length = last + 1 - first;
