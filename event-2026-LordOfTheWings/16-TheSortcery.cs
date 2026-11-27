@@ -58,6 +58,7 @@ class Tablets(string notes) {
             } else {
                 Flip();
             }
+            Test.Log($"{first / (float)shades.Count * 100:F}%");
         }
         return true;
     }
