@@ -198,20 +198,34 @@ class TabletsNext(string notes) {
             leftNonGroupStart = 1;
             rightGroupEnd = current.Count - 1;
             FindLeftNonGroup();
+            if (leftNonGroupStart > rightGroupEnd) {
+                break;
+            }
             FindRightGroup();
             rightNonGroupEnd = current.Count;
             AddRightNonGroup();
             while (true) {
-                AddLeftNonGroup();
-                FindLeftNonGroup();
                 if (leftNonGroupStart > rightGroupEnd) {
                     break;
                 }
+                Flips++;
+                int length = rightGroupEnd + 1 - leftNonGroupStart;
+                Flipped += length;
+                Test.Log((Flips, Flipped, "skipped 1"));
+                AddLeftNonGroup();
                 rightNonGroupEnd = rightGroupEnd;
                 while (current[rightNonGroupEnd] == shade) {
                     rightNonGroupEnd--;
                 }
                 rightGroupEnd = rightNonGroupEnd;
+                if (leftNonGroupStart > rightGroupEnd) {
+                    break;
+                }
+                Flips++;
+                length = rightGroupEnd + 1 - leftNonGroupStart;
+                Flipped += length;
+                Test.Log((Flips, Flipped, "skipped 2"));
+                FindLeftNonGroup();
                 FindRightGroup();
                 rightNonGroupEnd++;
                 AddRightNonGroup();
