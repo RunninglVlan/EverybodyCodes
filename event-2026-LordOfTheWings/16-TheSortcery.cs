@@ -37,33 +37,35 @@ class Tablets(string notes) {
             FindRightGroup();
             rightNonGroupEnd = current.Count;
             AddRightNonGroup();
-            while (true) {
-                if (leftNonGroupStart > rightGroupEnd) {
-                    break;
-                }
-                Flips++;
-                int length = rightGroupEnd + 1 - leftNonGroupStart;
-                Flipped += length;
-                AddLeftNonGroup();
-                rightNonGroupEnd = rightGroupEnd;
-                while (current[rightNonGroupEnd] == shade) {
-                    rightNonGroupEnd--;
-                }
-                rightGroupEnd = rightNonGroupEnd;
-                if (leftNonGroupStart > rightGroupEnd) {
-                    break;
-                }
-                Flips++;
-                length = rightGroupEnd + 1 - leftNonGroupStart;
-                Flipped += length;
-                FindLeftNonGroup();
-                FindRightGroup();
-                rightNonGroupEnd++;
-                AddRightNonGroup();
-            }
+            Group();
             next.Reverse();
             current = [.. next];
             next.Clear();
+        }
+    }
+
+    void Group() {
+        while (true) {
+            if (leftNonGroupStart > rightGroupEnd) {
+                break;
+            }
+            Flips++;
+            Flipped += rightGroupEnd + 1 - leftNonGroupStart;
+            AddLeftNonGroup();
+            rightNonGroupEnd = rightGroupEnd;
+            while (current[rightNonGroupEnd] == shade) {
+                rightNonGroupEnd--;
+            }
+            rightGroupEnd = rightNonGroupEnd;
+            if (leftNonGroupStart > rightGroupEnd) {
+                break;
+            }
+            Flips++;
+            Flipped += rightGroupEnd + 1 - leftNonGroupStart;
+            FindLeftNonGroup();
+            FindRightGroup();
+            rightNonGroupEnd++;
+            AddRightNonGroup();
         }
     }
 
@@ -86,14 +88,14 @@ class Tablets(string notes) {
     }
 
     void AddLeftNonGroup() {
-        int leftNonGroup = leftNonGroupStart;
-        for (; leftNonGroup < current.Count; leftNonGroup++) {
-            char tablet = current[leftNonGroup];
+        int nonGroup = leftNonGroupStart;
+        for (; nonGroup < current.Count; nonGroup++) {
+            char tablet = current[nonGroup];
             if (tablet == shade) {
                 break;
             }
             next.Add(tablet);
         }
-        leftNonGroupStart = leftNonGroup;
+        leftNonGroupStart = nonGroup;
     }
 }
