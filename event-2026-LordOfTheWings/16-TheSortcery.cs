@@ -180,3 +180,73 @@ class Tablets(string notes) {
         // Test.Log((Flips, Flipped, "flipped"));
     }
 }
+
+class TabletsNext(string notes) {
+    List<char> current = [.. notes];
+    readonly List<char> next = new(notes.Length);
+    char shade;
+    int leftNonGroupStart, rightGroupEnd, rightNonGroupEnd;
+    public int Flips { get; private set; }
+    public long Flipped { get; private set; }
+
+    public void GroupByShade() {
+        while (current.Count > 0) {
+            shade = current[0];
+            leftNonGroupStart = 1;
+            rightGroupEnd = current.Count - 1;
+            FindLeftNonGroup();
+            FindRightGroup();
+            rightNonGroupEnd = current.Count;
+            AddRightNonGroup();
+            while (true) {
+                AddLeftNonGroup();
+                FindLeftNonGroup();
+                if (leftNonGroupStart > rightGroupEnd) {
+                    break;
+                }
+                rightNonGroupEnd = rightGroupEnd;
+                while (current[rightNonGroupEnd] == shade) {
+                    rightNonGroupEnd--;
+                }
+                rightGroupEnd = rightNonGroupEnd;
+                FindRightGroup();
+                rightNonGroupEnd++;
+                AddRightNonGroup();
+            }
+            next.Reverse();
+            Test.Log(string.Join("", next));
+            current = [.. next];
+            next.Clear();
+        }
+    }
+
+    void FindLeftNonGroup() {
+        while (leftNonGroupStart < current.Count && current[leftNonGroupStart] == shade) {
+            leftNonGroupStart++;
+        }
+    }
+
+    void FindRightGroup() {
+        while (current[rightGroupEnd] != shade) {
+            rightGroupEnd--;
+        }
+    }
+
+    void AddRightNonGroup() {
+        int rightNonGroupStart = rightGroupEnd + 1;
+        current.Reverse(rightNonGroupStart, rightNonGroupEnd - rightNonGroupStart);
+        next.AddRange(current[rightNonGroupStart..rightNonGroupEnd]);
+    }
+
+    void AddLeftNonGroup() {
+        int leftNonGroup = leftNonGroupStart;
+        for (; leftNonGroup < current.Count; leftNonGroup++) {
+            char tablet = current[leftNonGroup];
+            if (tablet == shade) {
+                break;
+            }
+            next.Add(tablet);
+        }
+        leftNonGroupStart = leftNonGroup;
+    }
+}
