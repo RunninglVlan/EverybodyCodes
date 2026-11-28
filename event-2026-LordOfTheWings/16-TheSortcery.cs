@@ -77,6 +77,7 @@ class Tablets(string notes) {
             } else {
                 Flip();
             }
+            continue;
             float progress = first / (float)shades.Length;
             if (progress > progressLimit) {
                 Console.WriteLine($"{progress * 100:F}%, took: {stopwatch.Elapsed}");
@@ -130,11 +131,13 @@ class Tablets(string notes) {
         Array.Copy(temp, flipLength, shades, first, lastGroup.length);
         Array.Copy(temp, 0, shades, lastGroup.end + 1 - flipLength, flipLength);
         int length = lastGroup.end + 1 - first;
+        Flips++;
         Flipped += length;
+        Test.Log((Flips, Flipped, "skipped 1"));
+        Flips++;
         Flipped += middleLength;
-        Flips += 2;
+        Test.Log((Flips, Flipped, "skipped 2"));
         first += lastGroup.length;
-        // Test.Log((Flips, Flipped, "skipped"));
     }
 
     void Log() {
@@ -177,7 +180,7 @@ class Tablets(string notes) {
         Array.Reverse(shades, first, length);
         Flips++;
         Flipped += length;
-        // Test.Log((Flips, Flipped, "flipped"));
+        Test.Log((Flips, Flipped, "flipped"));
     }
 }
 
